@@ -218,16 +218,13 @@
       document.getElementById('btnSubmitAudio').textContent = 'Mengupload...';
 
       try {
-        const fileName = `setoran/${user.id}/${Date.now()}.webm`;
-        
-        // Upload via presigned URL or direct to R2 (simplified for V1 - in real app use Workers)
-        const audioUrl = `https://panel-tahsin-audio.r2.cloudflarestorage.com/${fileName}`;
+        const formData = new FormData();
+        formData.append('audio', recordedBlob, `setoran-${Date.now()}.webm`);
+        formData.append('user_id', user.id);
 
-        // Simpan record ke D1 via API
-        const res = await fetch(`${API_BASE}/api/setoran/create`, {
+        const res = await fetch(`${API_BASE}/api/setoran/upload`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ user_id: user.id, audio_url: audioUrl })
+          body: formData
         });
         const data = await res.json();
 
@@ -238,7 +235,7 @@
           alert('Gagal mengirim setoran: ' + (data.error || 'Unknown error'));
         }
       } catch (err) {
-        alert('Gagal mengupload audio.');
+        alert('Gagal mengupload audio: ' + err.message);
       }
     }
   </script>
