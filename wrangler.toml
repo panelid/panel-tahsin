@@ -6,3 +6,7 @@ pages_build_output_dir = "dist"
 binding = "DB"
 database_name = "panel-tahsin-db"
 database_id = "4538586f-4436-46c3-a6b0-97d45f21b21e"
+
+[[r2_buckets]]
+binding = "AUDIO"
+bucket_name = "panel-tahsin-audio"
