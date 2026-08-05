@@ -28,7 +28,14 @@ export async function onRequestPost(context) {
     }
 
     const arrayBuffer = await file.arrayBuffer()
-    const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)))
+    const bytes = new Uint8Array(arrayBuffer)
+    let binary = ''
+    const chunkSize = 8192
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+      const chunk = bytes.subarray(i, i + chunkSize)
+      binary += String.fromCharCode.apply(null, chunk)
+    }
+    const base64 = btoa(binary)
     const audioDataUrl = `data:audio/webm;base64,${base64}`
 
     const setoranId = 'set_' + Date.now() + Math.random().toString(36).substring(2, 7)
