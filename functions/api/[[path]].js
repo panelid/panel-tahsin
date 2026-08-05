@@ -14,7 +14,7 @@ app.post('/auth/register', async (c) => {
     
     const id = 'usr_' + Date.now() + Math.random().toString(36).substring(2, 7)
     await db.prepare("INSERT INTO users (id, name, email, password_hash, role) VALUES (?, ?, ?, ?, ?)").bind(id, name, email, password, role).run()
-    return c.json({ success: true, user: { id, name, email, role } })
+    return c.json({ success: true, message: 'Registrasi berhasil!', user: { id, name, email, role } })
   } catch (err) {
     return c.json({ success: false, error: err.message }, 500)
   }
@@ -26,7 +26,7 @@ app.post('/auth/login', async (c) => {
     const db = c.env.DB
     const user = await db.prepare("SELECT * FROM users WHERE email = ? AND password_hash = ?").bind(email, password).first()
     if (!user) return c.json({ success: false, error: 'Email atau password salah' }, 401)
-    return c.json({ success: true, user: { id: user.id, name: user.name, email: user.email, role: user.role } })
+    return c.json({ success: true, message: 'Login berhasil', user: { id: user.id, name: user.name, email: user.email, role: user.role } })
   } catch (err) {
     return c.json({ success: false, error: err.message }, 500)
   }
@@ -52,7 +52,7 @@ app.post('/setoran/upload', async (c) => {
 
     const setoranId = 'set_' + Date.now() + Math.random().toString(36).substring(2, 7)
     await db.prepare("INSERT INTO setoran (id, user_id, audio_url, status) VALUES (?, ?, ?, 'pending')").bind(setoranId, userId, audioDataUrl).run()
-    return c.json({ success: true, setoran_id: setoranId })
+    return c.json({ success: true, message: 'Setoran berhasil dikirim!', setoran_id: setoranId })
   } catch (err) {
     return c.json({ success: false, error: err.message }, 500)
   }
@@ -81,7 +81,7 @@ app.post('/review/submit', async (c) => {
       await db.prepare("INSERT INTO review_ayat (id, setoran_id, ayat_number, score, catatan_teks) VALUES (?, ?, ?, ?, ?)").bind(revId, setoran_id, rev.ayat_number, rev.score, rev.catatan_teks || '').run()
     }
     await db.prepare("UPDATE setoran SET status = 'reviewed' WHERE id = ?").bind(setoran_id).run()
-    return c.json({ success: true })
+    return c.json({ success: true, message: 'Review berhasil disimpan' })
   } catch (err) {
     return c.json({ success: false, error: err.message }, 500)
   }
