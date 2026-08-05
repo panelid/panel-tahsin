@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Murid — Panel Tahsin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { teal: { 50:'#f0fdfa',100:'#ccfbf1',500:'#14b8a6',600:'#0d9488',700:'#0f766e' }, gold: { 500:'#d4a843',600:'#c8923d' } } } }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>* { font-family: 'Inter', sans-serif; } .audio-recording { animation: pulse 1.5s infinite; } @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }</style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+  <!-- NAVBAR -->
+  <nav class="bg-white border-b border-slate-100 sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-teal-600 flex items-center justify-center">
+          <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+        </div>
+        <span class="font-bold text-slate-800">Panel Tahsin</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span id="userName" class="text-sm text-slate-600 hidden sm:block"></span>
+        <button onclick="logout()" class="text-xs font-medium text-slate-400 hover:text-red-500 transition">Keluar</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-5xl mx-auto px-4 py-8">
+
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-slate-800">Dashboard Murid</h1>
+      <p class="text-slate-500 text-sm mt-1">Kelola setoran bacaan Al-Fatihah kamu</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+      <div class="bg-white rounded-xl p-4 border border-slate-100">
+        <div class="text-2xl font-bold text-teal-600" id="statTotal">0</div>
+        <div class="text-xs text-slate-500 mt-1">Total Setoran</div>
+      </div>
+      <div class="bg-white rounded-xl p-4 border border-slate-100">
+        <div class="text-2xl font-bold text-gold-600" id="statPending">0</div>
+        <div class="text-xs text-slate-500 mt-1">Menunggu Review</div>
+      </div>
+      <div class="bg-white rounded-xl p-4 border border-slate-100">
+        <div class="text-2xl font-bold text-teal-600" id="statReviewed">0</div>
+        <div class="text-xs text-slate-500 mt-1">Sudah Direview</div>
+      </div>
+      <div class="bg-white rounded-xl p-4 border border-slate-100">
+        <div class="text-2xl font-bold text-slate-800" id="statAvg">-</div>
+        <div class="text-xs text-slate-500 mt-1">Rata-rata Nilai</div>
+      </div>
+    </div>
+
+    <!-- Tombol Setor Baru -->
+    <div class="mb-8">
+      <button onclick="showRecordPanel()" class="bg-teal-600 hover:bg-teal-700 text-white font-semibold px-6 py-3 rounded-xl transition shadow-md shadow-teal-600/20 flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+        Setor Bacaan Baru
+      </button>
+    </div>
+
+    <!-- Panel Rekaman (Hidden) -->
+    <div id="recordPanel" class="hidden mb-8 bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+      <h3 class="font-semibold text-slate-800 mb-4">Rekam Setoran Al-Fatihah</h3>
+      
+      <div id="recordUI" class="text-center py-8">
+        <div id="recordStatus" class="text-sm text-slate-500 mb-4">Tekan tombol untuk mulai merekam</div>
+        <div id="recordTimer" class="text-3xl font-mono font-bold text-slate-800 mb-4 hidden">00:00</div>
+        <audio id="audioPreview" class="hidden w-full mb-4" controls></audio>
+        
+        <div class="flex items-center justify-center gap-3">
+          <button id="btnRecord" onclick="toggleRecord()" class="w-16 h-16 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition shadow-lg shadow-red-500/30">
+            <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/></svg>
+          </button>
+          <button id="btnSubmitAudio" onclick="submitAudio()" class="hidden bg-teal-600 hover:bg-teal-700 text-white font-semibold px-6 py-3 rounded-xl transition">
+            Kirim Setoran
+          </button>
+          <button id="btnCancel" onclick="hideRecordPanel()" class="hidden text-sm text-slate-400 hover:text-slate-600 transition">Batal</button>
+        </div>
+      </div>
+      <div id="uploadStatus" class="hidden text-sm text-teal-600 text-center mt-4">Mengupload audio...</div>
+    </div>
+
+    <!-- Riwayat Setoran -->
+    <div>
+      <h2 class="font-semibold text-slate-800 mb-4">Riwayat Setoran</h2>
+      <div id="riwayatList" class="space-y-3">
+        <div class="text-center text-slate-400 text-sm py-8">Memuat data...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = '';
+    let user = null;
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let recordedBlob = null;
+    let timerInterval = null;
+
+    // Auth check
+    window.addEventListener('DOMContentLoaded', () => {
+      user = JSON.parse(localStorage.getItem('user'));
+      if (!user || user.role !== 'murid') { window.location.href = 'login.html'; return; }
+      document.getElementById('userName').textContent = user.name;
+      loadSetoran();
+    });
+
+    function logout() {
+      localStorage.removeItem('user');
+      window.location.href = 'login.html';
+    }
+
+    async function loadSetoran() {
+      try {
+        const res = await fetch(`${API_BASE}/api/setoran?user_id=${user.id}&role=murid`);
+        const data = await res.json();
+        const list = document.getElementById('riwayatList');
+        if (!data.success || data.setoran.length === 0) {
+          list.innerHTML = '<div class="text-center text-slate-400 text-sm py-8 bg-white rounded-xl border border-slate-100">Belum ada setoran. Tekan tombol "Setor Bacaan Baru" untuk memulai.</div>';
+          return;
+        }
+
+        let total = data.setoran.length;
+        let pending = 0, reviewed = 0;
+        data.setoran.forEach(s => { if (s.status === 'pending') pending++; else reviewed++; });
+        document.getElementById('statTotal').textContent = total;
+        document.getElementById('statPending').textContent = pending;
+        document.getElementById('statReviewed').textContent = reviewed;
+
+        list.innerHTML = data.setoran.map(s => `
+          <div class="bg-white rounded-xl p-4 border border-slate-100 flex items-center justify-between">
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-slate-800 text-sm truncate">${s.id}</div>
+              <div class="text-xs text-slate-400 mt-1">${new Date(s.created_at).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })}</div>
+            </div>
+            <span class="text-xs font-semibold px-3 py-1 rounded-full ${s.status === 'reviewed' ? 'bg-teal-50 text-teal-700' : 'bg-yellow-50 text-yellow-700'}">
+              ${s.status === 'reviewed' ? '✓ Direview' : '⏳ Pending'}
+            </span>
+          </div>
+        `).join('');
+      } catch (err) {
+        document.getElementById('riwayatList').innerHTML = '<div class="text-center text-red-400 text-sm py-8">Gagal memuat data.</div>';
+      }
+    }
+
+    // Audio Recording
+    function showRecordPanel() {
+      document.getElementById('recordPanel').classList.remove('hidden');
+      document.getElementById('recordPanel').scrollIntoView({ behavior: 'smooth' });
+    }
+    function hideRecordPanel() {
+      document.getElementById('recordPanel').classList.add('hidden');
+      resetRecordUI();
+    }
+
+    async function toggleRecord() {
+      const btn = document.getElementById('btnRecord');
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+        return;
+      }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+        mediaRecorder.onstop = () => {
+          recordedBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          const url = URL.createObjectURL(recordedBlob);
+          const preview = document.getElementById('audioPreview');
+          preview.src = url;
+          preview.classList.remove('hidden');
+          document.getElementById('btnSubmitAudio').classList.remove('hidden');
+          document.getElementById('btnCancel').classList.remove('hidden');
+          document.getElementById('recordStatus').textContent = 'Rekaman selesai. Dengarkan ulang lalu kirim.';
+          btn.classList.remove('audio-recording');
+          clearInterval(timerInterval);
+          stream.getTracks().forEach(t => t.stop());
+        };
+        mediaRecorder.start();
+        btn.classList.add('audio-recording');
+        document.getElementById('recordStatus').textContent = 'Sedang merekam...';
+        document.getElementById('recordTimer').classList.remove('hidden');
+        let seconds = 0;
+        timerInterval = setInterval(() => {
+          seconds++;
+          const m = String(Math.floor(seconds/60)).padStart(2,'0');
+          const s2 = String(seconds%60).padStart(2,'0');
+          document.getElementById('recordTimer').textContent = `${m}:${s2}`;
+        }, 1000);
+      } catch (err) {
+        document.getElementById('recordStatus').textContent = 'Gagal akses microphone. Berikan izin.';
+      }
+    }
+
+    function resetRecordUI() {
+      document.getElementById('audioPreview').classList.add('hidden');
+      document.getElementById('btnSubmitAudio').classList.add('hidden');
+      document.getElementById('btnCancel').classList.add('hidden');
+      document.getElementById('recordTimer').classList.add('hidden');
+      document.getElementById('recordStatus').textContent = 'Tekan tombol untuk mulai merekam';
+      document.getElementById('uploadStatus').classList.add('hidden');
+    }
+
+    async function submitAudio() {
+      if (!recordedBlob) return;
+      document.getElementById('uploadStatus').classList.remove('hidden');
+      document.getElementById('btnSubmitAudio').disabled = true;
+      document.getElementById('btnSubmitAudio').textContent = 'Mengupload...';
+
+      try {
+        const fileName = `setoran/${user.id}/${Date.now()}.webm`;
+        
+        // Upload via presigned URL or direct to R2 (simplified for V1 - in real app use Workers)
+        const audioUrl = `https://panel-tahsin-audio.r2.cloudflarestorage.com/${fileName}`;
+
+        // Simpan record ke D1 via API
+        const res = await fetch(`${API_BASE}/api/setoran/create`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: user.id, audio_url: audioUrl })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          hideRecordPanel();
+          loadSetoran();
+        } else {
+          alert('Gagal mengirim setoran: ' + (data.error || 'Unknown error'));
+        }
+      } catch (err) {
+        alert('Gagal mengupload audio.');
+      }
+    }
+  </script>
+
+</body>
+</html>
