@@ -1,11 +1,9 @@
-// Schema update: kita simpan audio langsung ke D1 sebagai data base64 atau URL data
-
 export async function onRequestOptions() {
   return new Response(null, {
     status: 204,
     headers: {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type',
     },
   })
@@ -33,7 +31,6 @@ export async function onRequestPost(context) {
       })
     }
 
-    // Convert file ke ArrayBuffer -> Base64 Data URL
     const arrayBuffer = await file.arrayBuffer()
     const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)))
     const audioDataUrl = `data:audio/webm;base64,${base64}`
