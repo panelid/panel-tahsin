@@ -222,20 +222,38 @@
         formData.append('audio', recordedBlob, `setoran-${Date.now()}.webm`);
         formData.append('user_id', user.id);
 
-        const res = await fetch(`${API_BASE}/api/setoran/upload`, {
+        console.log('Mengirim setoran untuk user:', user.id);
+        const res = await fetch('/api/setoran/upload', {
           method: 'POST',
           body: formData
         });
-        const data = await res.json();
+
+        const textRes = await res.text();
+        console.log('Response status:', res.status, 'Body:', textRes);
+
+        let data;
+        try {
+          data = JSON.parse(textRes);
+        } catch (e) {
+          throw new Error('Invalid JSON response: ' + textRes);
+        }
 
         if (data.success) {
+          alert('Setoran berhasil dikirim!');
           hideRecordPanel();
           loadSetoran();
         } else {
           alert('Gagal mengirim setoran: ' + (data.error || 'Unknown error'));
+          document.getElementById('btnSubmitAudio').disabled = false;
+          document.getElementById('btnSubmitAudio').textContent = 'Kirim Setoran';
+          document.getElementById('uploadStatus').classList.add('hidden');
         }
       } catch (err) {
+        console.error('Upload error:', err);
         alert('Gagal mengupload audio: ' + err.message);
+        document.getElementById('btnSubmitAudio').disabled = false;
+        document.getElementById('btnSubmitAudio').textContent = 'Kirim Setoran';
+        document.getElementById('uploadStatus').classList.add('hidden');
       }
     }
   </script>
