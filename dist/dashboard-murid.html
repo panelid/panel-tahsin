@@ -218,27 +218,42 @@
       document.getElementById('btnSubmitAudio').textContent = 'Mengupload...';
 
       try {
-        const fileName = `setoran/${user.id}/${Date.now()}.webm`;
-        
-        // Upload via presigned URL or direct to R2 (simplified for V1 - in real app use Workers)
-        const audioUrl = `https://panel-tahsin-audio.r2.cloudflarestorage.com/${fileName}`;
+        const formData = new FormData();
+        formData.append('audio', recordedBlob, `setoran-${Date.now()}.webm`);
+        formData.append('user_id', user.id);
 
-        // Simpan record ke D1 via API
-        const res = await fetch(`${API_BASE}/api/setoran/create`, {
+        console.log('Mengirim setoran untuk user:', user.id);
+        const res = await fetch('/api/setoran/upload', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ user_id: user.id, audio_url: audioUrl })
+          body: formData
         });
-        const data = await res.json();
+
+        const textRes = await res.text();
+        console.log('Response status:', res.status, 'Body:', textRes);
+
+        let data;
+        try {
+          data = JSON.parse(textRes);
+        } catch (e) {
+          throw new Error('Invalid JSON response: ' + textRes);
+        }
 
         if (data.success) {
+          alert('Setoran berhasil dikirim!');
           hideRecordPanel();
           loadSetoran();
         } else {
           alert('Gagal mengirim setoran: ' + (data.error || 'Unknown error'));
+          document.getElementById('btnSubmitAudio').disabled = false;
+          document.getElementById('btnSubmitAudio').textContent = 'Kirim Setoran';
+          document.getElementById('uploadStatus').classList.add('hidden');
         }
       } catch (err) {
-        alert('Gagal mengupload audio.');
+        console.error('Upload error:', err);
+        alert('Gagal mengupload audio: ' + err.message);
+        document.getElementById('btnSubmitAudio').disabled = false;
+        document.getElementById('btnSubmitAudio').textContent = 'Kirim Setoran';
+        document.getElementById('uploadStatus').classList.add('hidden');
       }
     }
   </script>
