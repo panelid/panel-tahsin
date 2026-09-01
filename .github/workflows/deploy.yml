@@ -15,9 +15,13 @@ jobs:
           node-version: 22
       - name: Install wrangler
         run: npm install -g wrangler
-      - name: Deploy root to Pages
+      - name: Prepare dist (static + functions)
         run: |
-          npx wrangler pages deploy . \
+          mkdir -p dist/functions
+          cp -r functions/* dist/functions/ 2>/dev/null || true
+      - name: Deploy to Cloudflare Pages
+        run: |
+          npx wrangler pages deploy dist \
             --project-name=panel-tahsin \
             --branch=main
         env:
