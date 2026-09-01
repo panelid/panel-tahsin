@@ -33,158 +33,159 @@
   }
 }
 </script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --green-50: #E1F5EE;
-    --green-600: #0F6E56;
-    --green-700: #0C5A46;
-    --green-800: #085041;
-    --text-primary: #1A1A18;
-    --text-secondary: #5F5E5A;
-    --text-muted: #888780;
-    --border: #E5E3DC;
-    --surface: #FFFFFF;
-    --surface-alt: #F7F6F2;
+    --ink: #0a0a0a;
+    --paper: #f4f1e9;
+    --accent: #d4ff00;
+    --green: #0F6E56;
+    --shadow: 3px 3px 0 var(--ink);
+    --border: 2.5px solid var(--ink);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-    color: var(--text-primary);
-    background: var(--surface);
-    font-size: 18px;
-    line-height: 1.8;
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 18px; line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
   }
-  .container { max-width: 480px; margin: 0 auto; }
+  .mono { font-family: 'DM Mono', monospace; }
+  .container { max-width: 520px; margin: 0 auto; padding: 0 18px 60px; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; padding: 18px; border-bottom: var(--border); background: var(--accent); }
+  .topbar .brand { font-weight: 800; font-size: 18px; }
+  .topbar a { color: var(--ink); text-decoration: none; font-weight: 700; font-size: 14px; margin-left: 16px; }
 
-  /* Hero */
-  .hero { background: var(--green-50); text-align: center; padding: 48px 24px 32px; }
-  .hero-icon { width: 56px; height: 56px; background: var(--surface); border-radius: 14px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 26px; }
-  .hero h1 { font-size: 30px; font-weight: 600; margin-bottom: 12px; line-height: 1.35; }
-  .hero p.tagline { font-size: 19px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 28px; padding: 0 4px; }
-  .btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; height: 50px; font-size: 16px; font-weight: 600; border-radius: 10px; border: none; cursor: pointer; text-decoration: none; margin-bottom: 10px; }
-  .btn-primary { background: var(--green-600); color: #fff; }
-  .btn-primary:hover { background: var(--green-700); }
-  .btn-secondary { background: transparent; color: var(--text-primary); border: 1px solid var(--border); }
-  .btn-secondary:hover { background: var(--surface-alt); }
+  .hero { background: var(--accent); border: var(--border); border-radius: 0; padding: 36px 22px; margin: 24px 0; box-shadow: var(--shadow); }
+  .hero .badge { display: inline-block; background: var(--ink); color: var(--accent); font-family: 'DM Mono', monospace; font-size: 12px; padding: 4px 10px; border-radius: 4px; margin-bottom: 14px; }
+  .hero h1 { font-size: 34px; font-weight: 800; line-height: 1.15; margin-bottom: 12px; }
+  .hero p { font-size: 18px; margin-bottom: 22px; }
+  .btn {
+    display: block; width: 100%; height: 52px; font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px; font-weight: 700; border: var(--border); border-radius: 6px;
+    cursor: pointer; text-decoration: none; text-align: center; line-height: 52px;
+    margin-bottom: 12px; transition: transform .08s;
+  }
+  .btn-primary { background: var(--ink); color: var(--accent); }
+  .btn-primary:hover { transform: translate(-2px,-2px); box-shadow: 2px 2px 0 var(--accent); }
+  .btn-secondary { background: var(--paper); color: var(--ink); }
+  .btn-secondary:hover { transform: translate(-2px,-2px); box-shadow: var(--shadow); }
 
-  /* Stats */
-  .stats { display: flex; justify-content: space-around; padding: 18px 24px; border-bottom: 1px solid var(--border); }
-  .stat { text-align: center; }
-  .stat .num { font-size: 24px; font-weight: 600; }
-  .stat .label { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+  .stats { display: flex; gap: 12px; margin-bottom: 28px; }
+  .stat { flex: 1; background: #fff; border: var(--border); border-radius: 6px; padding: 14px 10px; text-align: center; box-shadow: var(--shadow); }
+  .stat .num { font-size: 22px; font-weight: 800; }
+  .stat .label { font-size: 12px; font-family: 'DM Mono', monospace; margin-top: 2px; }
 
-  /* Sections */
-  section { padding: 36px 24px; }
-  section h2 { font-size: 23px; font-weight: 600; margin-bottom: 6px; }
-  section .lead { font-size: 15px; color: var(--text-secondary); margin-bottom: 20px; }
+  .box { background: #fff; border: var(--border); border-radius: 8px; padding: 24px 20px; margin-bottom: 26px; box-shadow: var(--shadow); }
+  .box h2 { font-size: 23px; font-weight: 800; margin-bottom: 4px; }
+  .box .lead { font-size: 15px; color: #444; margin-bottom: 18px; }
 
-  /* Track grid */
   .track-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-  .track-card { background: var(--surface-alt); border-radius: 10px; padding: 16px 14px; }
-  .track-card .icon { font-size: 22px; margin-bottom: 10px; display: block; }
-  .track-card .title { font-size: 16px; font-weight: 600; margin-bottom: 2px; }
-  .track-card .desc { font-size: 14px; color: var(--text-secondary); }
+  .track-card { background: var(--paper); border: var(--border); border-radius: 6px; padding: 14px; }
+  .track-card .icon { font-size: 22px; }
+  .track-card .title { font-size: 15px; font-weight: 700; margin: 6px 0 2px; }
+  .track-card .desc { font-size: 13px; font-family: 'DM Mono', monospace; color: #555; }
 
-  /* How it works */
-  .step { display: flex; gap: 14px; margin-bottom: 20px; }
+  .step { display: flex; gap: 12px; margin-bottom: 16px; align-items: flex-start; }
   .step:last-child { margin-bottom: 0; }
-  .step-num { width: 28px; height: 28px; flex-shrink: 0; background: var(--green-50); color: var(--green-800); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; }
-  .step-title { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
-  .step-desc { font-size: 15px; color: var(--text-secondary); }
+  .step-num { width: 30px; height: 30px; flex-shrink: 0; background: var(--accent); border: var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; }
+  .step-title { font-size: 15px; font-weight: 700; }
+  .step-desc { font-size: 14px; font-family: 'DM Mono', monospace; color: #555; }
 
-  /* Testimonial */
-  .testimonial { background: var(--surface-alt); padding: 28px 24px; }
-  .testimonial p.quote { font-size: 18px; font-style: italic; line-height: 1.7; margin-bottom: 10px; }
-  .testimonial p.author { font-size: 12px; color: var(--text-muted); }
+  .testi { background: var(--accent); border: var(--border); border-radius: 8px; padding: 22px 20px; box-shadow: var(--shadow); }
+  .testi .quote { font-size: 17px; font-weight: 600; line-height: 1.5; }
+  .testi .author { font-size: 13px; font-family: 'DM Mono', monospace; margin-top: 10px; }
 
-  /* Final CTA + form */
-  .final-cta { text-align: center; padding: 32px 24px; }
-  .final-cta .note { font-size: 12px; color: var(--text-muted); margin-top: 12px; }
-  .form-row { margin-bottom: 10px; text-align: left; }
-  .form-row input, .form-row select { width: 100%; padding: 11px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; font-family: inherit; }
-  .form-row input:focus, .form-row select:focus { outline: 2px solid var(--green-600); border-color: transparent; }
-  #msg { font-size: 13px; margin-top: 8px; min-height: 18px; }
+  .final-cta { background: var(--ink); color: var(--paper); border: var(--border); border-radius: 8px; padding: 26px 20px; box-shadow: var(--shadow); }
+  .final-cta h2 { font-size: 24px; font-weight: 800; margin-bottom: 16px; }
+  .form-row { margin-bottom: 10px; }
+  .form-row input, .form-row select {
+    width: 100%; padding: 12px; border: var(--border); border-radius: 6px;
+    font-family: 'DM Mono', monospace; font-size: 14px; background: #fff; color: var(--ink);
+  }
+  .form-row input:focus, .form-row select:focus { outline: 3px solid var(--accent); }
+  .final-cta .btn-primary { background: var(--accent); color: var(--ink); border-color: var(--ink); }
+  #msg { font-family: 'DM Mono', monospace; font-size: 13px; margin-top: 8px; min-height: 16px; }
+  .note { font-size: 12px; font-family: 'DM Mono', monospace; margin-top: 12px; opacity: 0.8; }
 
-  footer { text-align: center; padding: 20px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); }
+  footer { text-align: center; padding: 22px; font-size: 12px; font-family: 'DM Mono', monospace; border-top: var(--border); background: var(--accent); }
+  @media (max-width: 420px) { .hero h1 { font-size: 28px; } .track-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
+<div class="topbar">
+  <span class="brand">📖 PONPES.DIGITAL</span>
+  <nav><a href="#track">TRACK</a><a href="#daftar">DAFTAR</a></nav>
+</div>
+
 <div class="container">
   <div class="hero">
-    <div class="hero-icon">📖</div>
-    <h1>Ponpes Digital</h1>
-    <p class="tagline">Belajar tahsin online gratis. Setor bacaan, dapat review langsung dari pengajar.</p>
-    <a href="#daftar" class="btn btn-primary">Daftar gratis →</a>
-    <a href="#cara" class="btn btn-secondary">Lihat cara kerja</a>
+    <span class="badge">// gratis untuk semua</span>
+    <h1>Belajar Tahsin Online Gratis</h1>
+    <p>Setor bacaan, dapat review langsung dari pengajar. Progres tampil di profil publik tiap santri.</p>
+    <a href="#daftar" class="btn btn-primary">DAFTAR GRATIS →</a>
+    <a href="#cara" class="btn btn-secondary">LIHAT CARA KERJA</a>
   </div>
 
   <div class="stats">
-    <div class="stat"><div class="num">5</div><div class="label">Track belajar</div></div>
-    <div class="stat"><div class="num">100%</div><div class="label">Gratis</div></div>
-    <div class="stat"><div class="num">24/7</div><div class="label">Setor kapan saja</div></div>
+    <div class="stat"><div class="num">5</div><div class="label">TRACK</div></div>
+    <div class="stat"><div class="num">100%</div><div class="label">GRATIS</div></div>
+    <div class="stat"><div class="num">24/7</div><div class="label">SETOR</div></div>
   </div>
 
-  <section>
-    <h2>Pilih jalur belajarmu</h2>
+  <div class="box" id="track">
+    <h2>Pilih Jalur Belajarmu</h2>
     <div class="track-grid">
-      <div class="track-card"><span class="icon">📗</span><div class="title">Iqro</div><div class="desc">Dasar huruf & harakat</div></div>
-      <div class="track-card"><span class="icon">📘</span><div class="title">Al-Fatihah</div><div class="desc">Tajwid surat pembuka</div></div>
-      <div class="track-card"><span class="icon">📙</span><div class="title">Juz Amma</div><div class="desc">Surat pendek pemula</div></div>
-      <div class="track-card"><span class="icon">🎧</span><div class="title">Tilawah</div><div class="desc">Bacaan panjang, makhraj</div></div>
-      <div class="track-card"><span class="icon">🧠</span><div class="title">Hafalan</div><div class="desc">Hafal & direview pengajar</div></div>
-      <div class="track-card"><span class="icon">👥</span><div class="title">Profil publik</div><div class="desc">Etalase progres santri</div></div>
+      <div class="track-card"><div class="icon">📗</div><div class="title">Iqro</div><div class="desc">huruf & harakat</div></div>
+      <div class="track-card"><div class="icon">📘</div><div class="title">Al-Fatihah</div><div class="desc">tajwid pembuka</div></div>
+      <div class="track-card"><div class="icon">📙</div><div class="title">Juz Amma</div><div class="desc">surat pendek</div></div>
+      <div class="track-card"><div class="icon">🎧</div><div class="title">Tilawah</div><div class="desc">makhraj</div></div>
+      <div class="track-card"><div class="icon">🧠</div><div class="title">Hafalan</div><div class="desc">review ustadz</div></div>
+      <div class="track-card"><div class="icon">👥</div><div class="title">Profil</div><div class="desc">etalase progres</div></div>
     </div>
-  </section>
+  </div>
 
-  <section id="cara">
-    <h2>Cara kerja</h2>
-    <div class="step">
-      <div class="step-num">1</div>
-      <div><div class="step-title">Daftar gratis</div><div class="step-desc">Isi nama & email, langsung punya akun.</div></div>
-    </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <div><div class="step-title">Setor bacaan</div><div class="step-desc">Pilih track, rekam, kirim ke pengajar.</div></div>
-    </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <div><div class="step-title">Dapat review</div><div class="step-desc">Skor & catatan, progres tampil di profil.</div></div>
-    </div>
-  </section>
+  <div class="box" id="cara">
+    <h2>Cara Kerja</h2>
+    <div class="step"><div class="step-num">1</div><div><div class="step-title">Daftar gratis</div><div class="step-desc">Isi nama & email, langsung akun.</div></div></div>
+    <div class="step"><div class="step-num">2</div><div><div class="step-title">Setor bacaan</div><div class="step-desc">Pilih track, rekam, kirim.</div></div></div>
+    <div class="step"><div class="step-num">3</div><div><div class="step-title">Dapat review</div><div class="step-desc">Skor & catatan di profil.</div></div></div>
+  </div>
 
-  <div class="testimonial">
+  <div class="testi">
     <p class="quote">"Gratis tapi kualitas review kayak ngaji di pondok beneran."</p>
     <p class="author">— Santri, Yogyakarta</p>
   </div>
 
   <div class="final-cta" id="daftar">
-    <h2 style="margin-bottom:16px">Mulai tahsin hari ini</h2>
-    <div class="form-row"><input id="name" placeholder="Nama lengkap"></div>
-    <div class="form-row"><input id="email" placeholder="Email"></div>
-    <div class="form-row"><input id="wa" placeholder="WhatsApp (62...)"></div>
-    <div class="form-row"><input id="pass" type="password" placeholder="Password"></div>
+    <h2>Mulai Tahsin Hari Ini</h2>
+    <div class="form-row"><input id="name" placeholder="nama lengkap"></div>
+    <div class="form-row"><input id="email" placeholder="email"></div>
+    <div class="form-row"><input id="wa" placeholder="whatsapp (62...)"></div>
+    <div class="form-row"><input id="pass" type="password" placeholder="password"></div>
     <div class="form-row">
       <select id="role">
         <option value="murid">Murid</option>
-        <option value="guru">Guru (perlu verifikasi)</option>
+        <option value="guru">Guru (verifikasi)</option>
       </select>
     </div>
-    <div class="form-row"><input id="ref" placeholder="Kode referral (opsional)"></div>
-    <button class="btn btn-primary" onclick="register()">Daftar gratis</button>
+    <div class="form-row"><input id="ref" placeholder="kode referral (opsional)"></div>
+    <button class="btn btn-primary" onclick="register()">DAFTAR GRATIS</button>
     <p id="msg"></p>
-    <p class="note">Gratis selamanya · Diverifikasi pengajar</p>
+    <p class="note">gratis selamanya · diverifikasi pengajar</p>
   </div>
-
-  <footer>© Ponpes Digital · ponpes.org · Gratis untuk semua</footer>
 </div>
+
+<footer>© PONPES.DIGITAL · ponpes.org</footer>
 
 <script>
   async function register() {
     const body = { name: name.value, email: email.value, wa_number: wa.value, password: pass.value, role: role.value, ref: ref.value || undefined };
     const r = await fetch('/api/auth/register', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
     const d = await r.json();
-    if (d.success) { msg.textContent = 'Berhasil! Kode referral: ' + d.user.referral_code; msg.style.color = 'var(--green-700)'; setTimeout(()=>location.href='/dashboard-murid?uid='+d.user.id, 1200); }
-    else { msg.textContent = d.error; msg.style.color = '#c0392b'; }
+    if (d.success) { msg.textContent = 'OK! kode: ' + d.user.referral_code; msg.style.color = 'var(--accent)'; setTimeout(()=>location.href='/dashboard-murid?uid='+d.user.id, 1200); }
+    else { msg.textContent = d.error; msg.style.color = '#ff5555'; }
   }
 </script>
 </body>
