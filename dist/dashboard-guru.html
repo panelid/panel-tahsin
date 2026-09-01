@@ -3,280 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Guru — Panel Tahsin</title>
+  <title>Ponpes Digital — Dashboard Guru</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: { extend: { colors: { teal: { 50:'#f0fdfa',100:'#ccfbf1',500:'#14b8a6',600:'#0d9488',700:'#0f766e' }, gold: { 500:'#d4a843',600:'#c8923d' } } } }
-    }
-  </script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>* { font-family: 'Inter', sans-serif; }</style>
 </head>
-<body class="bg-slate-50 min-h-screen">
-
-  <nav class="bg-white border-b border-slate-100 sticky top-0 z-50">
-    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-lg bg-teal-600 flex items-center justify-center">
-          <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-        </div>
-        <span class="font-bold text-slate-800">Panel Tahsin — Guru</span>
-      </div>
-      <div class="flex items-center gap-3">
-        <span id="userName" class="text-sm text-slate-600 hidden sm:block"></span>
-        <button onclick="logout()" class="text-xs font-medium text-slate-400 hover:text-red-500 transition">Keluar</button>
-      </div>
-    </div>
-  </nav>
-
-  <div class="max-w-5xl mx-auto px-4 py-8">
-
-    <div class="mb-8">
-      <h1 class="text-2xl font-bold text-slate-800">Dashboard Guru</h1>
-      <p class="text-slate-500 text-sm mt-1">Review setoran bacaan murid</p>
-    </div>
-
-    <!-- Stats -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
-      <div class="bg-white rounded-xl p-4 border border-slate-100">
-        <div class="text-2xl font-bold text-teal-600" id="statTotal">0</div>
-        <div class="text-xs text-slate-500 mt-1">Total Setoran</div>
-      </div>
-      <div class="bg-white rounded-xl p-4 border border-slate-100">
-        <div class="text-2xl font-bold text-gold-600" id="statPending">0</div>
-        <div class="text-xs text-slate-500 mt-1">Perlu Review</div>
-      </div>
-      <div class="bg-white rounded-xl p-4 border border-slate-100">
-        <div class="text-2xl font-bold text-teal-600" id="statReviewed">0</div>
-        <div class="text-xs text-slate-500 mt-1">Selesai Direview</div>
-      </div>
-    </div>
-
-    <!-- Daftar Setoran Pending -->
-    <div class="mb-8">
-      <h2 class="font-semibold text-slate-800 mb-4">Setoran Menunggu Review</h2>
-      <div id="pendingList" class="space-y-3">
-        <div class="text-center text-slate-400 text-sm py-8 bg-white rounded-xl border border-slate-100">Memuat data...</div>
-      </div>
-    </div>
-
-    <!-- Review Panel (Hidden) -->
-    <div id="reviewPanel" class="hidden mb-8 bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
-      <div class="flex items-center justify-between mb-6">
-        <h3 class="font-semibold text-slate-800">Review Setoran</h3>
-        <button onclick="hideReviewPanel()" class="text-xs text-slate-400 hover:text-slate-600">Tutup</button>
-      </div>
-
-      <!-- Audio Player -->
-      <div class="bg-slate-50 rounded-xl p-4 mb-6">
-        <div class="text-xs text-slate-500 mb-2">Audio Setoran Murid</div>
-        <audio id="reviewAudio" controls class="w-full"></audio>
-      </div>
-
-      <!-- Ayat Tabs -->
-      <div class="mb-6">
-        <div class="text-sm font-medium text-slate-700 mb-3">Nilai per Ayat (1-10)</div>
-        <div id="ayatTabs" class="grid grid-cols-7 gap-2 mb-4">
-        </div>
-      </div>
-
-      <!-- Ayat Detail (Active Tab) -->
-      <div id="ayatDetail" class="space-y-4 mb-6">
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1.5">Ayat <span id="currentAyat">1</span> — Nilai</label>
-          <div class="flex items-center gap-3">
-            <input type="range" id="scoreSlider" min="1" max="10" value="7" class="flex-1 accent-teal-600">
-            <span id="scoreValue" class="text-lg font-bold text-teal-600 w-8 text-center">7</span>
-          </div>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1.5">Catatan Teks</label>
-          <textarea id="catatanTeks" rows="3" placeholder="Contoh: Makharijul huruf pada ayat 2 kurang jelas..." class="w-full px-4 py-3 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 transition resize-none"></textarea>
-        </div>
-      </div>
-
-      <button onclick="submitReview()" id="btnSubmitReview" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3.5 rounded-xl transition">
-        Simpan Semua Review
-      </button>
-      <div id="reviewStatus" class="hidden text-sm text-teal-600 text-center mt-3">Menyimpan review...</div>
-    </div>
-
-    <!-- Riwayat Review -->
-    <div>
-      <h2 class="font-semibold text-slate-800 mb-4">Riwayat Review</h2>
-      <div id="reviewedList" class="space-y-3">
-        <div class="text-center text-slate-400 text-sm py-8 bg-white rounded-xl border border-slate-100">Belum ada review.</div>
-      </div>
-    </div>
-
+<body class="bg-teal-50 min-h-screen">
+  <div class="max-w-2xl mx-auto p-6">
+    <h1 class="text-2xl font-bold text-teal-700 mb-4">📖 Dashboard Guru</h1>
+    <div id="app" class="space-y-4"></div>
   </div>
-
   <script>
-    const API_BASE = '';
-    let user = null;
-    let currentSetoranId = null;
-    const ayatScores = {}; // { 1: {score: 7, catatan: ''}, 2: {...}, ... }
-    let activeAyat = 1;
-
-    window.addEventListener('DOMContentLoaded', () => {
-      user = JSON.parse(localStorage.getItem('user'));
-      if (!user || user.role !== 'guru') { window.location.href = 'login.html'; return; }
-      document.getElementById('userName').textContent = user.name;
-      loadSetoran();
-    });
-
-    function logout() {
-      localStorage.removeItem('user');
-      window.location.href = 'login.html';
+    async function load() {
+      const r = await fetch('/api/guru/pending'); const list = await r.json();
+      let html = '<h2 class="font-semibold">Setoran Menunggu Review ('+list.length+')</h2>';
+      if (!list.length) html += '<p class="text-gray-500">Kosong.</p>';
+      list.forEach(s => {
+        html += '<div class="bg-white p-3 rounded shadow" id="'+s.id+'">'+
+          '<p><b>'+s.murid+'</b> — '+s.track_id+' '+(s.unit_ref||'')+' <small>'+s.created_at+'</small></p>'+
+          '<input id="unit_'+s.id+'" value="'+s.unit_ref+'" class="border p-1 rounded w-32">'+
+          '<input id="score_'+s.id+'" type="number" min="1" max="10" placeholder="skor" class="border p-1 rounded w-16">'+
+          '<input id="cat_'+s.id+'" placeholder="catatan" class="border p-1 rounded">'+
+          '<button onclick="review(\''+s.id+'\')" class="bg-teal-600 text-white p-1 rounded ml-2">Review</button></div>';
+      });
+      document.getElementById('app').innerHTML = html;
     }
-
-    async function loadSetoran() {
-      try {
-        const res = await fetch(`${API_BASE}/api/setoran?role=guru`);
-        const data = await res.json();
-        if (!data.success) return;
-
-        const all = data.setoran;
-        const pending = all.filter(s => s.status === 'pending');
-        const reviewed = all.filter(s => s.status === 'reviewed');
-
-        document.getElementById('statTotal').textContent = all.length;
-        document.getElementById('statPending').textContent = pending.length;
-        document.getElementById('statReviewed').textContent = reviewed.length;
-
-        const pendingEl = document.getElementById('pendingList');
-        if (pending.length === 0) {
-          pendingEl.innerHTML = '<div class="text-center text-slate-400 text-sm py-8 bg-white rounded-xl border border-slate-100">Semua setoran sudah direview! 🎉</div>';
-        } else {
-          pendingEl.innerHTML = pending.map(s => `
-            <div class="bg-white rounded-xl p-4 border border-slate-100 flex items-center justify-between">
-              <div class="flex-1 min-w-0">
-                <div class="font-medium text-slate-800 text-sm">${s.murid_name || 'Murid'}</div>
-                <div class="text-xs text-slate-400 mt-1">${new Date(s.created_at).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })}</div>
-              </div>
-              <button onclick="startReview('${s.id}', '${s.audio_url}')" class="text-xs font-semibold bg-teal-50 text-teal-700 hover:bg-teal-100 px-4 py-2 rounded-lg transition">
-                Review →
-              </button>
-            </div>
-          `).join('');
-        }
-
-        const reviewedEl = document.getElementById('reviewedList');
-        if (reviewed.length === 0) {
-          reviewedEl.innerHTML = '<div class="text-center text-slate-400 text-sm py-8 bg-white rounded-xl border border-slate-100">Belum ada riwayat review.</div>';
-        } else {
-          reviewedEl.innerHTML = reviewed.map(s => `
-            <div class="bg-white rounded-xl p-4 border border-slate-100 flex items-center justify-between">
-              <div class="flex-1 min-w-0">
-                <div class="font-medium text-slate-800 text-sm">${s.murid_name || 'Murid'}</div>
-                <div class="text-xs text-slate-400 mt-1">${new Date(s.created_at).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })}</div>
-              </div>
-              <span class="text-xs font-semibold px-3 py-1 rounded-full bg-teal-50 text-teal-700">✓ Direview</span>
-            </div>
-          `).join('');
-        }
-      } catch (err) {
-        console.error('Gagal memuat data:', err);
-      }
+    async function review(id) {
+      await fetch('/api/review/submit', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({setoranId:id,unitRef:document.getElementById('unit_'+id).value,score:document.getElementById('score_'+id).value,catatan:document.getElementById('cat_'+id).value})});
+      load();
     }
-
-    function startReview(setoranId, audioUrl) {
-      currentSetoranId = setoranId;
-      
-      // Init ayat scores
-      for (let i = 1; i <= 7; i++) {
-        ayatScores[i] = { score: 7, catatan: '' };
-      }
-      activeAyat = 1;
-
-      // Render ayat tabs
-      const tabs = document.getElementById('ayatTabs');
-      tabs.innerHTML = '';
-      for (let i = 1; i <= 7; i++) {
-        const btn = document.createElement('button');
-        btn.textContent = i;
-        btn.className = `w-full py-2 rounded-lg text-sm font-semibold transition ${i === 1 ? 'bg-teal-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
-        btn.onclick = () => switchAyat(i);
-        btn.id = `ayatTab${i}`;
-        tabs.appendChild(btn);
-      }
-
-      switchAyat(1);
-
-      // Set audio
-      document.getElementById('reviewAudio').src = audioUrl;
-
-      // Show panel
-      document.getElementById('reviewPanel').classList.remove('hidden');
-      document.getElementById('reviewPanel').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function switchAyat(num) {
-      // Save current ayat data
-      ayatScores[activeAyat].score = parseInt(document.getElementById('scoreSlider').value);
-      ayatScores[activeAyat].catatan = document.getElementById('catatanTeks').value;
-
-      activeAyat = num;
-      document.getElementById('currentAyat').textContent = num;
-      document.getElementById('scoreSlider').value = ayatScores[num].score;
-      document.getElementById('scoreValue').textContent = ayatScores[num].score;
-      document.getElementById('catatanTeks').value = ayatScores[num].catatan;
-
-      // Update tab styles
-      for (let i = 1; i <= 7; i++) {
-        const tab = document.getElementById(`ayatTab${i}`);
-        if (i === num) {
-          tab.className = 'w-full py-2 rounded-lg text-sm font-semibold transition bg-teal-600 text-white';
-        } else {
-          tab.className = 'w-full py-2 rounded-lg text-sm font-semibold transition bg-slate-100 text-slate-600 hover:bg-slate-200';
-        }
-      }
-    }
-
-    document.getElementById('scoreSlider')?.addEventListener('input', (e) => {
-      document.getElementById('scoreValue').textContent = e.target.value;
-    });
-
-    async function submitReview() {
-      // Save current ayat before submit
-      ayatScores[activeAyat].score = parseInt(document.getElementById('scoreSlider').value);
-      ayatScores[activeAyat].catatan = document.getElementById('catatanTeks').value;
-
-      const reviews = Object.keys(ayatScores).map(i => ({
-        ayat_number: parseInt(i),
-        score: ayatScores[i].score,
-        catatan_teks: ayatScores[i].catatan
-      }));
-
-      document.getElementById('reviewStatus').classList.remove('hidden');
-      document.getElementById('btnSubmitReview').disabled = true;
-
-      try {
-        const res = await fetch(`${API_BASE}/api/review/submit`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ setoran_id: currentSetoranId, reviews })
-        });
-        const data = await res.json();
-        if (data.success) {
-          hideReviewPanel();
-          loadSetoran();
-        } else {
-          alert('Gagal menyimpan: ' + (data.error || 'Unknown'));
-        }
-      } catch (err) {
-        alert('Gagal mengirim review.');
-      }
-      document.getElementById('reviewStatus').classList.add('hidden');
-      document.getElementById('btnSubmitReview').disabled = false;
-    }
-
-    function hideReviewPanel() {
-      document.getElementById('reviewPanel').classList.add('hidden');
-      currentSetoranId = null;
-    }
+    load();
   </script>
-
 </body>
 </html>
