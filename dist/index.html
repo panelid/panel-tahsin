@@ -57,16 +57,16 @@
     h1 { font-size: clamp(40px, 6vw, 64px); }
     h2 { font-size: clamp(32px, 4vw, 48px); letter-spacing: -0.02em; }
     .sub { font-size: 20px; font-weight: 600; color: var(--gray-500); line-height: 1.4; }
-    .btn { display: inline-block; padding: 11px 24px; border-radius: 6px; font-weight: 600; font-size: 15px; text-decoration: none; transition: transform .12s, background .15s; }
-    .btn-primary { background: var(--accent); color: #fff; }
+    .btn { display: inline-block; padding: 11px 24px; border-radius: 6px; font-weight: 600; font-size: 15px; text-decoration: none; transition: transform .12s, background .15s; cursor: pointer; }
+    .btn-primary { background: var(--accent); color: #fff; border: none; }
     .btn-primary:hover { background: var(--accent-dark); transform: scale(1.03); }
     .btn-ghost { color: var(--ink); border: var(--border); background: rgba(0,0,0,0.03); }
     .btn-ghost:hover { background: rgba(0,0,0,0.06); }
     .pill { display: inline-block; background: var(--badge-bg); color: var(--badge-text); padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 600; letter-spacing: 0.03em; }
-    .card { background: #fff; border: var(--border); border-radius: 14px; padding: 28px; box-shadow: var(--shadow); }
+    .card { background: #fff; border: var(--border); border-radius: 14px; padding: 28px; box-shadow: var(--shadow); transition: transform .15s, box-shadow .15s; }
+    .card:hover { transform: translateY(-3px); box-shadow: rgba(0,0,0,0.08) 0px 8px 28px; }
     .grid { display: grid; gap: 20px; }
     .grid-3 { grid-template-columns: repeat(3, 1fr); }
-    .grid-2 { grid-template-columns: repeat(2, 1fr); }
     .nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; }
     .nav a { color: var(--ink); text-decoration: none; font-weight: 500; font-size: 15px; margin-left: 24px; }
     .nav a:hover { color: var(--accent); }
@@ -75,7 +75,8 @@
     .step { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 28px; }
     .step-num { flex: 0 0 40px; height: 40px; background: var(--accent); color: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
     .testi { font-style: italic; color: var(--warm-dark); }
-    @media (max-width: 768px) { .grid-3, .grid-2 { grid-template-columns: 1fr; } .nav a { margin-left: 12px; } .section { padding: 56px 0; } }
+    .hero-art { width: 100%; max-width: 420px; height: auto; }
+    @media (max-width: 768px) { .grid-3 { grid-template-columns: 1fr; } .nav a { margin-left: 12px; } .section { padding: 56px 0; } .hero-flex { flex-direction: column !important; text-align: center; } }
   </style>
 </head>
 <body>
@@ -93,14 +94,48 @@
   </div>
 
   <!-- HERO -->
-  <header class="section" style="padding-top:64px;text-align:center">
-    <div class="wrap">
-      <span class="pill">Gratis untuk semua santri</span>
-      <h1 style="margin:20px 0 16px">Belajar Tahsin<br>jadi mudah & terpantau</h1>
-      <p class="sub" style="max-width:620px;margin:0 auto 32px">Dari Iqro sampai hafalan — setor bacaan, dapat review langsung dari ustadz. Progres tampil di profil publik tiap santri.</p>
-      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-        <a href="#daftar" class="btn btn-primary">Daftar Gratis</a>
-        <a href="#cara" class="btn btn-ghost">Lihat Cara Kerja</a>
+  <header class="section" style="padding-top:48px">
+    <div class="wrap hero-flex" style="display:flex;align-items:center;gap:48px;justify-content:space-between">
+      <div style="flex:1">
+        <span class="pill">Gratis untuk semua santri</span>
+        <h1 style="margin:20px 0 16px">Belajar Tahsin<br>jadi mudah & terpantau</h1>
+        <p class="sub" style="margin-bottom:32px">Dari Iqro sampai hafalan — setor bacaan, dapat review langsung dari ustadz. Progres tampil di profil publik tiap santri.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <a href="#daftar" class="btn btn-primary">Daftar Gratis</a>
+          <a href="#cara" class="btn btn-ghost">Lihat Cara Kerja</a>
+        </div>
+      </div>
+      <div style="flex:0 0 auto">
+        <!-- SVG islamic art: dome + mushaf -->
+        <svg class="hero-art" viewBox="0 0 400 360" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ilustrasi masjid dan mushaf">
+          <defs>
+            <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#e6f7f5"/>
+              <stop offset="100%" stop-color="#f6f5f4"/>
+            </linearGradient>
+            <pattern id="geo" width="40" height="40" patternUnits="userSpaceOnUse">
+              <path d="M20 0 L40 20 L20 40 L0 20 Z" fill="none" stroke="#0d9488" stroke-opacity="0.12" stroke-width="1"/>
+            </pattern>
+          </defs>
+          <rect width="400" height="360" fill="url(#sky)"/>
+          <rect width="400" height="360" fill="url(#geo)"/>
+          <!-- dome -->
+          <path d="M120 200 Q200 90 280 200 Z" fill="#0d9488"/>
+          <path d="M120 200 Q200 90 280 200" fill="none" stroke="#0f766e" stroke-width="3"/>
+          <rect x="150" y="200" width="100" height="90" fill="#0f766e" opacity="0.85"/>
+          <rect x="188" y="120" width="24" height="80" fill="#0f766e"/>
+          <circle cx="200" cy="118" r="8" fill="#0d9488"/>
+          <!-- stars -->
+          <circle cx="60" cy="70" r="3" fill="#0d9488" opacity="0.5"/>
+          <circle cx="330" cy="90" r="3" fill="#0d9488" opacity="0.5"/>
+          <circle cx="300" cy="50" r="2" fill="#0d9488" opacity="0.4"/>
+          <!-- mushaf book -->
+          <g transform="translate(150 250)">
+            <path d="M0 30 Q50 0 100 30 L100 90 Q50 60 0 90 Z" fill="#fff" stroke="#0f766e" stroke-width="2"/>
+            <path d="M50 30 L50 90" stroke="#0d9488" stroke-width="2"/>
+            <path d="M15 45 Q35 38 45 45 M15 55 Q35 48 45 55 M55 45 Q75 38 85 45 M55 55 Q75 48 85 55" stroke="#0d9488" stroke-width="1.5" opacity="0.6"/>
+          </g>
+        </svg>
       </div>
     </div>
   </header>
@@ -161,7 +196,7 @@
           <option value="guru">Guru (perlu verifikasi)</option>
         </select>
         <input id="ref" placeholder="Kode referral (opsional)">
-        <button onclick="register()" class="btn btn-primary" style="width:100%;border:none;cursor:pointer">Daftar Gratis</button>
+        <button onclick="register()" class="btn btn-primary" style="width:100%">Daftar Gratis</button>
         <p id="msg" style="font-size:14px;margin-top:12px"></p>
       </div>
     </div>
