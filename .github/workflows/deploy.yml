@@ -15,12 +15,9 @@ jobs:
           node-version: 22
       - name: Install wrangler
         run: npm install -g wrangler
-      - name: Build (if needed)
+      - name: Deploy root to Pages
         run: |
-          if [ -f package.json ] && grep -q '"build"' package.json; then npm ci && npm run build; fi
-      - name: Deploy to Cloudflare Pages
-        run: |
-          npx wrangler pages deploy dist \
+          npx wrangler pages deploy . \
             --project-name=panel-tahsin \
             --branch=main
         env:
