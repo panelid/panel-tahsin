@@ -6,7 +6,7 @@ export async function onRequestGet(context) {
   const path = url.pathname; // /@username
   const username = path.startsWith('/@') ? path.slice(2) : null;
   if (!username) {
-    return new Response('Not found', { status: 404 });
+    return; // fallback to static file (dashboard-*.html, etc)
   }
   const db = env.DB;
   if (!db) return new Response('DB error', { status: 500 });
