@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ponpes Digital — Playful Warm</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Plus Jakarta Sans', sans-serif; color: #3b2f2a; background: #fdf6ec; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+nav { display: flex; justify-content: space-between; align-items: center; padding: 22px 0; }
+nav a { color: #3b2f2a; text-decoration: none; font-weight: 700; font-size: 14px; margin-left: 20px; }
+.hero { text-align: center; padding: 70px 0 50px; position: relative; }
+.blob { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 320px; height: 320px; background: radial-gradient(circle, #fde68a 0%, #fbd9a8 60%, transparent 70%); border-radius: 50%; z-index: -1; opacity: 0.6; }
+.pill { display: inline-block; background: #fff; border: 2px solid #e8c08a; color: #b4793a; padding: 5px 14px; border-radius: 999px; font-size: 13px; font-weight: 700; }
+h1 { font-size: clamp(38px, 6vw, 60px); font-weight: 800; line-height: 1.05; margin: 18px 0; letter-spacing: -0.02em; }
+.lead { font-size: 19px; color: #7a6a5e; max-width: 520px; margin: 0 auto 30px; }
+.btn { display: inline-block; background: #0d9488; color: #fff; padding: 14px 32px; border-radius: 999px; font-weight: 700; text-decoration: none; font-size: 15px; box-shadow: 0 8px 20px rgba(13,148,136,0.25); }
+.btn:hover { transform: translateY(-2px); }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; padding: 50px 0; }
+.card { background: #fff; border-radius: 22px; padding: 26px; border: 1px solid #f0e2d0; transition: .15s; }
+.card:hover { transform: rotate(-1deg) scale(1.02); }
+.card .ico { font-size: 34px; }
+.card h3 { font-size: 19px; margin: 10px 0 6px; }
+.card p { color: #8a7a6e; font-size: 14px; }
+.strip { background: #0d9488; border-radius: 28px; padding: 44px; color: #fff; text-align: center; margin: 30px 0; }
+.strip h2 { font-size: 30px; font-weight: 800; margin-bottom: 18px; }
+.testi { background: #fff; border-radius: 22px; padding: 24px; border: 1px solid #f0e2d0; margin-bottom: 16px; }
+.testi p { font-style: italic; color: #5a4a3e; }
+.testi b { display: block; margin-top: 10px; font-style: normal; }
+footer { text-align: center; padding: 36px 0; color: #b0a090; font-size: 13px; }
+@media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<nav class="wrap"><strong style="font-size:18px">📖 Ponpes Digital</strong><div><a href="#track">Track</a><a href="#daftar">Daftar</a></div></nav>
+<section class="hero wrap">
+  <div class="blob"></div>
+  <span class="pill">✨ Gratis untuk semua</span>
+  <h1>Yuk, belajar tahsin<br>jadi asyik!</h1>
+  <p class="lead">Dari Iqro sampai hafalan — setor bacaan, dapet review ustadz, progresnya bisa dibagikan ke keluarga. 🤩</p>
+  <a href="#daftar" class="btn">Daftar Gratis</a>
+</section>
+<section class="wrap" id="track">
+  <div class="grid">
+    <div class="card"><div class="ico">📗</div><h3>Iqro</h3><p>Dasar huruf & harakat dengan benar.</p></div>
+    <div class="card"><div class="ico">📘</div><h3>Al-Fatihah</h3><p>Surat pembuka dengan tajwid tepat.</p></div>
+    <div class="card"><div class="ico">📙</div><h3>Juz Amma</h3><p>Surat pendek untuk pemula.</p></div>
+    <div class="card"><div class="ico">🎧</div><h3>Tilawah</h3><p>Membaca panjang, makhraj sempurna.</p></div>
+    <div class="card"><div class="ico">🧠</div><h3>Hafalan</h3><p>Hafal surat dengan koreksi ustadz.</p></div>
+    <div class="card"><div class="ico">👥</div><h3>Profil</h3><p>Etalase progres tiap santri.</p></div>
+  </div>
+</section>
+<section class="strip">
+  <h2>3 langkah mudah</h2>
+  <a href="#daftar" class="btn" style="background:#fff;color:#0d9488">Daftar → Setor → Dapat Review</a>
+</section>
+<section class="wrap" id="daftar">
+  <div class="testi"><p>"Anak saya semangat setor tiap hari karena ada profil progres yang bisa dibagikan."</p><b>— Orang tua, Bandung</b></div>
+  <div class="testi"><p>"Gratis tapi kualitas review kayak ngaji di pondok beneran."</p><b>— Santri, Yogyakarta</b></div>
+  <div style="text-align:center;margin-top:24px"><a href="#daftar" class="btn">Mulai Tahsin Hari Ini</a></div>
+</section>
+<footer>© Ponpes Digital · ponpes.org · Gratis untuk semua</footer>
+</body>
+</html>
