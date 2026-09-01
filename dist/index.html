@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ponpes Digital — Platform Tahsin Online Gratis | Iqro, Fatihah, Juz Amma</title>
+  <title>Ponpes Digital — Belajar Tahsin Online Gratis | Iqro, Fatihah, Juz Amma</title>
   <meta name="description" content="Ponpes Digital: platform tahsin online gratis untuk belajar membaca Al-Quran — Iqro, Al-Fatihah, Juz Amma, Tilawah, Hafalan. Setor & dapat review dari ustadz. Profil publik per santri.">
   <meta name="keywords" content="tahsin online, belajar iqro, tahsin al-fatihah, juz amma, tilawah, hafalan quran, ponpes digital">
   <link rel="canonical" href="https://ponpes.org/">
@@ -12,7 +12,7 @@
   <meta property="og:description" content="Belajar tahsin online gratis: Iqro, Al-Fatihah, Juz Amma, Tilawah, Hafalan. Setor & review dari ustadz.">
   <meta property="og:url" content="https://ponpes.org/">
   <meta property="og:site_name" content="Ponpes Digital">
-  <meta name="twitter:card" content="summary">
+  <meta name="twitter:card" content="summary_large_image">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -35,41 +35,93 @@
   </script>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-teal-50 min-h-screen text-gray-800">
-  <header class="max-w-3xl mx-auto p-6 text-center">
-    <h1 class="text-3xl font-bold text-teal-700">📖 Ponpes Digital</h1>
-    <p class="text-gray-600 mt-2">Platform tahsin online gratis — Iqro, Al-Fatihah, Juz Amma, Tilawah, Hafalan.</p>
+<body class="bg-white text-gray-800">
+
+  <!-- HERO -->
+  <header class="bg-gradient-to-b from-teal-600 to-teal-700 text-white">
+    <div class="max-w-4xl mx-auto px-6 py-20 text-center">
+      <div class="text-5xl mb-4">📖</div>
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">Ponpes Digital</h1>
+      <p class="text-lg md:text-xl text-teal-50 mb-8 max-w-2xl mx-auto">Belajar tahsin online gratis. Dari Iqro sampai hafalan — setor bacaan, dapat review langsung dari ustadz.</p>
+      <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        <a href="#daftar" class="bg-white text-teal-700 font-semibold px-8 py-3 rounded-full shadow hover:bg-teal-50">Daftar Gratis</a>
+        <a href="#cara" class="border border-white text-white px-8 py-3 rounded-full hover:bg-teal-500">Cara Kerja</a>
+      </div>
+      <p class="text-sm text-teal-100 mt-6">✓ Gratis selamanya &nbsp; ✓ Tanpa kartu &nbsp; ✓ Diverifikasi ustadz</p>
+    </div>
   </header>
-  <main class="max-w-md mx-auto p-6">
-    <div class="bg-white rounded-xl shadow p-4 mb-4">
-      <h2 class="font-semibold mb-2">Daftar Gratis</h2>
-      <input id="name" placeholder="Nama" class="w-full border p-2 rounded mb-2">
-      <input id="email" placeholder="Email" class="w-full border p-2 rounded mb-2">
-      <input id="wa" placeholder="WhatsApp (62...)" class="w-full border p-2 rounded mb-2">
-      <input id="pass" type="password" placeholder="Password" class="w-full border p-2 rounded mb-2">
-      <select id="role" class="w-full border p-2 rounded mb-2">
-        <option value="murid">Murid</option>
-        <option value="guru">Guru (perlu verifikasi)</option>
-      </select>
-      <input id="ref" placeholder="Kode referral (opsional)" class="w-full border p-2 rounded mb-2">
-      <button onclick="register()" class="w-full bg-teal-600 text-white p-2 rounded">Daftar</button>
-      <p id="msg" class="text-sm mt-2"></p>
+
+  <!-- STATS -->
+  <section class="max-w-4xl mx-auto px-6 py-10 grid grid-cols-3 gap-4 text-center">
+    <div><div class="text-3xl font-bold text-teal-700">5</div><div class="text-sm text-gray-500">Track belajar</div></div>
+    <div><div class="text-3xl font-bold text-teal-700">100%</div><div class="text-sm text-gray-500">Gratis</div></div>
+    <div><div class="text-3xl font-bold text-teal-700">24/7</div><div class="text-sm text-gray-500">Setor kapan saja</div></div>
+  </section>
+
+  <!-- TRACKS -->
+  <section class="max-w-4xl mx-auto px-6 py-12">
+    <h2 class="text-2xl font-bold text-center mb-8 text-gray-800">Pilih Jalur Belajarmu</h2>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="border rounded-xl p-5 hover:shadow-lg transition"><div class="text-3xl mb-2">📗</div><h3 class="font-semibold">Iqro</h3><p class="text-sm text-gray-500">Dasar mengenal huruf & harakat.</p></div>
+      <div class="border rounded-xl p-5 hover:shadow-lg transition"><div class="text-3xl mb-2">📘</div><h3 class="font-semibold">Al-Fatihah</h3><p class="text-sm text-gray-500">Surat pembuka dengan tajwid benar.</p></div>
+      <div class="border rounded-xl p-5 hover:shadow-lg transition"><div class="text-3xl mb-2">📙</div><h3 class="font-semibold">Juz Amma</h3><p class="text-sm text-gray-500">Surat pendek untuk pemula.</p></div>
+      <div class="border rounded-xl p-5 hover:shadow-lg transition"><div class="text-3xl mb-2">🎧</div><h3 class="font-semibold">Tilawah</h3><p class="text-sm text-gray-500">Membaca panjang dengan makhraj.</p></div>
+      <div class="border rounded-xl p-5 hover:shadow-lg transition"><div class="text-3xl mb-2">🧠</div><h3 class="font-semibold">Hafalan</h3><p class="text-sm text-gray-500">Hafal surat dengan review ustadz.</p></div>
+      <div class="border rounded-xl p-5 hover:shadow-lg transition bg-teal-50"><div class="text-3xl mb-2">👥</div><h3 class="font-semibold">Profil Publik</h3><p class="text-sm text-gray-500">Etalase progres tiap santri.</p></div>
     </div>
-    <div class="grid grid-cols-2 gap-2 text-sm">
-      <a href="/dashboard-murid" class="bg-white p-3 rounded shadow text-center">📚 Dashboard Murid</a>
-      <a href="/dashboard-guru" class="bg-white p-3 rounded shadow text-center">🧑‍🏫 Dashboard Guru</a>
-      <a href="/u/sobur" class="bg-white p-3 rounded shadow text-center">👤 Profil Contoh</a>
-      <a href="/tentang" class="bg-white p-3 rounded shadow text-center">ℹ️ Tentang</a>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="cara" class="bg-gray-50 py-12">
+    <div class="max-w-3xl mx-auto px-6">
+      <h2 class="text-2xl font-bold text-center mb-8">Cara Kerja</h2>
+      <div class="space-y-4">
+        <div class="flex gap-4 items-start"><div class="bg-teal-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold shrink-0">1</div><div><h3 class="font-semibold">Daftar gratis</h3><p class="text-sm text-gray-500">Isi nama & email, langsung punya akun tanpa verifikasi.</p></div></div>
+        <div class="flex gap-4 items-start"><div class="bg-teal-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold shrink-0">2</div><div><h3 class="font-semibold">Setor bacaan</h3><p class="text-sm text-gray-500">Pilih track, rekam/unggah bacaan, kirim ke ustadz.</p></div></div>
+        <div class="flex gap-4 items-start"><div class="bg-teal-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold shrink-0">3</div><div><h3 class="font-semibold">Dapat review</h3><p class="text-sm text-gray-500">Ustadz beri skor & catatan perbaikan. Progres tampil di profil publik.</p></div></div>
+      </div>
     </div>
-  </main>
-  <footer class="text-center text-xs text-gray-500 p-6">© Ponpes Digital · ponpes.org</footer>
+  </section>
+
+  <!-- SOCIAL PROOF -->
+  <section class="max-w-4xl mx-auto px-6 py-12">
+    <h2 class="text-2xl font-bold text-center mb-8">Sudah Dipakai Santri</h2>
+    <div class="grid sm:grid-cols-3 gap-4">
+      <div class="border rounded-xl p-5"><p class="text-sm italic">"Akhirnya bisa baca Al-Fatihah dengan benar, ustadz review cepat."</p><p class="text-sm font-semibold mt-3">— Santri Jakarta</p></div>
+      <div class="border rounded-xl p-5"><p class="text-sm italic">"Anak saya semangat setor tiap hari karena ada profil progres."</p><p class="text-sm font-semibold mt-3">— Orang Tua, Bandung</p></div>
+      <div class="border rounded-xl p-5"><p class="text-sm italic">"Gratis tapi kualitas review kayak ngaji di pondok beneran."</p><p class="text-sm font-semibold mt-3">— Santri Yogyakarta</p></div>
+    </div>
+    <p class="text-center text-sm text-gray-500 mt-6">Lihat contoh: <a href="/u/sobur" class="text-teal-600 underline">ponpes.org/u/sobur</a></p>
+  </section>
+
+  <!-- CTA / DAFTAR -->
+  <section id="daftar" class="bg-teal-600 text-white py-16">
+    <div class="max-w-md mx-auto px-6 text-center">
+      <h2 class="text-3xl font-bold mb-4">Mulai Tahsin Hari Ini</h2>
+      <div class="bg-white rounded-xl p-6 text-gray-800 text-left">
+        <input id="name" placeholder="Nama" class="w-full border p-2 rounded mb-2">
+        <input id="email" placeholder="Email" class="w-full border p-2 rounded mb-2">
+        <input id="wa" placeholder="WhatsApp (62...)" class="w-full border p-2 rounded mb-2">
+        <input id="pass" type="password" placeholder="Password" class="w-full border p-2 rounded mb-2">
+        <select id="role" class="w-full border p-2 rounded mb-2">
+          <option value="murid">Murid</option>
+          <option value="guru">Guru (perlu verifikasi)</option>
+        </select>
+        <input id="ref" placeholder="Kode referral (opsional)" class="w-full border p-2 rounded mb-3">
+        <button onclick="register()" class="w-full bg-teal-600 text-white p-3 rounded font-semibold">Daftar Gratis</button>
+        <p id="msg" class="text-sm mt-2"></p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="text-center text-xs text-gray-500 p-6">© Ponpes Digital · ponpes.org · Gratis untuk semua</footer>
 
   <script>
     async function register() {
       const body = { name: name.value, email: email.value, wa_number: wa.value, password: pass.value, role: role.value, ref: ref.value || undefined };
       const r = await fetch('/api/auth/register', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
       const d = await r.json();
-      if (d.success) { msg.textContent = 'Berhasil! Kode referral: ' + d.user.referral_code; msg.className = 'text-green-600 text-sm mt-2'; }
+      if (d.success) { msg.textContent = 'Berhasil! Kode referral: ' + d.user.referral_code; msg.className = 'text-green-600 text-sm mt-2'; setTimeout(()=>location.href='/dashboard-murid?uid='+d.user.id, 1200); }
       else { msg.textContent = d.error; msg.className = 'text-red-600 text-sm mt-2'; }
     }
   </script>
