@@ -27,7 +27,7 @@ export async function onRequestGet(context) {
     "SELECT t.name as track, e.current_unit, e.status FROM enrollments e JOIN tracks t ON t.id = e.track_id WHERE e.user_id = ?"
   ).bind(user.id).all();
 
-  const html = `<!DOCTYPE html><html><head><title>${user.name} · Tahsin</title>
+  const html = `<!DOCTYPE html><html><head><title>${user.name} · Ponpes Digital</title>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <style>body{font-family:sans-serif;max-width:600px;margin:40px auto;padding:0 16px}
   h1{margin-bottom:4px}.muted{color:#666}.track{border:1px solid #ddd;border-radius:8px;padding:12px;margin:8px 0}</style></head>
