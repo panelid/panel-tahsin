@@ -3,50 +3,74 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ponpes Digital — Platform Tahsin Online</title>
+  <title>Ponpes Digital — Platform Tahsin Online Gratis | Iqro, Fatihah, Juz Amma</title>
+  <meta name="description" content="Ponpes Digital: platform tahsin online gratis untuk belajar membaca Al-Quran — Iqro, Al-Fatihah, Juz Amma, Tilawah, Hafalan. Setor & dapat review dari ustadz. Profil publik per santri.">
+  <meta name="keywords" content="tahsin online, belajar iqro, tahsin al-fatihah, juz amma, tilawah, hafalan quran, ponpes digital">
+  <link rel="canonical" href="https://ponpes.org/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Ponpes Digital — Platform Tahsin Online">
+  <meta property="og:description" content="Belajar tahsin online gratis: Iqro, Al-Fatihah, Juz Amma, Tilawah, Hafalan. Setor & review dari ustadz.">
+  <meta property="og:url" content="https://ponpes.org/">
+  <meta property="og:site_name" content="Ponpes Digital">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Ponpes Digital",
+    "url": "https://ponpes.org",
+    "description": "Platform tahsin online gratis: Iqro, Al-Fatihah, Juz Amma, Tilawah, Hafalan dengan review ustadz.",
+    "applicationCategory": "EducationApplication",
+    "inLanguage": "id",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "IDR" },
+    "faq": {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {"@type": "Question","name": "Apa itu Ponpes Digital?","acceptedAnswer": {"@type": "Answer","text": "Platform tahsin online gratis untuk belajar membaca Al-Quran (Iqro, Al-Fatihah, Juz Amma, Tilawah, Hafalan) dengan setoran dan review dari ustadz."}},
+        {"@type": "Question","name": "Apakah gratis?","acceptedAnswer": {"@type": "Answer","text": "Ya, gratis untuk murid. Daftar langsung tanpa verifikasi email."}},
+        {"@type": "Question","name": "Track apa saja yang tersedia?","acceptedAnswer": {"@type": "Answer","text": "Iqro, Al-Fatihah, Juz Amma, Tilawah, dan Hafalan."}}
+      ]
+    }
+  }
+  </script>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-teal-50 min-h-screen text-gray-800">
-  <div class="max-w-md mx-auto p-6">
-    <h1 class="text-2xl font-bold text-teal-700 mb-2">📖 Ponpes Digital</h1>
-    <p class="text-sm text-gray-600 mb-6">Setor & review tahsin online — Iqro, Al-Fatihah, Juz Amma, Tilawah, Hafalan.</p>
-
-    <div id="app">
-      <div class="bg-white rounded-xl shadow p-4 mb-4">
-        <h2 class="font-semibold mb-2">Daftar</h2>
-        <input id="name" placeholder="Nama" class="w-full border p-2 rounded mb-2">
-        <input id="email" placeholder="Email" class="w-full border p-2 rounded mb-2">
-        <input id="wa" placeholder="WhatsApp (62...)" class="w-full border p-2 rounded mb-2">
-        <input id="pass" type="password" placeholder="Password" class="w-full border p-2 rounded mb-2">
-        <select id="role" class="w-full border p-2 rounded mb-2">
-          <option value="murid">Murid</option>
-          <option value="guru">Guru (perlu verifikasi)</option>
-        </select>
-        <input id="ref" placeholder="Kode referral (opsional)" class="w-full border p-2 rounded mb-2">
-        <button onclick="register()" class="w-full bg-teal-600 text-white p-2 rounded">Daftar</button>
-        <p id="msg" class="text-sm mt-2"></p>
-      </div>
-      <p class="text-xs text-gray-500">Punya akun? Lihat profil: <a class="text-teal-600" href="/u/@sobur">/@sobur</a></p>
+  <header class="max-w-3xl mx-auto p-6 text-center">
+    <h1 class="text-3xl font-bold text-teal-700">📖 Ponpes Digital</h1>
+    <p class="text-gray-600 mt-2">Platform tahsin online gratis — Iqro, Al-Fatihah, Juz Amma, Tilawah, Hafalan.</p>
+  </header>
+  <main class="max-w-md mx-auto p-6">
+    <div class="bg-white rounded-xl shadow p-4 mb-4">
+      <h2 class="font-semibold mb-2">Daftar Gratis</h2>
+      <input id="name" placeholder="Nama" class="w-full border p-2 rounded mb-2">
+      <input id="email" placeholder="Email" class="w-full border p-2 rounded mb-2">
+      <input id="wa" placeholder="WhatsApp (62...)" class="w-full border p-2 rounded mb-2">
+      <input id="pass" type="password" placeholder="Password" class="w-full border p-2 rounded mb-2">
+      <select id="role" class="w-full border p-2 rounded mb-2">
+        <option value="murid">Murid</option>
+        <option value="guru">Guru (perlu verifikasi)</option>
+      </select>
+      <input id="ref" placeholder="Kode referral (opsional)" class="w-full border p-2 rounded mb-2">
+      <button onclick="register()" class="w-full bg-teal-600 text-white p-2 rounded">Daftar</button>
+      <p id="msg" class="text-sm mt-2"></p>
     </div>
-  </div>
+    <div class="grid grid-cols-2 gap-2 text-sm">
+      <a href="/dashboard-murid" class="bg-white p-3 rounded shadow text-center">📚 Dashboard Murid</a>
+      <a href="/dashboard-guru" class="bg-white p-3 rounded shadow text-center">🧑‍🏫 Dashboard Guru</a>
+      <a href="/u/sobur" class="bg-white p-3 rounded shadow text-center">👤 Profil Contoh</a>
+      <a href="/tentang" class="bg-white p-3 rounded shadow text-center">ℹ️ Tentang</a>
+    </div>
+  </main>
+  <footer class="text-center text-xs text-gray-500 p-6">© Ponpes Digital · ponpes.org</footer>
 
   <script>
     async function register() {
-      const body = {
-        name: name.value, email: email.value, wa_number: wa.value,
-        password: pass.value, role: role.value, ref: ref.value || undefined
-      };
-      const r = await fetch('/api/auth/register', {
-        method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body)
-      });
+      const body = { name: name.value, email: email.value, wa_number: wa.value, password: pass.value, role: role.value, ref: ref.value || undefined };
+      const r = await fetch('/api/auth/register', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
       const d = await r.json();
-      if (d.success) {
-        msg.textContent = 'Berhasil! Kode referral: ' + d.user.referral_code + ' — profil: /@' + d.user.referral_code;
-        msg.className = 'text-green-600 text-sm mt-2';
-      } else {
-        msg.textContent = d.error;
-        msg.className = 'text-red-600 text-sm mt-2';
-      }
+      if (d.success) { msg.textContent = 'Berhasil! Kode referral: ' + d.user.referral_code; msg.className = 'text-green-600 text-sm mt-2'; }
+      else { msg.textContent = d.error; msg.className = 'text-red-600 text-sm mt-2'; }
     }
   </script>
 </body>

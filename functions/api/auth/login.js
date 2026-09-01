@@ -1,3 +1,5 @@
+import { verifyPassword } from '../../../src/utils/hash.js'
+
 export async function onRequestOptions() {
   return new Response(null, {
     status: 204,
@@ -11,8 +13,10 @@ export async function onRequestPost(context) {
     const { email, password } = await request.json()
     if (!email || !password) return new Response(JSON.stringify({ success: false, error: 'Email dan password wajib diisi' }), { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
     const db = env.DB
-    const user = await db.prepare("SELECT * FROM users WHERE email = ? AND password_hash = ?").bind(email, password).first()
+    const user = await db.prepare("SELECT * FROM users WHERE email = ?").bind(email).first()
     if (!user) return new Response(JSON.stringify({ success: false, error: 'Email atau password salah' }), { status: 401, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
+    const ok = await verifyPassword(password, user.password_hash)
+    if (!ok) return new Response(JSON.stringify({ success: false, error: 'Email atau password salah' }), { status: 401, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
     return new Response(JSON.stringify({ success: true, message: 'Login berhasil', user: { id: user.id, name: user.name, email: user.email, role: user.role } }), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
   } catch (err) {
     return new Response(JSON.stringify({ success: false, error: err.message }), { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })

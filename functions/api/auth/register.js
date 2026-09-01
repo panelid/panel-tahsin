@@ -5,6 +5,8 @@ export async function onRequestOptions() {
   })
 }
 
+import { hashPassword } from '../../../src/utils/hash.js'
+
 export async function onRequestPost(context) {
   const { env, request } = context
   try {
@@ -21,8 +23,9 @@ export async function onRequestPost(context) {
       const refUser = await db.prepare("SELECT id FROM users WHERE referral_code = ?").bind(ref).first()
       if (refUser) referredBy = refUser.id
     }
+    const pwHash = await hashPassword(password)
     await db.prepare("INSERT INTO users (id, name, email, password_hash, role, wa_number, referral_code, referred_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
-      .bind(id, name, email, password, role, wa_number || null, referralCode, referredBy).run()
+      .bind(id, name, email, pwHash, role, wa_number || null, referralCode, referredBy).run()
     if (referredBy) {
       await db.prepare("INSERT INTO referrals (id, referrer_id, referred_id) VALUES (?, ?, ?)")
         .bind('ref_' + Date.now(), referredBy, id).run()
