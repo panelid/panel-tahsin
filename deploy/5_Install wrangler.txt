@@ -1,9 +1,0 @@
-﻿2026-09-10T05:39:29.0294497Z ##[group]Run npm i -g wrangler
-2026-09-10T05:39:29.0294756Z [36;1mnpm i -g wrangler[0m
-2026-09-10T05:39:29.0323773Z shell: /usr/bin/bash -e {0}
-2026-09-10T05:39:29.0324016Z ##[endgroup]
-2026-09-10T05:39:34.6618958Z 
-2026-09-10T05:39:34.6619743Z added 35 packages in 6s
-2026-09-10T05:39:34.6620037Z 
-2026-09-10T05:39:34.6620509Z 7 packages are looking for funding
-2026-09-10T05:39:34.6620979Z   run `npm fund` for details
