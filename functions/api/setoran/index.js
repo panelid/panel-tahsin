@@ -12,11 +12,17 @@ export async function onRequestGet(context) {
     const url = new URL(request.url)
     const userId = url.searchParams.get('user_id')
     const role = url.searchParams.get('role')
+    const trackId = url.searchParams.get('track_id')
 
     let query = "SELECT s.*, u.name as murid_name FROM setoran s JOIN users u ON s.user_id = u.id"
     let stmt
     if (role === 'murid' && userId) {
-      stmt = db.prepare(query + " WHERE s.user_id = ? ORDER BY s.created_at DESC").bind(userId)
+      const clauses = ["s.user_id = ?"]
+      const binds = [userId]
+      if (trackId) { clauses.push("s.track_id = ?"); binds.push(trackId) }
+      stmt = db.prepare(query + " WHERE " + clauses.join(" AND ") + " ORDER BY s.created_at DESC").bind(...binds)
+    } else if (trackId) {
+      stmt = db.prepare(query + " WHERE s.track_id = ? ORDER BY s.created_at DESC").bind(trackId)
     } else {
       stmt = db.prepare(query + " ORDER BY s.created_at DESC")
     }

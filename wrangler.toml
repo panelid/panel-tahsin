@@ -5,4 +5,5 @@ pages_build_output_dir = "dist"
 [[d1_databases]]
 binding = "DB"
 database_name = "panel-tahsin-db"
-database_id = "4538586f-4436-46c3-a6b0-97d45f21b21e"
+database_id = "60791983-cb88-4ab8-a428-d9c9e1d5ec6a"
+account_id = "bdef7344eef64225e299823faaed4cea"

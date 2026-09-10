@@ -19,6 +19,8 @@ export async function onRequestPost(context) {
     const formData = await request.formData()
     const file = formData.get('audio')
     const userId = formData.get('user_id')
+    const trackId = formData.get('track_id') || null
+    const unitRef = formData.get('unit_ref') || null
 
     if (!file || !userId) {
       return new Response(JSON.stringify({ success: false, error: 'Data tidak lengkap' }), {
@@ -40,19 +42,21 @@ export async function onRequestPost(context) {
 
     const setoranId = 'set_' + Date.now() + Math.random().toString(36).substring(2, 7)
 
-    await db.prepare(
-      "INSERT INTO setoran (id, user_id, audio_url, status) VALUES (?, ?, ?, 'pending')"
-    ).bind(setoranId, userId, audioDataUrl).run()
+        await db.prepare(
+          "INSERT INTO setoran (id, user_id, track_id, unit_ref, audio_url, status) VALUES (?, ?, ?, ?, ?, 'pending')"
+        ).bind(setoranId, userId, trackId, unitRef, audioDataUrl).run()
 
-    return new Response(JSON.stringify({ 
-      success: true, 
-      message: 'Setoran berhasil dikirim!', 
-      setoran_id: setoranId,
-      audio_url: audioDataUrl
-    }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-    })
+        // Notify guru if instructor_id provided (TBD: need an instructor.id or a separate instructors table)
+        // TEMPORARY: require track_id known and look up first enrolled guru? We'll skip TA for now until instructor lookup is defined.
+        return new Response(JSON.stringify({
+          success: true,
+          message: 'Setoran berhasil dikirim!',
+          setoran_id: setoranId,
+          audio_url: audioDataUrl
+        }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+        })
 
   } catch (err) {
     return new Response(JSON.stringify({ success: false, error: err.message }), {

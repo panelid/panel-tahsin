@@ -6,6 +6,7 @@ export async function onRequestOptions() {
 }
 
 import { hashPassword } from '../../../src/utils/hash.js'
+import { sendWA, notifyMuridReviewed, notifyUstadzNewSetoran } from '../../../src/utils/wa.js'
 
 export async function onRequestPost(context) {
   const { env, request } = context
@@ -29,6 +30,13 @@ export async function onRequestPost(context) {
     if (referredBy) {
       await db.prepare("INSERT INTO referrals (id, referrer_id, referred_id) VALUES (?, ?, ?)")
         .bind('ref_' + Date.now(), referredBy, id).run()
+      const refUser = await db.prepare("SELECT wa_number, name FROM users WHERE id = ?").bind(referredBy).first()
+      if (refUser && refUser.wa_number) {
+        await sendWA(refUser.wa_number, `🎉 ${name} mendaftar lewat undangan kamu di Ponpes Digital!`)
+      }
+    }
+    if (wa_number) {
+      await sendWA(wa_number, `Assalamu'alaikum ${name}! Selamat datang di Ponpes Digital 📖 Platform tahsin & ngaji online gratis. Kode referral kamu: ${referralCode}`)
     }
     return new Response(JSON.stringify({ success: true, message: 'Registrasi berhasil!', user: { id, name, email, role, referral_code: referralCode } }), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
   } catch (err) {
