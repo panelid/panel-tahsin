@@ -1,0 +1,32 @@
+﻿2026-09-10T05:39:34.6784791Z ##[group]Run wrangler pages deploy dist --project-name=panel-tahsin --branch=main
+2026-09-10T05:39:34.6785446Z [36;1mwrangler pages deploy dist --project-name=panel-tahsin --branch=main[0m
+2026-09-10T05:39:34.6819657Z shell: /usr/bin/bash -e {0}
+2026-09-10T05:39:34.6819881Z env:
+2026-09-10T05:39:34.6820272Z   CLOUDFLARE_API_KEY: ***
+2026-09-10T05:39:34.6820507Z   CLOUDFLARE_EMAIL: ***
+2026-09-10T05:39:34.6820743Z   CLOUDFLARE_ACCOUNT_ID: ***
+2026-09-10T05:39:34.6820946Z ##[endgroup]
+2026-09-10T05:39:35.3502000Z 
+2026-09-10T05:39:35.3502772Z  ⛅️ wrangler 4.86.0
+2026-09-10T05:39:35.3503205Z ───────────────────
+2026-09-10T05:39:35.3985018Z [33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mProcessing wrangler.toml configuration:[0m
+2026-09-10T05:39:35.3985529Z 
+2026-09-10T05:39:35.3985827Z     - Unexpected fields found in d1_databases[0] field: "account_id"
+2026-09-10T05:39:35.3986167Z 
+2026-09-10T05:39:35.3986175Z 
+2026-09-10T05:39:35.7054771Z There is a newer version of Wrangler available (current: 4.86.0, latest: 4.130.0). Try upgrading, as it might support this configuration option.
+2026-09-10T05:39:35.7585912Z [33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mWarning: Your working directory is a git repo and has uncommitted changes[0m
+2026-09-10T05:39:35.7586545Z 
+2026-09-10T05:39:35.7586808Z   To silence this warning, pass in --commit-dirty=true
+2026-09-10T05:39:35.7587110Z 
+2026-09-10T05:39:35.7587118Z 
+2026-09-10T05:39:35.8941591Z 
+2026-09-10T05:39:35.8952772Z [31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mA request to the Cloudflare API (/accounts/***/pages/projects/panel-tahsin) failed.[0m
+2026-09-10T05:39:35.8953419Z 
+2026-09-10T05:39:35.8953915Z   Project not found. The specified project name does not match any of your existing projects. [code: 8000007]
+2026-09-10T05:39:35.8954364Z   
+2026-09-10T05:39:35.8954876Z   If you think this is a bug, please open an issue at: [4mhttps://github.com/cloudflare/workers-sdk/issues/new/choose[0m
+2026-09-10T05:39:35.8955228Z 
+2026-09-10T05:39:35.8955234Z 
+2026-09-10T05:39:35.9186850Z 🪵  Logs were written to "/home/runner/.config/.wrangler/logs/wrangler-2026-09-10_05-39-35_095.log"
+2026-09-10T05:39:35.9310869Z ##[error]Process completed with exit code 1.

@@ -1,0 +1,228 @@
+﻿2026-09-10T05:39:22.6442017Z Current runner version: '2.337.0'
+2026-09-10T05:39:22.6462835Z ##[group]Runner Image Provisioner
+2026-09-10T05:39:22.6463651Z Hosted Compute Agent
+2026-09-10T05:39:22.6464147Z Version: 20260828.587
+2026-09-10T05:39:22.6464779Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+2026-09-10T05:39:22.6465422Z Build Date: 2026-08-28T16:44:25Z
+2026-09-10T05:39:22.6466050Z Worker ID: {4e96a20b-7097-4b65-95b7-aaa83aa2b3f7}
+2026-09-10T05:39:22.6466703Z Azure Region: westcentralus
+2026-09-10T05:39:22.6467255Z ##[endgroup]
+2026-09-10T05:39:22.6468481Z ##[group]Operating System
+2026-09-10T05:39:22.6469030Z Ubuntu
+2026-09-10T05:39:22.6469677Z 24.04.4
+2026-09-10T05:39:22.6470191Z LTS
+2026-09-10T05:39:22.6470748Z ##[endgroup]
+2026-09-10T05:39:22.6471305Z ##[group]Runner Image
+2026-09-10T05:39:22.6471856Z Image: ubuntu-24.04
+2026-09-10T05:39:22.6472679Z Version: 20260831.293.1
+2026-09-10T05:39:22.6473768Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260831.293/images/ubuntu/Ubuntu2404-Readme.md
+2026-09-10T05:39:22.6475085Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260831.293
+2026-09-10T05:39:22.6475917Z ##[endgroup]
+2026-09-10T05:39:22.6476973Z ##[group]GITHUB_TOKEN Permissions
+2026-09-10T05:39:22.6478754Z Contents: read
+2026-09-10T05:39:22.6479454Z Metadata: read
+2026-09-10T05:39:22.6480018Z Packages: read
+2026-09-10T05:39:22.6480527Z ##[endgroup]
+2026-09-10T05:39:22.6482240Z Secret source: Actions
+2026-09-10T05:39:22.6483108Z Cache mode: write
+2026-09-10T05:39:22.6483736Z Prepare workflow directory
+2026-09-10T05:39:22.6745932Z Prepare all required actions
+2026-09-10T05:39:22.6800214Z Getting action download info
+2026-09-10T05:39:22.9827082Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-09-10T05:39:23.1002726Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+2026-09-10T05:39:23.3563708Z Complete job name: deploy
+2026-09-10T05:39:23.4145594Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-09-10T05:39:23.4152990Z ##[group]Run actions/checkout@v4
+2026-09-10T05:39:23.4153561Z with:
+2026-09-10T05:39:23.4153948Z   repository: panelid/panel-tahsin
+2026-09-10T05:39:23.4157082Z   token: ***
+2026-09-10T05:39:23.4157455Z   ssh-strict: true
+2026-09-10T05:39:23.4157819Z   ssh-user: git
+2026-09-10T05:39:23.4158197Z   persist-credentials: true
+2026-09-10T05:39:23.4158599Z   clean: true
+2026-09-10T05:39:23.4158977Z   sparse-checkout-cone-mode: true
+2026-09-10T05:39:23.4159580Z   fetch-depth: 1
+2026-09-10T05:39:23.4159948Z   fetch-tags: false
+2026-09-10T05:39:23.4160313Z   show-progress: true
+2026-09-10T05:39:23.4160676Z   lfs: false
+2026-09-10T05:39:23.4161053Z   submodules: false
+2026-09-10T05:39:23.4161428Z   set-safe-directory: true
+2026-09-10T05:39:23.4161834Z   allow-unsafe-pr-checkout: false
+2026-09-10T05:39:23.4162409Z ##[endgroup]
+2026-09-10T05:39:23.4963366Z Syncing repository: panelid/panel-tahsin
+2026-09-10T05:39:23.4965393Z ##[group]Getting Git version info
+2026-09-10T05:39:23.4966334Z Working directory is '/home/runner/work/panel-tahsin/panel-tahsin'
+2026-09-10T05:39:23.4967682Z [command]/usr/bin/git version
+2026-09-10T05:39:23.5068455Z git version 2.55.0
+2026-09-10T05:39:23.5085608Z ##[endgroup]
+2026-09-10T05:39:23.5099128Z Temporarily overriding HOME='/home/runner/work/_temp/77b0ba27-6788-43f9-b63c-0b7f0f33b848' before making global git config changes
+2026-09-10T05:39:23.5101035Z Adding repository directory to the temporary git global config as a safe directory
+2026-09-10T05:39:23.5103815Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/panel-tahsin/panel-tahsin
+2026-09-10T05:39:23.5152518Z Deleting the contents of '/home/runner/work/panel-tahsin/panel-tahsin'
+2026-09-10T05:39:23.5166796Z ##[group]Initializing the repository
+2026-09-10T05:39:23.5167713Z [command]/usr/bin/git init /home/runner/work/panel-tahsin/panel-tahsin
+2026-09-10T05:39:23.5370978Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-09-10T05:39:23.5372550Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-09-10T05:39:23.5373862Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-09-10T05:39:23.5374954Z hint: call:
+2026-09-10T05:39:23.5375676Z hint:
+2026-09-10T05:39:23.5376358Z hint: 	git config --global init.defaultBranch <name>
+2026-09-10T05:39:23.5376996Z hint:
+2026-09-10T05:39:23.5377601Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-09-10T05:39:23.5378468Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-09-10T05:39:23.5379316Z hint:
+2026-09-10T05:39:23.5380003Z hint: 	git branch -m <name>
+2026-09-10T05:39:23.5380665Z hint:
+2026-09-10T05:39:23.5381350Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-09-10T05:39:23.5382739Z Initialized empty Git repository in /home/runner/work/panel-tahsin/panel-tahsin/.git/
+2026-09-10T05:39:23.5384458Z [command]/usr/bin/git remote add origin https://github.com/panelid/panel-tahsin
+2026-09-10T05:39:23.5439598Z ##[endgroup]
+2026-09-10T05:39:23.5440296Z ##[group]Disabling automatic garbage collection
+2026-09-10T05:39:23.5443672Z [command]/usr/bin/git config --local gc.auto 0
+2026-09-10T05:39:23.5473759Z ##[endgroup]
+2026-09-10T05:39:23.5474375Z ##[group]Setting up auth
+2026-09-10T05:39:23.5480164Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-09-10T05:39:23.5509653Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-09-10T05:39:23.5804827Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-09-10T05:39:23.5834361Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-09-10T05:39:23.6022858Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-09-10T05:39:23.6051943Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-09-10T05:39:23.6251034Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-09-10T05:39:23.6282885Z ##[endgroup]
+2026-09-10T05:39:23.6283892Z ##[group]Fetching the repository
+2026-09-10T05:39:23.6291819Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +64c2a708b11715ff3fde9ab3deaae07cef385647:refs/remotes/origin/main
+2026-09-10T05:39:24.3902429Z From https://github.com/panelid/panel-tahsin
+2026-09-10T05:39:24.3903932Z  * [new ref]         64c2a708b11715ff3fde9ab3deaae07cef385647 -> origin/main
+2026-09-10T05:39:24.3907465Z ##[endgroup]
+2026-09-10T05:39:24.3908530Z ##[group]Determining the checkout info
+2026-09-10T05:39:24.3910395Z ##[endgroup]
+2026-09-10T05:39:24.3930181Z [command]/usr/bin/git sparse-checkout disable
+2026-09-10T05:39:24.3959958Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-09-10T05:39:24.3988400Z ##[group]Checking out the ref
+2026-09-10T05:39:24.3992322Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-09-10T05:39:24.4927665Z Switched to a new branch 'main'
+2026-09-10T05:39:24.4930932Z branch 'main' set up to track 'origin/main'.
+2026-09-10T05:39:24.4937454Z ##[endgroup]
+2026-09-10T05:39:24.4977535Z [command]/usr/bin/git log -1 --format=%H
+2026-09-10T05:39:24.5001205Z 64c2a708b11715ff3fde9ab3deaae07cef385647
+2026-09-10T05:39:24.5296022Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-09-10T05:39:24.5300114Z ##[group]Run actions/setup-node@v4
+2026-09-10T05:39:24.5301053Z with:
+2026-09-10T05:39:24.5301789Z   node-version: 20
+2026-09-10T05:39:24.5302583Z   always-auth: false
+2026-09-10T05:39:24.5303389Z   check-latest: false
+2026-09-10T05:39:24.5309960Z   token: ***
+2026-09-10T05:39:24.5310716Z ##[endgroup]
+2026-09-10T05:39:24.6480123Z Attempting to download 20...
+2026-09-10T05:39:24.6592961Z (node:2106) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-09-10T05:39:24.6594552Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-09-10T05:39:25.6083439Z Acquiring 20.20.2 - x64 from https://github.com/actions/node-versions/releases/download/20.20.2-23521894959/node-20.20.2-linux-x64.tar.gz
+2026-09-10T05:39:26.2219634Z Extracting ...
+2026-09-10T05:39:26.2315164Z [command]/usr/bin/tar xz --strip 1 --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/0388e00e-35f6-4f6e-a211-f0b7eeee22d7 -f /home/runner/work/_temp/99a0e133-a909-4876-be97-ebdbe2e19683
+2026-09-10T05:39:27.0828898Z Adding to the cache ...
+2026-09-10T05:39:28.8146431Z ##[group]Environment details
+2026-09-10T05:39:28.9952123Z node: v20.20.2
+2026-09-10T05:39:28.9952552Z npm: 10.8.2
+2026-09-10T05:39:28.9952787Z yarn: 1.22.22
+2026-09-10T05:39:28.9953322Z ##[endgroup]
+2026-09-10T05:39:29.0116017Z ##[group]Run mkdir -p dist/functions
+2026-09-10T05:39:29.0116343Z [36;1mmkdir -p dist/functions[0m
+2026-09-10T05:39:29.0116612Z [36;1mcp -r functions/* dist/functions/[0m
+2026-09-10T05:39:29.0116876Z [36;1mecho "Functions copied:"[0m
+2026-09-10T05:39:29.0117125Z [36;1mls -R dist/functions | head -40[0m
+2026-09-10T05:39:29.0154668Z shell: /usr/bin/bash -e {0}
+2026-09-10T05:39:29.0154950Z ##[endgroup]
+2026-09-10T05:39:29.0256761Z Functions copied:
+2026-09-10T05:39:29.0263388Z dist/functions:
+2026-09-10T05:39:29.0263711Z api
+2026-09-10T05:39:29.0263997Z llms.txt.js
+2026-09-10T05:39:29.0264222Z robots.txt.js
+2026-09-10T05:39:29.0264428Z sitemap.xml.js
+2026-09-10T05:39:29.0264624Z u
+2026-09-10T05:39:29.0264730Z 
+2026-09-10T05:39:29.0264852Z dist/functions/api:
+2026-09-10T05:39:29.0265051Z admin
+2026-09-10T05:39:29.0265232Z auth
+2026-09-10T05:39:29.0265415Z enroll.js
+2026-09-10T05:39:29.0265581Z guru
+2026-09-10T05:39:29.0265923Z review
+2026-09-10T05:39:29.0266195Z setoran
+2026-09-10T05:39:29.0266433Z 
+2026-09-10T05:39:29.0266550Z dist/functions/api/admin:
+2026-09-10T05:39:29.0266781Z guru-pending.js
+2026-09-10T05:39:29.0266909Z 
+2026-09-10T05:39:29.0267021Z dist/functions/api/auth:
+2026-09-10T05:39:29.0267219Z login.js
+2026-09-10T05:39:29.0267398Z register.js
+2026-09-10T05:39:29.0267519Z 
+2026-09-10T05:39:29.0267625Z dist/functions/api/guru:
+2026-09-10T05:39:29.0267842Z pending.js
+2026-09-10T05:39:29.0268017Z verify.js
+2026-09-10T05:39:29.0268117Z 
+2026-09-10T05:39:29.0268218Z dist/functions/api/review:
+2026-09-10T05:39:29.0268420Z submit.js
+2026-09-10T05:39:29.0268508Z 
+2026-09-10T05:39:29.0268612Z dist/functions/api/setoran:
+2026-09-10T05:39:29.0268815Z index.js
+2026-09-10T05:39:29.0269006Z upload.js
+2026-09-10T05:39:29.0269094Z 
+2026-09-10T05:39:29.0269378Z dist/functions/u:
+2026-09-10T05:39:29.0269567Z [profile].js
+2026-09-10T05:39:29.0294507Z ##[group]Run npm i -g wrangler
+2026-09-10T05:39:29.0294758Z [36;1mnpm i -g wrangler[0m
+2026-09-10T05:39:29.0323782Z shell: /usr/bin/bash -e {0}
+2026-09-10T05:39:29.0324019Z ##[endgroup]
+2026-09-10T05:39:34.6619012Z 
+2026-09-10T05:39:34.6619749Z added 35 packages in 6s
+2026-09-10T05:39:34.6620040Z 
+2026-09-10T05:39:34.6620513Z 7 packages are looking for funding
+2026-09-10T05:39:34.6620982Z   run `npm fund` for details
+2026-09-10T05:39:34.6784802Z ##[group]Run wrangler pages deploy dist --project-name=panel-tahsin --branch=main
+2026-09-10T05:39:34.6785450Z [36;1mwrangler pages deploy dist --project-name=panel-tahsin --branch=main[0m
+2026-09-10T05:39:34.6819664Z shell: /usr/bin/bash -e {0}
+2026-09-10T05:39:34.6819883Z env:
+2026-09-10T05:39:34.6820274Z   CLOUDFLARE_API_KEY: ***
+2026-09-10T05:39:34.6820509Z   CLOUDFLARE_EMAIL: ***
+2026-09-10T05:39:34.6820745Z   CLOUDFLARE_ACCOUNT_ID: ***
+2026-09-10T05:39:34.6820947Z ##[endgroup]
+2026-09-10T05:39:35.3502075Z 
+2026-09-10T05:39:35.3502776Z  ⛅️ wrangler 4.86.0
+2026-09-10T05:39:35.3503208Z ───────────────────
+2026-09-10T05:39:35.3985065Z [33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mProcessing wrangler.toml configuration:[0m
+2026-09-10T05:39:35.3985535Z 
+2026-09-10T05:39:35.3985831Z     - Unexpected fields found in d1_databases[0] field: "account_id"
+2026-09-10T05:39:35.3986169Z 
+2026-09-10T05:39:35.3986178Z 
+2026-09-10T05:39:35.7054889Z There is a newer version of Wrangler available (current: 4.86.0, latest: 4.130.0). Try upgrading, as it might support this configuration option.
+2026-09-10T05:39:35.7585952Z [33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mWarning: Your working directory is a git repo and has uncommitted changes[0m
+2026-09-10T05:39:35.7586551Z 
+2026-09-10T05:39:35.7586812Z   To silence this warning, pass in --commit-dirty=true
+2026-09-10T05:39:35.7587113Z 
+2026-09-10T05:39:35.7587120Z 
+2026-09-10T05:39:35.8941645Z 
+2026-09-10T05:39:35.8952789Z [31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mA request to the Cloudflare API (/accounts/***/pages/projects/panel-tahsin) failed.[0m
+2026-09-10T05:39:35.8953423Z 
+2026-09-10T05:39:35.8953919Z   Project not found. The specified project name does not match any of your existing projects. [code: 8000007]
+2026-09-10T05:39:35.8954366Z   
+2026-09-10T05:39:35.8954880Z   If you think this is a bug, please open an issue at: [4mhttps://github.com/cloudflare/workers-sdk/issues/new/choose[0m
+2026-09-10T05:39:35.8955230Z 
+2026-09-10T05:39:35.8955276Z 
+2026-09-10T05:39:35.9186871Z 🪵  Logs were written to "/home/runner/.config/.wrangler/logs/wrangler-2026-09-10_05-39-35_095.log"
+2026-09-10T05:39:35.9310886Z ##[error]Process completed with exit code 1.
+2026-09-10T05:39:35.9425068Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-09-10T05:39:35.9425990Z Post job cleanup.
+2026-09-10T05:39:36.0106023Z [command]/usr/bin/git version
+2026-09-10T05:39:36.0140364Z git version 2.55.0
+2026-09-10T05:39:36.0168006Z Temporarily overriding HOME='/home/runner/work/_temp/29029146-d851-458f-b862-9933472969d3' before making global git config changes
+2026-09-10T05:39:36.0169366Z Adding repository directory to the temporary git global config as a safe directory
+2026-09-10T05:39:36.0172820Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/panel-tahsin/panel-tahsin
+2026-09-10T05:39:36.0204248Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-09-10T05:39:36.0233842Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-09-10T05:39:36.0462091Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-09-10T05:39:36.0486227Z http.https://github.com/.extraheader
+2026-09-10T05:39:36.0495281Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-09-10T05:39:36.0523089Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-09-10T05:39:36.0731590Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-09-10T05:39:36.0763697Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-09-10T05:39:36.1086822Z Cleaning up orphan processes
+2026-09-10T05:39:36.1345583Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
