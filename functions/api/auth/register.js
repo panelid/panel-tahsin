@@ -32,11 +32,11 @@ export async function onRequestPost(context) {
         .bind('ref_' + Date.now(), referredBy, id).run()
       const refUser = await db.prepare("SELECT wa_number, name FROM users WHERE id = ?").bind(referredBy).first()
       if (refUser && refUser.wa_number) {
-        await sendWA(refUser.wa_number, `🎉 ${name} mendaftar lewat undangan kamu di Ponpes Digital!`)
+        await sendWA(refUser.wa_number, `🎉 ${name} mendaftar lewat undangan kamu di Ponpes Digital!`, env)
       }
     }
     if (wa_number) {
-      await sendWA(wa_number, `Assalamu'alaikum ${name}! Selamat datang di Ponpes Digital 📖 Platform tahsin & ngaji online gratis. Kode referral kamu: ${referralCode}`)
+      await sendWA(wa_number, `Assalamu'alaikum ${name}! Selamat datang di Ponpes Digital 📖 Platform tahsin & ngaji online gratis. Kode referral kamu: ${referralCode}`, env)
     }
     return new Response(JSON.stringify({ success: true, message: 'Registrasi berhasil!', user: { id, name, email, role, referral_code: referralCode } }), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
   } catch (err) {

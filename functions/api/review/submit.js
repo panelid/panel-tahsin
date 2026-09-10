@@ -29,7 +29,7 @@ export async function onRequestPost(context) {
       // WA notify murid
       const murid = await db.prepare("SELECT wa_number, name FROM users WHERE id = ?").bind(s.user_id).first()
       if (murid && murid.wa_number) {
-        await notifyMuridReviewed(murid.wa_number, Math.round(avg), reviews[0]?.catatan_teks || '')
+        await notifyMuridReviewed(murid.wa_number, Math.round(avg), reviews[0]?.catatan_teks || '', env)
       }
     }
     return new Response(JSON.stringify({ success: true, message: 'Review berhasil disimpan', avg_score: reviews.reduce((a, r) => a + (r.score || 0), 0) / (reviews.length || 1) }), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
