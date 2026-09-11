@@ -84,10 +84,12 @@
 
         // Simpan data user di localStorage
         localStorage.setItem('user', JSON.stringify(data.user));
+        // simpan uid biar dashboard bisa load
+        localStorage.setItem('uid', data.user.id);
 
-        // Redirect berdasarkan role
+        // Redirect berdasarkan role (bawa uid di URL)
         if (data.user.role === 'murid') {
-          window.location.href = 'dashboard-murid.html';
+          window.location.href = 'dashboard-murid.html?uid=' + data.user.id;
         } else {
           window.location.href = 'dashboard-guru.html';
         }

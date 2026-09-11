@@ -98,9 +98,12 @@
           btn.disabled = false; btn.textContent = 'Daftar Sekarang';
           return;
         }
-        successEl.textContent = 'Berhasil! Mengarahkan ke halaman masuk...';
+        // simpan uid + langsung ke dashboard (skip login, akun baru)
+        localStorage.setItem('uid', data.user.id);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        successEl.textContent = 'Berhasil! Mengarahkan ke dashboard...';
         successEl.classList.remove('hidden');
-        setTimeout(() => window.location.href = 'login.html', 1500);
+        setTimeout(() => window.location.href = 'dashboard-murid.html?uid=' + data.user.id, 1200);
       } catch (err) {
         errorEl.textContent = 'Terjadi kesalahan. Coba lagi.';
         errorEl.classList.remove('hidden');

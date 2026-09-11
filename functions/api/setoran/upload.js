@@ -46,8 +46,20 @@ export async function onRequestPost(context) {
           "INSERT INTO setoran (id, user_id, track_id, unit_ref, audio_url, status) VALUES (?, ?, ?, ?, ?, 'pending')"
         ).bind(setoranId, userId, trackId, unitRef, audioDataUrl).run()
 
-        // Notify guru if instructor_id provided (TBD: need an instructor.id or a separate instructors table)
-        // TEMPORARY: require track_id known and look up first enrolled guru? We'll skip TA for now until instructor lookup is defined.
+        // WA notif ke guru (cari guru pertama / INSTRUCTOR_WA env)
+        try {
+          const { notifyUstadzNewSetoran } = await import('../../../src/utils/wa.js')
+          const murid = await db.prepare("SELECT name FROM users WHERE id = ?").bind(userId).first()
+          const guru = await db.prepare("SELECT wa_number FROM users WHERE role = 'guru' AND wa_number IS NOT NULL LIMIT 1").first()
+          const instructorWa = env && env.INSTRUCTOR_WA
+          const target = instructorWa || (guru && guru.wa_number)
+          if (target) {
+            await notifyUstadzNewSetoran(target, murid ? murid.name : 'Santri', setoranId, env)
+          }
+        } catch (waErr) {
+          console.warn('[WA] notify skipped:', waErr.message)
+        }
+
         return new Response(JSON.stringify({
           success: true,
           message: 'Setoran berhasil dikirim!',
