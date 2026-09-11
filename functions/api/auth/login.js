@@ -13,11 +13,11 @@ export async function onRequestPost(context) {
     const { email, password } = await request.json()
     if (!email || !password) return new Response(JSON.stringify({ success: false, error: 'Email dan password wajib diisi' }), { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
     const db = env.DB
-    const user = await db.prepare("SELECT * FROM users WHERE email = ?").bind(email).first()
+    const user = await db.prepare("SELECT id, name, email, password_hash, role, username, referral_code FROM users WHERE email = ?").bind(email).first();
     if (!user) return new Response(JSON.stringify({ success: false, error: 'Email atau password salah' }), { status: 401, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
     const ok = await verifyPassword(password, user.password_hash)
     if (!ok) return new Response(JSON.stringify({ success: false, error: 'Email atau password salah' }), { status: 401, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
-    return new Response(JSON.stringify({ success: true, message: 'Login berhasil', user: { id: user.id, name: user.name, email: user.email, role: user.role, referral_code: user.referral_code } }), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
+    return new Response(JSON.stringify({ success: true, message: 'Login berhasil', user: { id: user.id, name: user.name, email: user.email, role: user.role, username: user.username, referral_code: user.referral_code } }), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
   } catch (err) {
     return new Response(JSON.stringify({ success: false, error: err.message }), { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
   }

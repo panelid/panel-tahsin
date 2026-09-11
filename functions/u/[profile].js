@@ -10,9 +10,12 @@ export async function onRequestGet(context) {
   const db = env.DB;
   if (!db) return new Response('DB error', { status: 500 });
 
-  const user = await db.prepare(
-    "SELECT id, name, referral_code, username, created_at FROM users WHERE username = ? OR referral_code = ? OR id = ?"
-  ).bind(username, username, username).first();
+  let user = await db.prepare(
+    "SELECT id, name, referral_code, username, created_at FROM users WHERE username = ?"
+  ).bind(username).first();
+  if (!user) user = await db.prepare(
+    "SELECT id, name, referral_code, username, created_at FROM users WHERE referral_code = ? OR id = ?"
+  ).bind(username, username).first();
   if (!user) return new Response('User not found', { status: 404 });
 
   const ref = await db.prepare("SELECT COUNT(*) as c FROM referrals WHERE referrer_id = ?").bind(user.id).first();
