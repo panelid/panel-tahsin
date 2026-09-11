@@ -38,13 +38,30 @@ CREATE TABLE IF NOT EXISTS enrollments (
 
 CREATE TABLE IF NOT EXISTS guru_verification (
   id TEXT PRIMARY KEY,
-  user_id TEXT NOT NULL,
-  demo_audio_url TEXT,
-  cert_url TEXT,
-  status TEXT DEFAULT 'pending',
-  reviewed_by TEXT,
+  user_id TEXT NOT NULL,          -- guru_pending
+  demo_audio_url TEXT,            -- setoran bacaannya (Al-Hajj 1-5)
+  cert_url TEXT,                  -- sertifikat sanad
+  sanad_url TEXT,                 -- upload bukti sanad (jika ada)
+  mahad_text TEXT,                -- isian: pernah belajar di Ma'had (jika tanpa sertifikat)
+  setoran_id TEXT,                -- id setoran bacaan yang di-review
+  status TEXT DEFAULT 'pending', -- pending|approved|rejected
+  reviewed_by TEXT,               -- siapa terakhir aksi (audit)
   reviewed_at TEXT,
-  created_at TEXT DEFAULT (datetime('now'))
+  created_at TEXT DEFAULT (datetime('now')),
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Review per-guru untuk calon pengajar (1 ACC = lolos)
+CREATE TABLE IF NOT EXISTS guru_review (
+  id TEXT PRIMARY KEY,
+  verification_id TEXT NOT NULL,
+  guru_id TEXT NOT NULL,
+  decision TEXT NOT NULL,         -- acc|reject
+  catatan TEXT,
+  created_at TEXT DEFAULT (datetime('now')),
+  UNIQUE(verification_id, guru_id),
+  FOREIGN KEY (verification_id) REFERENCES guru_verification(id),
+  FOREIGN KEY (guru_id) REFERENCES users(id)
 );
 
 -- 4. Tambah kolom track_id + unit_ref ke setoran
