@@ -20,7 +20,7 @@ export async function onRequestPost(context) {
 
     // hitung acc
     const acc = await db.prepare("SELECT COUNT(*) c FROM guru_review WHERE verification_id = ? AND decision='acc'").bind(verificationId).first()
-    const v = await db.prepare("SELECT user_id, u_name FROM guru_verification gv JOIN users u ON u.id=gv.user_id WHERE gv.id = ?").bind(verificationId).first()
+    const v = await db.prepare("SELECT user_id FROM guru_verification WHERE id = ?").bind(verificationId).first()
 
     if (acc.c >= 1) {
       await db.prepare("UPDATE users SET role = 'guru' WHERE id = ?").bind(v.user_id).run()
