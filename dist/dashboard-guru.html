@@ -11,6 +11,7 @@
 </head>
 <body data-page="guru">
 <div id="hdr"></div>
+<div id="liveToast"></div>
 <div class="wrap">
   <div class="hero">
     <div class="ar">خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ</div>
@@ -31,7 +32,7 @@ const TRACKS = [['iqro','Iqro'],['fatihah','Al-Fatihah'],['juz_amma','Juz Amma']
 let tab = 'setoran', counts = { setoran: 0, calon: 0, angkat: 0, belajar: 0 };
 
 function renderSeg() {
-  const tabs = [['setoran', 'Setoran Santri'], ['calon', 'Calon Guru'], ['angkat', 'Angkat Murid']];
+  const tabs = [['setoran', 'Setoran Santri'], ['calon', 'Calon Guru'], ['angkat', 'Angkat Murid'], ['live', 'Live Ngaji']];
   if (PP.me.is_student) tabs.push(['belajar', 'Mode Belajar']);
   seg.innerHTML = tabs.map(t => '<button role="tab" aria-selected="' + (t[0] === tab) + '" onclick="go(\'' + t[0] + '\')">' + t[1]
     + (counts[t[0]] ? '<span class="n">' + counts[t[0]] + '</span>' : '') + '</button>').join('');
@@ -43,6 +44,7 @@ async function render() {
   if (tab === 'setoran') return renderSetoran();
   if (tab === 'calon') return renderCalon();
   if (tab === 'angkat') return renderAngkat();
+  if (tab === 'live') return renderLive();
   if (tab === 'belajar') { location.href = '/dashboard-murid'; return; }
 }
 
@@ -134,7 +136,76 @@ async function angkat(id, nm) {
   else { m.textContent = d.error || 'Gagal'; m.className = 'hint bad'; }
 }
 
-renderSeg(); render();
-</script>
+
+// ───── LIVE: guru dapat notif, respon, balas ─────
+let gLiveSid = null, gLiveTimer = null, gLiveAfter = '1970-01-01', gBlob = null, gMr = null, gChunks = [], gRec = false, gT0, gTick, gPollTimer;
+async function guruPollLive() {
+  if (!PP.me.id) return;
+  const list = await (await fetch('/api/live?guruId=' + encodeURIComponent(PP.me.id))).json();
+  if (list.length && !gLiveSid) {
+    const r = list[0];
+    const t = document.getElementById('liveToast');
+    t.innerHTML = '<div class="toast"><h3>🎙 Ngaji Live 1-on-1</h3><p class="sub">' + PP.esc(r.murid_name) + (r.murid_username ? ' (@' + r.murid_username + ')' : '') + ' meminta sesi ngaji live bersamamu.</p>'
+      + '<button class="btn btn-primary" onclick="guruRespond(\'' + r.id + '\',true)">✓ Terima</button>'
+      + '<button class="btn btn-ghost" onclick="guruRespond(\'' + r.id + '\',false)">Nanti dulu</button></div>';
+  }
+  gPollTimer = setTimeout(guruPollLive, 5000);
+}
+async function guruRespond(sid, accept) {
+  const d = await (await fetch('/api/live', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'respond', sessionId: sid, accept }) })).json();
+  document.getElementById('liveToast').innerHTML = '';
+  if (accept) { gLiveSid = sid; openGuruLive(); } else { alert('Permintaan ditolak. Murid akan diberi tahu.'); }
+  guruPollLive();
+}
+function openGuruLive() {
+  location.hash = '#live'; tab = 'live'; renderSeg(); render();
+}
+async function renderLive() {
+  const d = await (await fetch('/api/live?sessionId=' + gLiveSid)).json();
+  let h = '<div class="card"><div class="card-t">🎙 Sesi Live Aktif</div><div class="card-s">Dengarkan bacaan murid, lalu rekam koreksimu.</div>';
+  h += '<div id="gMsgs" style="max-height:260px;overflow:auto;margin-bottom:12px"></div>';
+  h += '<div class="rec"><div class="eq" id="geq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><button class="rec-orb" id="grec" onclick="gToggle()">REKAM</button></div>';
+  h += '<button class="btn btn-primary btn-block" id="gsend" style="margin-top:10px" disabled onclick="gSend()">Kirim Koreksi</button>';
+  h += '<button class="btn btn-ghost btn-block" style="margin-top:8px" onclick="gEnd()">Akhiri Sesi</button></div>';
+  app.innerHTML = h;
+  gLiveAfter = '1970-01-01'; gPoll();
+}
+async function gPoll() {
+  if (!gLiveSid) return;
+  const d = await (await fetch('/api/live?sessionId=' + gLiveSid + '&after=' + encodeURIComponent(gLiveAfter))).json();
+  if (d.session && d.session.status !== 'active') { alert('Sesi diakhiri.'); location.reload(); return; }
+  const box = document.getElementById('gMsgs');
+  (d.messages || []).forEach(m => {
+    const w = document.createElement('div'); w.className = 'item'; w.style.animation = 'none';
+    const who = m.sender === 'guru' ? '🎓 Kamu' : '🧕 Murid';
+    w.innerHTML = '<div class="sub">' + who + '</div>' + (m.audio_url ? '<audio controls preload="none" src="' + m.audio_url + '"></audio>' : '') + (m.text ? '<div>' + PP.esc(m.text) + '</div>' : '');
+    box.appendChild(w); box.scrollTop = box.scrollHeight; gLiveAfter = m.created_at;
+  });
+  gLiveTimer = setTimeout(gPoll, 2500);
+}
+async function gToggle() {
+  if (!gRec) {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mime = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+      gMr = new MediaRecorder(stream, { mimeType: mime }); gChunks = [];
+      gMr.ondataavailable = e => gChunks.push(e.data);
+      gMr.onstop = () => { gBlob = new Blob(gChunks, { type: mime }); stream.getTracks().forEach(t => t.stop()); gsend.disabled = false; };
+      gMr.start(); gRec = true; gT0 = Date.now(); gTick = setInterval(() => { const s = Math.floor((Date.now() - gT0) / 1000); grec.textContent = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }, 250);
+      grec.textContent = 'SELESAI'; grec.classList.add('on'); geq.classList.add('on');
+    } catch (e) { alert('Gagal mic: ' + e.message); }
+  } else { gMr.stop(); gRec = false; clearInterval(gTick); grec.textContent = 'REKAM'; grec.classList.remove('on'); geq.classList.remove('on'); }
+}
+async function gSend() {
+  if (!gBlob) return; gsend.disabled = true; gsend.textContent = 'Mengirim…';
+  const fd = new FormData(); fd.append('audio', gBlob, 'live.webm'); fd.append('user_id', PP.me.id); fd.append('track_id', 'live'); fd.append('unit_ref', 'live-koreksi');
+  const d = await (await fetch('/api/setoran/upload', { method: 'POST', body: fd })).json();
+  await fetch('/api/live', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'message', sessionId: gLiveSid, sender: 'guru', userId: PP.me.id, audio_url: d.audio_url }) });
+  gBlob = null; gsend.textContent = 'Kirim Koreksi'; gPoll();
+}
+async function gEnd() { await fetch('/api/live', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'end', sessionId: gLiveSid }) }); location.reload(); }
+
+renderSeg(); render(); guruPollLive();
+
 </body>
 </html>

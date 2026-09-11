@@ -154,6 +154,13 @@ audio{width:100%;height:38px;margin-top:10px;border-radius:999px}
 .nav a{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;font-weight:700;color:var(--muted);padding:4px 10px;border-radius:12px;flex:1;max-width:110px}
 .nav a.on{color:var(--teal);background:var(--mint)}
 .nav a i{font-style:normal;font-size:19px;line-height:1}
+
+/* ── live toast ── */
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-120%);z-index:50;max-width:92vw;width:420px;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--sh-3);padding:18px;animation:drop .4s cubic-bezier(.2,.9,.3,1.2) forwards}
+@keyframes drop{to{transform:translateX(-50%) translateY(0)}}
+.toast h3{font-family:var(--fd);font-size:17px;color:var(--teal);margin-bottom:4px}
+.toast .btn{width:100%;margin-top:9px}
 @media (min-width:760px){.nav{position:static;background:none;border:none;backdrop-filter:none;justify-content:flex-start;padding:0 0 16px}
   .nav a{max-width:none;flex-direction:row;font-size:14px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
