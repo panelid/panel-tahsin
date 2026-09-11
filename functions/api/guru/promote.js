@@ -15,6 +15,11 @@ export async function onRequestPost(context) {
     else if (muridEmail) murid = await db.prepare("SELECT id, name, email, role, wa_number FROM users WHERE email = ?").bind(muridEmail).first()
     if (!murid) return json({ success: false, error: 'murid tidak ditemukan' }, 404)
     if (murid.role === 'guru') return json({ success: false, error: 'sudah jadi guru' }, 400)
+    // guru biasa hanya boleh angkat murid bimbingannya sendiri (admin bebas)
+    if (!prom.is_admin) {
+      const my = await db.prepare("SELECT 1 FROM referrals WHERE referrer_id = ? AND referred_id = ?").bind(promoterId, murid.id).first()
+      if (!my) return json({ success: false, error: 'bukan murid bimbingan kamu' }, 403)
+    }
 
     // angkat: role -> guru, insert guru_verification approved
     await db.prepare("UPDATE users SET role = 'guru' WHERE id = ?").bind(murid.id).run()
