@@ -28,23 +28,32 @@
   <div class="wrap">
     <a href="/" class="back">← ponpes.org</a>
     <h1>Dashboard Santri</h1>
+    <div id="app"><p style="color:var(--muted)">Memuat…</p></div>
+  </div>
   <script>
+    const app = document.getElementById('app');
     const uid = new URLSearchParams(location.search).get('uid') || localStorage.getItem('uid');
     if (uid) localStorage.setItem('uid', uid);
+    if (!uid) { location.href = '/login.html'; }
     async function load() {
-      if (!uid) { document.getElementById('app').innerHTML = '<p>Login dulu (daftar → simpan uid).</p>'; return; }
-      const r = await fetch('/api/enroll/' + uid); const d = await r.json();
-      if (d.error) { document.getElementById('app').innerHTML = '<p>'+d.error+'</p>'; return; }
-      let html = '<p class="text-lg">Halo <b>' + d.user.name + '</b></p>';
-      html += '<h2 class="font-semibold mt-4">Track Aktif</h2>';
-      (d.enrollments||[]).forEach(e => html += '<div class="track-pill">'+e.track+' — '+e.status+(e.current_unit?' (unit: '+e.current_unit+')':'')+'</div>');
-      html += '<h2 class="font-semibold mt-4">Setoran Terakhir</h2>';
-      (d.setoran||[]).forEach(s => html += '<div class="track-pill">'+s.track_id+' — '+s.status+' ('+s.created_at+')</div>');
-      html += '<div class="mt-6 p-4 box"><h3 class="font-semibold mb-2">Mulai Track Baru</h3>'+
-        '<select id="track" class="ipt"><option value="iqro">Iqro</option><option value="fatihah">Al-Fatihah</option><option value="juz_amma">Juz Amma</option><option value="tilawah">Tilawah</option><option value="hafalan">Hafalan</option></select>'+
-        '<input id="unit" placeholder="Unit mulai (misal: Iqro 3 hal 10)" class="ipt w-full my-2">'+
-        '<button onclick="enroll()" class="btn btn-teal">Mulai</button></div>';
-      document.getElementById('app').innerHTML = html;
+      if (!uid) return;
+      try {
+        const r = await fetch('/api/enroll/' + uid);
+        const d = await r.json();
+        if (d.error) { app.innerHTML = '<p>' + d.error + '</p>'; return; }
+        let html = '<p>Halo <b>' + d.user.name + '</b></p>';
+        html += '<h2>Track Aktif</h2>';
+        if (!(d.enrollments||[]).length) html += '<div class="track-pill">Belum ada track. Pilih di bawah.</div>';
+        (d.enrollments||[]).forEach(e => html += '<div class="track-pill">' + e.track + ' — ' + e.status + (e.current_unit ? ' (unit: ' + e.current_unit + ')' : '') + '</div>');
+        html += '<h2>Setoran Terakhir</h2>';
+        if (!(d.setoran||[]).length) html += '<div class="track-pill">Belum ada setoran.</div>';
+        (d.setoran||[]).forEach(s => html += '<div class="track-pill">' + (s.track_id||'-') + ' — ' + s.status + ' (' + (s.created_at||'') + ')</div>');
+        html += '<div class="box"><h3 style="margin-bottom:8px">Mulai Track Baru</h3>' +
+          '<select id="track" class="ipt"><option value="iqro">Iqro</option><option value="fatihah">Al-Fatihah</option><option value="juz_amma">Juz Amma</option><option value="tilawah">Tilawah</option><option value="hafalan">Hafalan</option></select>' +
+          '<input id="unit" placeholder="Unit mulai (misal: Iqro 3 hal 10)" class="ipt">' +
+          '<button onclick="enroll()" class="btn btn-teal" style="margin-top:10px">Mulai</button></div>';
+        app.innerHTML = html;
+      } catch (e) { app.innerHTML = '<p style="color:#c0392b">Gagal memuat: ' + e.message + '</p>'; }
     }
     async function enroll() {
       await fetch('/api/enroll', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:uid,trackId:track.value,currentUnit:unit.value})});
