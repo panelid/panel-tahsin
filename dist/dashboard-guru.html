@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Literata:opsz,wght@7..72,600&display=swap" rel="stylesheet">
   <style>
-    :root{--base:#F6F5EF;--teal:#1E4640;--amber:#E3A23B;--ink:#1C2420;--soft:#E7EEE6;--muted:#5A655F;--line:#D9DED8}
+    :root{--base:#F6F5EF;--teal:#1E4640;--amber:#E3A23B;--ink:#1C2420;--soft:#E7EEE6;--muted:#5A655F;--line:#D9DED8;--bad:#c0392b;--ok:#1f8a55}
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--base);color:var(--ink);font-size:16px;line-height:1.7;padding:20px 14px}
     .wrap{max-width:680px;margin:0 auto}
@@ -25,7 +25,8 @@
     .back{display:inline-block;margin-bottom:10px;font-size:14px}
     audio{width:100%;margin:8px 0}
     .badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:#FCEFD6;color:#9a6b15}
-    .hint{font-size:13px;margin-top:6px;min-height:18px}.hint.ok{color:#1f8a55}.hint.bad{color:#c0392b}.hint.muted{color:var(--muted)}
+    .hint{font-size:13px;margin-top:6px;min-height:18px}.hint.ok{color:var(--ok)}.hint.bad{color:var(--bad)}.hint.muted{color:var(--muted)}
+    .btn-bad{background:var(--bad)} .btn-ghost{background:#fff;color:var(--teal);border-color:var(--line)} .btn-amber{background:var(--amber);color:#221A06}
   </style>
 </head>
 <body>
@@ -34,27 +35,31 @@
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
       <h1 style="margin:0">Dashboard Pengajar</h1>
       <span id="learnTab" style="display:none"></span>
+      <span id="reviewTab" style="display:none"></span>
     </div>
-    <div id="app"></div>
-    <div class="card" style="margin-top:20px">
-      <h2 style="margin-top:0">🎓 Angkat Murid Jadi Guru</h2>
-      <p class="muted">Pilih murid bimbinganmu yang sudah layak mengajar, lalu angkat sebagai pengajar.</p>
-      <div class="row">
-        <select id="muridSel" class="ipt" style="flex:1;min-width:180px"><option>memuat…</option></select>
-        <button class="btn" onclick="angkat()">Angkat Jadi Guru</button>
+    <div id="mainView">
+      <div id="app"></div>
+      <div class="card" style="margin-top:20px">
+        <h2 style="margin-top:0">🎓 Angkat Murid Jadi Guru</h2>
+        <p class="muted">Pilih murid bimbinganmu yang sudah layak mengajar, lalu angkat sebagai pengajar.</p>
+        <div class="row">
+          <select id="muridSel" class="ipt" style="flex:1;min-width:180px"><option>memuat…</option></select>
+          <button class="btn" onclick="angkat()">Angkat Jadi Guru</button>
+        </div>
+        <p id="promMsg" class="hint muted"></p>
       </div>
-      <p id="promMsg" class="hint muted"></p>
     </div>
+    <div id="reviewView" style="display:none"></div>
   </div>
   <script>
     const me = JSON.parse(localStorage.getItem('user') || '{}');
     const tab = document.getElementById('learnTab');
     if (me.is_student) {
       tab.style.display = 'inline-block';
-      tab.innerHTML = '<a href="/dashboard-murid" class="btn" style="background:var(--amber);color:#221A06">📖 Mode Belajar</a> <button class="btn" style="background:#fff;color:var(--muted);border-color:var(--line)" onclick="toggleStud(false)">Matikan</button>';
+      tab.innerHTML = '<a href="/dashboard-murid" class="btn btn-amber">📖 Mode Belajar</a> <button class="btn btn-ghost" onclick="toggleStud(false)">Matikan</button>';
     } else if (me.role === 'guru' && me.id) {
       tab.style.display = 'inline-block';
-      tab.innerHTML = '<button class="btn" style="background:#fff;color:var(--teal);border-color:var(--teal)" onclick="toggleStud(true)">+ Aktifkan Mode Belajar</button>';
+      tab.innerHTML = '<button class="btn btn-ghost" onclick="toggleStud(true)">+ Aktifkan Mode Belajar</button>';
     }
     async function toggleStud(on) {
       await fetch('/api/guru/toggle-student', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ userId: me.id, on }) });
@@ -118,6 +123,59 @@
       else { msg.textContent = d.error || 'Gagal'; msg.className = 'hint bad'; }
     }
     loadMurid();
+
+    // --- Review calon pengajar: semua guru bisa vote, 1 ACC = lolos ---
+    let pendingCalon = 0;
+    if (me.role === 'guru' && me.id) {
+      document.getElementById('reviewTab').innerHTML = '<button class="btn btn-amber" onclick="showReview()">📝 Review Calon Guru <span id="calonBadge"></span></button>';
+      checkCalan();
+    }
+    async function checkCalan() {
+      const list = await (await fetch('/api/guru/queue')).json();
+      pendingCalon = list.length;
+      const b = document.getElementById('calonBadge');
+      if (b) b.textContent = pendingCalon ? ' ('+pendingCalon+')' : '';
+    }
+    function showReview() {
+      document.getElementById('mainView').style.display = 'none';
+      document.getElementById('reviewView').style.display = 'block';
+      loadQueue();
+    }
+    function backMain() {
+      document.getElementById('mainView').style.display = 'block';
+      document.getElementById('reviewView').style.display = 'none';
+      load(); loadMurid(); checkCalan();
+    }
+    async function loadQueue() {
+      const rv = document.getElementById('reviewView');
+      rv.innerHTML = '<p class="muted">Memuat…</p>';
+      const list = await (await fetch('/api/guru/queue')).json();
+      if (!list.length) { rv.innerHTML = '<div class="card"><p class="muted">Tidak ada calon menunggu review.</p><button class="btn btn-ghost" onclick="backMain()">← Kembali</button></div>'; return; }
+      let html = '<h2>Calon Pengajar Menunggu ('+list.length+')</h2><p class="muted">Dengerin bacaan Al-Hajj 1-5 + cek bukti, lalu ACC/Tolak. Cukup 1 guru ACC = lolos.</p>';
+      list.forEach(c => {
+        let bukti = '<span class="muted">tanpa bukti tertulis</span>';
+        if (c.sanad_url) bukti = 'Sanad: <a href="'+c.sanad_url+'" target="_blank">lihat</a>';
+        else if (c.mahad_text) bukti = 'Ma\'had: '+c.mahad_text;
+        else if (c.cert_url) bukti = 'Sertifikat: <a href="'+c.cert_url+'" target="_blank">lihat</a>';
+        const audio = c.demo_audio_url ? '<audio controls src="'+c.demo_audio_url+'"></audio>' : '<p class="muted">tidak ada audio</p>';
+        html += '<div class="card"><p><b>'+c.name+'</b> <span class="muted">'+c.email+'</span></p>'
+          +'<p class="muted" style="font-size:13px">'+bukti+'</p>'+audio
+          +'<p class="muted" style="font-size:13px">ACC: '+c.acc_count+' · Tolak: '+c.rej_count+' · Guru aktif: '+c.guru_total+'</p>'
+          +'<input id="cat_'+c.id+'" class="ipt" placeholder="catatan (opsional)" style="width:100%;margin:8px 0">'
+          +'<div class="row"><button class="btn" onclick="vote(\''+c.id+'\',\'acc\')">✓ ACC</button>'
+          +'<button class="btn btn-bad" onclick="vote(\''+c.id+'\',\'reject\')">✗ Tolak</button>'
+          +'<button class="btn btn-ghost" onclick="backMain()">← Kembali</button></div></div>';
+      });
+      rv.innerHTML = html;
+    }
+    async function vote(verId, decision) {
+      const el = document.getElementById('cat_'+verId);
+      const cat = el ? el.value : '';
+      const d = await (await fetch('/api/guru/review', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({guruId: me.id, verificationId: verId, decision, catatan: cat})})).json();
+      if (d.error) { alert(d.error); return; }
+      if (d.status === 'approved') alert('✓ Calon ini sudah ACC dan resmi menjadi guru.');
+      loadQueue();
+    }
   </script>
 </body>
 </html>
