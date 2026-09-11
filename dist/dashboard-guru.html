@@ -1,181 +1,140 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Pengajar — ponpes.org</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Literata:opsz,wght@7..72,600&display=swap" rel="stylesheet">
-  <style>
-    :root{--base:#F6F5EF;--teal:#1E4640;--amber:#E3A23B;--ink:#1C2420;--soft:#E7EEE6;--muted:#5A655F;--line:#D9DED8;--bad:#c0392b;--ok:#1f8a55}
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--base);color:var(--ink);font-size:16px;line-height:1.7;padding:20px 14px}
-    .wrap{max-width:680px;margin:0 auto}
-    h1{font-family:'Literata',serif;font-size:26px;margin-bottom:4px}
-    h2{font-size:17px;color:var(--teal);margin:20px 0 10px}
-    .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
-    .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
-    .ipt{padding:9px 12px;border:1px solid var(--line);border-radius:10px;font-family:'Plus Jakarta Sans';font-size:14px;background:#fff;color:var(--ink)}
-    .ipt:focus{outline:2px solid var(--amber)}
-    .btn{display:inline-flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;border-radius:10px;padding:9px 16px;text-decoration:none;cursor:pointer;border:1px solid transparent;font-family:'Plus Jakarta Sans';background:var(--teal);color:#fff}
-    .btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 14px rgba(30,70,64,.25)}
-    .btn:disabled{opacity:.5;cursor:not-allowed}
-    .muted{color:var(--muted);font-size:14px}
-    a{color:var(--teal);font-weight:600;text-decoration:none}
-    .back{display:inline-block;margin-bottom:10px;font-size:14px}
-    audio{width:100%;margin:8px 0}
-    .badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:#FCEFD6;color:#9a6b15}
-    .hint{font-size:13px;margin-top:6px;min-height:18px}.hint.ok{color:var(--ok)}.hint.bad{color:var(--bad)}.hint.muted{color:var(--muted)}
-    .btn-bad{background:var(--bad)} .btn-ghost{background:#fff;color:var(--teal);border-color:var(--line)} .btn-amber{background:var(--amber);color:#221A06}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Pengajar — ponpes.org</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Literata:opsz,wght@7..72,500;7..72,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/app.css">
 </head>
-<body>
-  <div class="wrap">
-    <a href="/" class="back">← ponpes.org</a>
-    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-      <h1 style="margin:0">Dashboard Pengajar</h1>
-      <span id="learnTab" style="display:none"></span>
-      <span id="reviewTab" style="display:none"></span>
-    </div>
-    <div id="mainView">
-      <div id="app"></div>
-      <div class="card" style="margin-top:20px">
-        <h2 style="margin-top:0">🎓 Angkat Murid Jadi Guru</h2>
-        <p class="muted">Pilih murid bimbinganmu yang sudah layak mengajar, lalu angkat sebagai pengajar.</p>
-        <div class="row">
-          <select id="muridSel" class="ipt" style="flex:1;min-width:180px"><option>memuat…</option></select>
-          <button class="btn" onclick="angkat()">Angkat Jadi Guru</button>
-        </div>
-        <p id="promMsg" class="hint muted"></p>
-      </div>
-    </div>
-    <div id="reviewView" style="display:none"></div>
+<body data-page="guru">
+<div id="hdr"></div>
+<div class="wrap">
+  <div class="hero">
+    <div class="ar">خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ</div>
+    <h1 id="heroName">Dashboard Pengajar</h1>
+    <p id="heroSub">Reviu setoran santri dan bantu mereka bergerak maju.</p>
+    <div id="heroWave"></div>
   </div>
-  <script>
-    const me = JSON.parse(localStorage.getItem('user') || '{}');
-    const tab = document.getElementById('learnTab');
-    if (me.is_student) {
-      tab.style.display = 'inline-block';
-      tab.innerHTML = '<a href="/dashboard-murid" class="btn btn-amber">📖 Mode Belajar</a> <button class="btn btn-ghost" onclick="toggleStud(false)">Matikan</button>';
-    } else if (me.role === 'guru' && me.id) {
-      tab.style.display = 'inline-block';
-      tab.innerHTML = '<button class="btn btn-ghost" onclick="toggleStud(true)">+ Aktifkan Mode Belajar</button>';
-    }
-    async function toggleStud(on) {
-      await fetch('/api/guru/toggle-student', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ userId: me.id, on }) });
-      me.is_student = on; localStorage.setItem('user', JSON.stringify(me));
-      location.reload();
-    }
-    const TRACKS = [['iqro','Iqro'],['fatihah','Al-Fatihah'],['juz_amma','Juz Amma'],['tilawah','Tilawah'],['hafalan','Hafalan']];
-    async function load() {
-      const r = await fetch('/api/guru/pending'); const list = (await r.json()).filter(s => s.user_id !== me.id);
-      let html = '<h2>Setoran Menunggu Review ('+list.length+')</h2>';
-      if (!list.length) html += '<p class="muted">Kosong.</p>';
-      list.forEach(s => {
-        const opts = TRACKS.map(t => '<option value="'+t[0]+'"'+(s.track_id===t[0]?' selected':'')+'>'+t[1]+'</option>').join('');
-        const audio = s.audio_url ? '<audio controls src="'+s.audio_url+'"></audio>' : '<p class="muted">audio tidak tersedia</p>';
-        html += '<div class="card" id="'+s.id+'">'+
-          '<p><b>'+s.murid+'</b> <span class="badge">'+s.status+'</span></p>'+
-          '<p class="muted">'+(s.unit_ref||'')+' · '+(s.created_at||'')+'</p>'+
-          audio +
-          '<div class="row"><label class="muted">Track</label><select id="track_'+s.id+'" class="ipt">'+opts+'</select>'+
-          '<input id="unit_'+s.id+'" value="'+(s.unit_ref||'')+'" class="ipt" placeholder="unit (cth: Iqro 3 hal 10)" style="flex:1;min-width:160px">'+
-          '<input id="score_'+s.id+'" type="number" min="1" max="10" placeholder="skor 1-10" class="ipt" style="width:90px">'+
-          '<input id="cat_'+s.id+'" placeholder="catatan" class="ipt" style="flex:1;min-width:140px">'+
-          '<button class="btn" onclick="review(\''+s.id+'\')">Kirim Review</button></div></div>';
-      });
-      document.getElementById('app').innerHTML = html;
-    }
-    async function review(id) {
-      const trackId = document.getElementById('track_'+id).value;
-      const unitRef = document.getElementById('unit_'+id).value;
-      const score = Number(document.getElementById('score_'+id).value) || 0;
-      const catatan = document.getElementById('cat_'+id).value;
-      const btn = event.target; btn.disabled = true;
-      await fetch('/api/review/submit', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
-        setoran_id: id, track_id: trackId, unit_ref: unitRef,
-        reviews: [{ ayat_number: 1, score: score, catatan_teks: catatan }]
-      })});
-      load();
-    }
-    load();
+  <div class="seg" role="tablist" id="seg"></div>
+  <div id="app"><p class="muted" style="text-align:center;padding:30px">Memuat…</p></div>
+</div>
+<nav id="nav"></nav>
+<script src="/assets/app.js"></script>
+<script>
+const app = document.getElementById('app'), seg = document.getElementById('seg');
+document.getElementById('heroWave').outerHTML = PP.wave(30);
+if (PP.me.name) document.getElementById('heroName').textContent = 'Ahlan, Ustadz ' + PP.me.name.split(' ')[0];
+const TRACKS = [['iqro','Iqro'],['fatihah','Al-Fatihah'],['juz_amma','Juz Amma'],['tilawah','Tilawah'],['hafalan','Hafalan']];
+let tab = 'setoran', counts = { setoran: 0, calon: 0, angkat: 0, belajar: 0 };
 
-    // --- Angkat murid jadi guru (murid = yang daftar pakai referral code guru ini) ---
-    let muridList = [];
-    async function loadMurid() {
-      if (!me.id) { document.querySelector('#muridSel').innerHTML = '<option>login dulu</option>'; return; }
-      const r = await fetch('/api/guru/murid?guruId=' + encodeURIComponent(me.id));
-      muridList = (await r.json()).filter(m => m.role !== 'guru');
-      const sel = document.getElementById('muridSel');
-      sel.innerHTML = muridList.length
-        ? muridList.map(m => '<option value="'+m.id+'">'+m.name+' ('+m.email+')</option>').join('')
-        : '<option value="">Belum ada murid bimbingan</option>';
-    }
-    async function angkat() {
-      const id = document.getElementById('muridSel').value;
-      const msg = document.getElementById('promMsg');
-      if (!id) { msg.textContent = 'Tidak ada murid dipilih.'; msg.className = 'hint bad'; return; }
-      if (!confirm('Angkat murid ini jadi pengajar? Dia akan langsung bisa mengajar.')) return;
-      msg.textContent = 'Mengangkat…'; msg.className = 'hint muted';
-      const r = await fetch('/api/guru/promote', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ promoterId: me.id, muridId: id }) });
-      const d = await r.json();
-      if (d.success) { msg.textContent = '✓ Berhasil diangkat jadi guru.'; msg.className = 'hint ok'; loadMurid(); }
-      else { msg.textContent = d.error || 'Gagal'; msg.className = 'hint bad'; }
-    }
-    loadMurid();
+function renderSeg() {
+  const tabs = [['setoran', 'Setoran Santri'], ['calon', 'Calon Guru'], ['angkat', 'Angkat Murid']];
+  if (PP.me.is_student) tabs.push(['belajar', 'Mode Belajar']);
+  seg.innerHTML = tabs.map(t => '<button role="tab" aria-selected="' + (t[0] === tab) + '" onclick="go(\'' + t[0] + '\')">' + t[1]
+    + (counts[t[0]] ? '<span class="n">' + counts[t[0]] + '</span>' : '') + '</button>').join('');
+}
+function go(t) { tab = t; renderSeg(); render(); }
 
-    // --- Review calon pengajar: semua guru bisa vote, 1 ACC = lolos ---
-    let pendingCalon = 0;
-    if (me.role === 'guru' && me.id) {
-      document.getElementById('reviewTab').innerHTML = '<button class="btn btn-amber" onclick="showReview()">📝 Review Calon Guru <span id="calonBadge"></span></button>';
-      checkCalan();
-    }
-    async function checkCalan() {
-      const list = await (await fetch('/api/guru/queue')).json();
-      pendingCalon = list.length;
-      const b = document.getElementById('calonBadge');
-      if (b) b.textContent = pendingCalon ? ' ('+pendingCalon+')' : '';
-    }
-    function showReview() {
-      document.getElementById('mainView').style.display = 'none';
-      document.getElementById('reviewView').style.display = 'block';
-      loadQueue();
-    }
-    function backMain() {
-      document.getElementById('mainView').style.display = 'block';
-      document.getElementById('reviewView').style.display = 'none';
-      load(); loadMurid(); checkCalan();
-    }
-    async function loadQueue() {
-      const rv = document.getElementById('reviewView');
-      rv.innerHTML = '<p class="muted">Memuat…</p>';
-      const list = await (await fetch('/api/guru/queue')).json();
-      if (!list.length) { rv.innerHTML = '<div class="card"><p class="muted">Tidak ada calon menunggu review.</p><button class="btn btn-ghost" onclick="backMain()">← Kembali</button></div>'; return; }
-      let html = '<h2>Calon Pengajar Menunggu ('+list.length+')</h2><p class="muted">Dengerin bacaan Al-Hajj 1-5 + cek bukti, lalu ACC/Tolak. Cukup 1 guru ACC = lolos.</p>';
-      list.forEach(c => {
-        let bukti = '<span class="muted">tanpa bukti tertulis</span>';
-        if (c.sanad_url) bukti = 'Sanad: <a href="'+c.sanad_url+'" target="_blank">lihat</a>';
-        else if (c.mahad_text) bukti = 'Ma\'had: '+c.mahad_text;
-        else if (c.cert_url) bukti = 'Sertifikat: <a href="'+c.cert_url+'" target="_blank">lihat</a>';
-        const audio = c.demo_audio_url ? '<audio controls src="'+c.demo_audio_url+'"></audio>' : '<p class="muted">tidak ada audio</p>';
-        html += '<div class="card"><p><b>'+c.name+'</b> <span class="muted">'+c.email+'</span></p>'
-          +'<p class="muted" style="font-size:13px">'+bukti+'</p>'+audio
-          +'<p class="muted" style="font-size:13px">ACC: '+c.acc_count+' · Tolak: '+c.rej_count+' · Guru aktif: '+c.guru_total+'</p>'
-          +'<input id="cat_'+c.id+'" class="ipt" placeholder="catatan (opsional)" style="width:100%;margin:8px 0">'
-          +'<div class="row"><button class="btn" onclick="vote(\''+c.id+'\',\'acc\')">✓ ACC</button>'
-          +'<button class="btn btn-bad" onclick="vote(\''+c.id+'\',\'reject\')">✗ Tolak</button>'
-          +'<button class="btn btn-ghost" onclick="backMain()">← Kembali</button></div></div>';
-      });
-      rv.innerHTML = html;
-    }
-    async function vote(verId, decision) {
-      const el = document.getElementById('cat_'+verId);
-      const cat = el ? el.value : '';
-      const d = await (await fetch('/api/guru/review', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({guruId: me.id, verificationId: verId, decision, catatan: cat})})).json();
-      if (d.error) { alert(d.error); return; }
-      if (d.status === 'approved') alert('✓ Calon ini sudah ACC dan resmi menjadi guru.');
-      loadQueue();
-    }
-  </script>
+async function render() {
+  app.innerHTML = '<p class="muted" style="text-align:center;padding:20px">Memuat…</p>';
+  if (tab === 'setoran') return renderSetoran();
+  if (tab === 'calon') return renderCalon();
+  if (tab === 'angkat') return renderAngkat();
+  if (tab === 'belajar') { location.href = '/dashboard-murid'; return; }
+}
+
+// ───── SETORAN SANTRI ─────
+async function renderSetoran() {
+  const all = await (await fetch('/api/guru/pending')).json();
+  const list = all.filter(s => s.user_id !== PP.me.id);
+  counts.setoran = list.length; renderSeg();
+  let h = '<div class="stats">'
+    + '<div class="stat"><b>' + list.length + '</b><span>Menunggu</span></div>'
+    + '<div class="stat"><b>' + all.length + '</b><span>Total antri</span></div>'
+    + '<div class="stat"><b>' + new Set(all.map(s => s.murid)).size + '</b><span>Santri</span></div></div>';
+  if (!list.length) { app.innerHTML = h + '<div class="empty"><span class="big">✅</span>Semua setoran sudah direviu. Barakallahu fiik.</div>'; return; }
+  h += list.map((s, i) => {
+    const opts = TRACKS.map(t => '<option value="' + t[0] + '"' + (s.track_id === t[0] ? ' selected' : '') + '>' + t[1] + '</option>').join('');
+    const au = s.audio_url ? '<audio controls preload="none" src="' + s.audio_url + '"></audio>' : '<p class="sub">audio tidak tersedia</p>';
+    return '<div class="card" style="animation-delay:' + (i * 50) + 'ms">'
+      + '<div class="item-h"><b style="font-size:17px">🎧 ' + PP.esc(s.murid) + '</b><span class="badge b-pend">Menunggu</span></div>'
+      + '<div class="sub">' + PP.esc(s.unit_ref || '') + (s.created_at ? ' · ' + PP.fmt(s.created_at) : '') + '</div>' + au
+      + '<div class="row" style="margin-top:14px">'
+      + '<div style="flex:1;min-width:130px"><label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Pelajaran</label><select id="tr_' + s.id + '" class="input" style="margin-top:4px">' + opts + '</select></div>'
+      + '<div style="flex:1;min-width:150px"><label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Unit</label><input id="un_' + s.id + '" class="input" value="' + PP.esc(s.unit_ref || '') + '" style="margin-top:4px"></div>'
+      + '<div style="width:96px"><label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Skor</label><input id="sc_' + s.id + '" type="number" min="1" max="10" placeholder="1-10" class="input" style="margin-top:4px"></div>'
+      + '</div>'
+      + '<input id="ct_' + s.id + '" class="input" placeholder="Catatan untuk santri…" style="margin-top:9px">'
+      + '<button class="btn btn-primary btn-block" style="margin-top:12px" onclick="kirimReviu(\'' + s.id + '\')">Kirim Reviu</button>'
+      + '</div>';
+  }).join('');
+  app.innerHTML = h;
+}
+async function kirimReviu(id) {
+  const btn = event.target; btn.disabled = true; btn.textContent = 'Mengirim…';
+  await fetch('/api/review/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+    setoran_id: id, track_id: document.getElementById('tr_' + id).value, unit_ref: document.getElementById('un_' + id).value,
+    reviews: [{ ayat_number: 1, score: Number(document.getElementById('sc_' + id).value) || 0, catatan_teks: document.getElementById('ct_' + id).value }]
+  }) });
+  renderSetoran();
+}
+
+// ───── CALON GURU ─────
+async function renderCalon() {
+  const list = await (await fetch('/api/guru/queue')).json();
+  counts.calon = list.length; renderSeg();
+  let h = '<div class="note">Dengerin bacaan <b>Al-Hajj 1–5</b> dan cek bukti sanad/Ma’had. <b>Cukup 1 guru ACC</b>, calon langsung jadi pengajar.</div>';
+  if (!list.length) { app.innerHTML = h + '<div class="empty"><span class="big">🎓</span>Tidak ada calon menunggu.</div>'; return; }
+  h += list.map((c, i) => {
+    let bukti;
+    if (c.sanad_url) bukti = '<a href="' + PP.esc(c.sanad_url) + '" target="_blank">📜 Sertifikat Sanad</a>';
+    else if (c.mahad_text) bukti = '🏫 ' + PP.esc(c.mahad_text);
+    else if (c.cert_url) bukti = '<a href="' + PP.esc(c.cert_url) + '" target="_blank">📄 Sertifikat</a>';
+    else bukti = '<span class="sub">tanpa bukti tertulis</span>';
+    const au = c.demo_audio_url ? '<audio controls preload="none" src="' + c.demo_audio_url + '"></audio>' : '<p class="sub">tidak ada audio</p>';
+    return '<div class="card" style="animation-delay:' + (i * 50) + 'ms">'
+      + '<div class="item-h"><b style="font-size:17px">' + PP.esc(c.name) + '</b><span class="badge b-pend">' + c.acc_count + ' ACC · ' + c.rej_count + ' tolak</span></div>'
+      + '<div class="sub">' + PP.esc(c.email || '') + '</div>'
+      + '<div style="margin:12px 0;padding:12px;background:var(--mint);border-radius:12px"><div class="sub" style="margin-bottom:4px;font-weight:700">BUKTI</div>' + bukti + '</div>'
+      + '<div class="sub" style="font-weight:700">BACAAN AL-HAJJ 1–5</div>' + au
+      + '<input id="vc_' + c.id + '" class="input" placeholder="Catatan (opsional)" style="margin-top:12px">'
+      + '<div class="row"><button class="btn btn-primary" style="flex:1" onclick="vote(\'' + c.id + '\',\'acc\')">✓ ACC</button>'
+      + '<button class="btn btn-danger" style="flex:1" onclick="vote(\'' + c.id + '\',\'reject\')">✗ Tolak</button></div>'
+      + '<div class="sub" style="margin-top:8px">Guru aktif: ' + c.guru_total + '</div></div>';
+  }).join('');
+  app.innerHTML = h;
+}
+async function vote(vid, decision) {
+  const d = await (await fetch('/api/guru/review', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ guruId: PP.me.id, verificationId: vid, decision, catatan: (document.getElementById('vc_' + vid) || {}).value || '' }) })).json();
+  if (d.error) return alert(d.error);
+  if (d.status === 'approved') alert('MasyaAllah, calon ini resmi jadi guru 🎉');
+  renderCalon();
+}
+
+// ───── ANGKAT MURID ─────
+async function renderAngkat() {
+  const list = (await (await fetch('/api/guru/murid?guruId=' + encodeURIComponent(PP.me.id))).json()).filter(m => m.role !== 'guru');
+  counts.angkat = list.length; renderSeg();
+  let h = '<div class="card"><div class="card-t">🎓 Angkat Murid Jadi Guru</div><div class="card-s">Murid bimbinganmu yang sudah layak bisa langsung kamu angkat jadi pengajar.</div>';
+  if (!list.length) h += '<div class="empty"><span class="big">👥</span>Belum ada murid bimbingan. Bagikan referral / profil @username-mu agar santri mendaftar lewat kamu.</div>';
+  else h += list.map(m => '<div class="track"><div class="ico">🧕</div><div style="flex:1"><div class="nm">' + PP.esc(m.name) + '</div><div class="sub">' + PP.esc(m.email) + '</div></div>'
+    + '<button class="btn btn-gold btn-sm" onclick="angkat(\'' + m.id + '\',\'' + PP.esc(m.name).replace(/'/g, '') + '\')">Angkat</button></div>').join('');
+  h += '</div><p class="hint" id="promMsg" style="text-align:center"></p>';
+  app.innerHTML = h;
+}
+async function angkat(id, nm) {
+  if (!confirm('Angkat ' + nm + ' menjadi pengajar?')) return;
+  const d = await (await fetch('/api/guru/promote', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ promoterId: PP.me.id, muridId: id }) })).json();
+  const m = document.getElementById('promMsg');
+  if (d.success) { m.textContent = '✓ ' + nm + ' resmi jadi guru.'; m.className = 'hint ok'; renderAngkat(); }
+  else { m.textContent = d.error || 'Gagal'; m.className = 'hint bad'; }
+}
+
+renderSeg(); render();
+</script>
 </body>
 </html>

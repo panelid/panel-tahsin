@@ -1,139 +1,135 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Santri — ponpes.org</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Literata:opsz,wght@7..72,600&display=swap" rel="stylesheet">
-  <style>
-    :root{--base:#F6F5EF;--teal:#1E4640;--amber:#E3A23B;--ink:#1C2420;--soft:#E7EEE6;--muted:#5A655F;--line:#D9DED8}
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--base);color:var(--ink);font-size:16px;line-height:1.6;padding:20px 14px}
-    .wrap{max-width:640px;margin:0 auto}
-    h1{font-family:'Literata',serif;font-size:26px;margin-bottom:4px}
-    h2{font-size:17px;color:var(--teal);margin:22px 0 8px}
-    .box{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;margin-top:12px}
-    .pill{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:9px 13px;margin-bottom:7px;font-size:14px}
-    .ipt{width:100%;padding:10px 13px;border:1px solid var(--line);border-radius:12px;font-family:'Plus Jakarta Sans';font-size:14px;background:#fff;color:var(--ink);margin-top:6px}
-    .ipt:focus{outline:2px solid var(--amber)}
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-weight:600;font-size:15px;border-radius:12px;padding:11px 18px;text-decoration:none;cursor:pointer;border:1px solid transparent;font-family:'Plus Jakarta Sans'}
-    .btn-teal{background:var(--teal);color:#fff}
-    .btn-teal:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 14px rgba(30,70,64,.25)}
-    .btn-amber{background:var(--amber);color:#221A06}
-    .btn-red{background:#c0392b;color:#fff}
-    .btn:disabled{opacity:.45;cursor:not-allowed}
-    a{color:var(--teal);font-weight:600;text-decoration:none}
-    .back{display:inline-block;margin-bottom:10px;font-size:14px}
-    .rec-dot{width:10px;height:10px;border-radius:50%;background:#c0392b;display:inline-block;animation:pulse 1s infinite}
-    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
-    audio{width:100%;margin-top:6px}
-    .wave{display:flex;align-items:flex-end;gap:3px;height:20px;margin:8px 0}
-    .wave span{width:4px;background:var(--teal);border-radius:2px;opacity:.3;height:100%}
-    .wave span:nth-child(odd){opacity:.55}
-    .badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px}
-    .b-pending{background:#FCEFD6;color:#9a6b15}
-    .b-reviewed{background:#DFF3E6;color:#1E8E4E}
-    .muted{color:var(--muted);font-size:13px}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Santri — ponpes.org</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Literata:opsz,wght@7..72,500;7..72,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/app.css">
 </head>
-<body>
-  <div class="wrap">
-    <a href="/" class="back">← ponpes.org</a>
-    <h1>Dashboard Santri</h1>
-    <div class="wave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
-    <div id="app"><p class="muted">Memuat…</p></div>
+<body data-page="murid" data-tab="home">
+<div id="hdr"></div>
+<div class="wrap">
+  <div class="hero">
+    <div class="ar">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+    <h1 id="heroName">Dashboard Santri</h1>
+    <p>Rencanakan setoranmu. Rekam bacaan, kirim, lalu tunggu review dari pengajar.</p>
+    <div id="heroWave"></div>
   </div>
-  <script>
-    const app = document.getElementById('app');
-    const uid = new URLSearchParams(location.search).get('uid') || localStorage.getItem('uid');
-    if (uid) localStorage.setItem('uid', uid);
-    if (!uid) location.href = '/login.html';
+  <div id="app"><p class="muted" style="text-align:center;padding:30px">Memuat…</p></div>
+</div>
+<nav id="nav"></nav>
+<script src="/assets/app.js"></script>
+<script>
+const app = document.getElementById('app');
+const uid = new URLSearchParams(location.search).get('uid') || localStorage.getItem('uid');
+if (uid) localStorage.setItem('uid', uid);
+if (!uid) location.href = '/login';
+document.getElementById('heroWave').outerHTML = PP.wave(30);
 
-    async function load() {
-      if (!uid) return;
-      try {
-        const r = await fetch('/api/enroll/' + uid);
-        const d = await r.json();
-        if (d.error) { app.innerHTML = '<p>' + d.error + '</p>'; return; }
-        let h = '<p>Halo <b>' + d.user.name + '</b> · @' + (d.user.username||'') + '</p>';
+let TRACKS = [['iqro','Iqro','📗'],['fatihah','Al-Fatihah','🕌'],['juz_amma','Juz Amma','🌙'],['tilawah','Tilawah','🎧'],['hafalan','Hafalan','📿']];
 
-        // --- Rekam setoran ---
-        const trackOpts = (d.enrollments||[]).map(e => '<option value="'+e.track_id+'">'+e.track+' '+(e.current_unit?'(unit: '+e.current_unit+')':'')+'</option>').join('')
-          || '<option value="iqro">Iqro</option><option value="fatihah">Al-Fatihah</option><option value="juz_amma">Juz Amma</option><option value="tilawah">Tilawah</option><option value="hafalan">Hafalan</option>';
-        h += '<div class="box"><h2 style="margin-top:0">Rekam Setoran</h2>'
-          + '<label class="muted">Pilih track</label><select id="recTrack" class="ipt">'+trackOpts+'</select>'
-          + '<label class="muted">Unit / halaman (cth: Iqro 3 hal 10)</label><input id="recUnit" class="ipt" placeholder="Iqro 3 hal 10">'
-          + '<div id="recStatus" class="muted" style="margin-top:8px">Tekan mulai untuk rekam bacaan.</div>'
-          + '<div style="display:flex;gap:8px;margin-top:10px">'
-          + '<button id="recBtn" class="btn btn-red" onclick="toggleRec()">● Rekam</button>'
-          + '<button id="submitBtn" class="btn btn-teal" disabled onclick="submitSetoran()">Kirim Setoran</button></div>'
-          + '<div id="preview"></div></div>';
+async function load() {
+  try {
+    const d = await (await fetch('/api/enroll/' + uid)).json();
+    if (d.error) { app.innerHTML = '<div class="empty"><span class="big">🙏</span>' + PP.esc(d.error) + '</div>'; return; }
+    document.getElementById('heroName').textContent = 'Assalamu’alaikum, ' + d.user.name.split(' ')[0];
 
-        // --- Setoran terakhir ---
-        h += '<h2>Setoran Saya</h2>';
-        if (!(d.setoran||[]).length) h += '<div class="pill muted">Belum ada setoran.</div>';
-        (d.setoran||[]).forEach(s => {
-          const badge = s.status === 'reviewed' ? '<span class="badge b-reviewed">revi...' : '<span class="badge b-pending">menunggu</span>';
-          const audio = s.audio_url ? '<audio controls src="'+s.audio_url+'"></audio>' : '<p class="muted">audio tidak tersedia</p>';
-          h += '<div class="box" style="margin-top:8px"><div style="display:flex;justify-content:space-between"><b>'+(s.track_id||'-')+'</b>'+badge+'</div><div class="muted">'+(s.unit_ref||'')+' · '+(s.created_at||'')+'</div>'+audio+'</div>';
-        });
-        app.innerHTML = h;
-      } catch (e) { app.innerHTML = '<p style="color:#c0392b">Gagal memuat: ' + e.message + '</p>'; }
-    }
+    const enr = d.enrollments || [];
+    const active = enr.filter(e => e.status === 'active');
+    const done = enr.filter(e => e.status === 'done').length;
+    const set = d.setoran || [];
+    const rev = set.filter(s => s.status === 'reviewed').length;
 
-    // --- Recorder ---
-    let mediaRecorder, chunks = [], recording = false, audioBlob = null;
-    async function toggleRec() {
-      if (!recording) {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          const mime = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
-          mediaRecorder = new MediaRecorder(stream, { mimeType: mime });
-          chunks = [];
-          mediaRecorder.ondataavailable = e => chunks.push(e.data);
-          mediaRecorder.onstop = () => {
-            audioBlob = new Blob(chunks, { type: mime });
-            const url = URL.createObjectURL(audioBlob);
-            document.getElementById('preview').innerHTML = '<p class="muted">Pratinjau:</p><audio controls src="'+url+'"></audio>';
-            document.getElementById('submitBtn').disabled = false;
-            document.getElementById('recStatus').textContent = 'Rekaman siap dikirim (' + (audioBlob.size/1024).toFixed(0) + ' KB).';
-            stream.getTracks().forEach(t => t.stop());
-          };
-          mediaRecorder.start();
-          recording = true;
-          document.getElementById('recBtn').textContent = '■ Stop';
-          document.getElementById('recStatus').innerHTML = '<span class="rec-dot"></span> Merekam…';
-        } catch (e) { document.getElementById('recStatus').textContent = 'Gagal akses mic: ' + e.message; }
-      } else {
-        mediaRecorder.stop();
-        recording = false;
-        document.getElementById('recBtn').textContent = '● Rekam';
-      }
-    }
+    let h = '';
+    h += '<div class="stats">'
+       + '<div class="stat"><b>' + active.length + '</b><span>Track aktif</span></div>'
+       + '<div class="stat"><b>' + set.length + '</b><span>Total setoran</span></div>'
+       + '<div class="stat"><b>' + rev + '</b><span>Reviu diterima</span></div></div>';
 
-    async function submitSetoran() {
-      if (!audioBlob) return;
-      const btn = document.getElementById('submitBtn');
-      btn.disabled = true; btn.textContent = 'Mengirim…';
-      const fd = new FormData();
-      fd.append('audio', audioBlob, 'setoran.webm');
-      fd.append('user_id', uid);
-      fd.append('track_id', document.getElementById('recTrack').value);
-      fd.append('unit_ref', document.getElementById('recUnit').value);
-      try {
-        const res = await fetch('/api/setoran/upload', { method: 'POST', body: fd });
-        const data = await res.json();
-        if (!data.success) throw new Error(data.error);
-        audioBlob = null;
-        load();
-      } catch (e) {
-        btn.disabled = false; btn.textContent = 'Kirim Setoran';
-        document.getElementById('recStatus').textContent = 'Gagal: ' + e.message;
-      }
-    }
+    // ---- REKAM ----
+    const opts = (active.length ? active.map(e => [e.track_id || TRACKS.find(t => t[1] === e.track)[0], e.track, e.current_unit]) : TRACKS)
+      .map(t => '<option value="' + PP.esc(t[0]) + '">' + PP.esc(t[1]) + (t[2] ? ' · ' + PP.esc(t[2]) : '') + '</option>').join('');
+    h += '<div class="card" id="rekam">'
+      + '<div class="card-t">🎙 Rekam Setoran</div><div class="card-s">Pilih pelajaran, tekan tombol, baca dengan tartil.</div>'
+      + '<div class="field"><label>Pelajaran</label><select id="recTrack" class="input">' + opts + '</select></div>'
+      + '<div class="field"><label>Unit / halaman</label><input id="recUnit" class="input" placeholder="cth: Iqro 3 halaman 10"></div>'
+      + '<div class="rec"><div class="eq" id="eq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>'
+      + '<button class="rec-orb" id="recBtn" onclick="toggleRec()">REKAM</button>'
+      + '<div class="rec-time" id="recTime">00:00</div></div>'
+      + '<p class="hint" id="recStatus" style="text-align:center">Tekan tombol untuk mulai merekam.</p>'
+      + '<div id="preview"></div>'
+      + '<button class="btn btn-primary btn-block" id="submitBtn" style="margin-top:14px" disabled onclick="submitSetoran()">Kirim Setoran</button>'
+      + '</div>';
 
+    // ---- SETORAN ----
+    h += '<div class="card"><div class="card-t">📚 Setoranku</div>';
+    if (!set.length) h += '<div class="empty"><span class="big">🎙</span>Belum ada setoran. Mulai rekam bacaanmu!</div>';
+    set.slice(0, 8).forEach((s, i) => {
+      const b = s.status === 'reviewed' ? '<span class="badge b-ok">Direview</span>' : '<span class="badge b-pend">Menunggu</span>';
+      const au = s.audio_url ? '<audio controls preload="none" src="' + s.audio_url + '"></audio>' : '';
+      h += '<div class="item" style="animation-delay:' + (i * 45) + 'ms"><div class="item-h"><b>' + PP.esc(s.track_id || '-') + '</b>' + b + '</div>'
+        + '<div class="sub">' + PP.esc(s.unit_ref || '') + (s.created_at ? ' · ' + PP.fmt(s.created_at) : '') + '</div>' + au + '</div>';
+    });
+    h += '</div>';
+
+    // ---- TRACK ----
+    h += '<div class="card"><div class="card-t">🗂 Perjalanan Belajar</div>';
+    if (!enr.length) h += '<div class="empty"><span class="big">🌱</span>Belum mulai track apa pun.</div>';
+    enr.forEach(e => {
+      const pct = e.status === 'done' ? 100 : 30;
+      h += '<div class="track"><div class="ico">' + (TRACKS.find(t => t[1] === e.track)?.[2] || '📖') + '</div>'
+        + '<div style="flex:1"><div class="nm">' + PP.esc(e.track) + '</div><div class="sub">' + (e.current_unit ? 'Unit: ' + PP.esc(e.current_unit) : 'Aktif') + '</div>'
+        + '<div class="bar"><i style="width:' + pct + '%"></i></div></div>'
+        + '<span class="badge ' + (e.status === 'done' ? 'b-ok' : 'b-pend') + '">' + (e.status === 'done' ? 'Selesai' : 'Aktif') + '</span></div>';
+    });
+    h += '</div><div class="foot">ponpes.org — platform tahsin & ngaji online gratis</div>';
+    app.innerHTML = h;
+  } catch (e) { app.innerHTML = '<div class="empty">Gagal memuat: ' + PP.esc(e.message) + '</div>'; }
+}
+
+let mr, chunks = [], recording = false, blob = null, t0, timer;
+function tick() { const s = Math.floor((Date.now() - t0) / 1000); document.getElementById('recTime').textContent = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
+async function toggleRec() {
+  if (!recording) {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mime = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+      mr = new MediaRecorder(stream, { mimeType: mime }); chunks = [];
+      mr.ondataavailable = e => chunks.push(e.data);
+      mr.onstop = () => {
+        blob = new Blob(chunks, { type: mime });
+        document.getElementById('preview').innerHTML = '<div class="item" style="margin-top:12px"><div class="sub">Pratinjau hasil rekaman</div><audio controls src="' + URL.createObjectURL(blob) + '"></audio></div>';
+        document.getElementById('submitBtn').disabled = false;
+        document.getElementById('recStatus').textContent = 'Rekaman siap (' + Math.round(blob.size / 1024) + ' KB) — kirim atau rekam ulang.';
+        stream.getTracks().forEach(t => t.stop());
+      };
+      mr.start(); recording = true; t0 = Date.now(); timer = setInterval(tick, 250);
+      document.getElementById('recBtn').textContent = 'SELESAI'; document.getElementById('recBtn').classList.add('on');
+      document.getElementById('eq').classList.add('on'); document.getElementById('recStatus').textContent = 'Merekam… baca dengan tartil.';
+    } catch (e) { document.getElementById('recStatus').textContent = 'Gagal akses mic: ' + e.message; }
+  } else {
+    mr.stop(); recording = false; clearInterval(timer);
+    document.getElementById('recBtn').textContent = 'REKAM'; document.getElementById('recBtn').classList.remove('on');
+    document.getElementById('eq').classList.remove('on');
+  }
+}
+async function submitSetoran() {
+  if (!blob) return;
+  const btn = document.getElementById('submitBtn'); btn.disabled = true; btn.textContent = 'Mengirim…';
+  const fd = new FormData();
+  fd.append('audio', blob, 'setoran.webm'); fd.append('user_id', uid);
+  fd.append('track_id', recTrack.value); fd.append('unit_ref', recUnit.value);
+  try {
+    const d = await (await fetch('/api/setoran/upload', { method: 'POST', body: fd })).json();
+    if (!d.success) throw new Error(d.error);
+    blob = null; recTime.textContent = '00:00';
     load();
-  </script>
+  } catch (e) { btn.disabled = false; btn.textContent = 'Kirim Setoran'; document.getElementById('recStatus').textContent = 'Gagal: ' + e.message; }
+}
+load();
+</script>
 </body>
 </html>

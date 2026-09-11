@@ -1,148 +1,139 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daftar Jadi Pengajar — ponpes.org</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Literata:opsz,wght@7..72,600&display=swap" rel="stylesheet">
-  <style>
-    :root{--base:#F6F5EF;--teal:#1E4640;--amber:#E3A23B;--ink:#1C2420;--soft:#E7EEE6;--muted:#5A655F;--line:#D9DED8;--ok:#1f8a55;--bad:#c0392b}
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--base);color:var(--ink);font-size:16px;line-height:1.7;padding:24px 16px}
-    .wrap{max-width:520px;margin:0 auto}
-    h1{font-family:'Literata',serif;font-size:26px;margin-bottom:6px}
-    p.lead{color:var(--muted);margin-bottom:16px;font-size:14px}
-    .box{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px}
-    .sec{margin:16px 0;padding-top:14px;border-top:1px solid var(--line)}
-    .sec h3{font-size:15px;color:var(--teal);margin-bottom:8px}
-    .ipt{width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:12px;font-family:'Plus Jakarta Sans';font-size:14px;background:#fff;color:var(--ink);margin:6px 0}
-    .ipt:focus{outline:2px solid var(--amber)}
-    textarea.ipt{min-height:70px;resize:vertical}
-    .hint{font-size:13px;color:var(--muted);margin:4px 0}
-    .un{display:flex;align-items:center;gap:8px}
-    .un .pre{font-weight:700;color:var(--teal)}
-    .chk{display:flex;gap:10px;align-items:flex-start;margin:8px 0;padding:10px;background:var(--soft);border-radius:10px;cursor:pointer;font-size:14px}
-    .chk input{width:18px;height:18px;margin-top:2px;accent-color:var(--teal)}
-    .btn{display:inline-flex;align-items:center;justify-content:center;font-weight:600;font-size:15px;border-radius:12px;padding:12px 20px;text-decoration:none;cursor:pointer;border:1px solid transparent;font-family:'Plus Jakarta Sans';width:100%}
-    .btn-amber{background:var(--amber);color:#221A06}
-    .btn-amber:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(227,162,59,.35)}
-    .btn:disabled{opacity:.5;cursor:not-allowed}
-    .rec{display:flex;gap:10px;align-items:center;margin:8px 0}
-    .rec-btn{background:var(--teal);color:#fff;border:none;padding:10px 16px;border-radius:10px;font-weight:600;cursor:pointer}
-    .rec-btn.recording{background:var(--bad)}
-    a{color:var(--teal);font-weight:600;text-decoration:none}
-    .back{display:inline-block;margin-bottom:12px;font-size:14px}
-    #msg{font-size:14px;margin-top:10px;min-height:20px}
-    .ok{color:var(--ok)} .bad{color:var(--bad)}
-    audio{width:100%;margin:8px 0}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daftar Pengajar — ponpes.org</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Literata:opsz,wght@7..72,500;7..72,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/app.css">
 </head>
-<body>
-  <div class="wrap">
-    <a href="/" class="back">← ponpes.org</a>
-    <h1>Daftar Jadi Pengajar</h1>
-    <p class="lead">Isi data, unggah bukti (sertifikat sanad / riwayat Ma'had), dan setor bacaan <b>Al-Hajj 1-5</b>. Semua guru terdaftar akan mereview — cukup 1 yang ACC, kamu lolos.</p>
-    <div class="box">
-      <input id="name" class="ipt" placeholder="nama lengkap">
-      <div class="un"><span class="pre">@</span><input id="username" class="ipt" placeholder="username (mis: ustz_aisyah)" maxlength="20"></div>
-      <div id="uhint" class="hint">3-20 karakter: huruf kecil, angka, underscore. Profilmu: ponpes.org/@username</div>
-      <input id="email" class="ipt" type="email" placeholder="email">
-      <input id="wa" class="ipt" placeholder="whatsapp (62...)">
-      <input id="pass" class="ipt" type="password" placeholder="password">
-
-      <div class="sec">
-        <h3>1. Bukti Kelulusan</h3>
-        <div class="chk"><input type="radio" name="bukti" value="sanad" id="b_sanad"><span><b>Upload Sertifikat Sanad</b> (URL/file)</span></div>
-        <input id="sanadUrl" class="ipt" placeholder="URL sertifikat sanad (img/pdf)">
-        <div class="chk"><input type="radio" name="bukti" value="mahad" id="b_mahad"><span><b>Atau isi riwayat belajar di Ma'had</b></span></div>
-        <textarea id="mahadText" class="ipt" placeholder="Contoh: Santri di Ma'had X (2015-2020), sanad dari Ust. Y, pernah mengaji tahsin..."></textarea>
-        <div class="chk"><input type="radio" name="bukti" value="cert" id="b_cert"><span><b>Atau URL sertifikat lain</b></span></div>
-        <input id="certUrl" class="ipt" placeholder="URL sertifikat (jika ada)">
-      </div>
-
-      <div class="sec">
-        <h3>2. Setor Bacaan — Al-Hajj 1-5</h3>
-        <p class="hint">Rekam bacaan Al-Hajj ayat 1 sampai 5, lalu kirim.</p>
-        <div class="rec">
-          <button class="rec-btn" id="recBtn" type="button">● Rekam</button>
-          <span id="recStatus" class="hint">belum rekam</span>
-        </div>
-        <audio id="player" controls style="display:none"></audio>
-      </div>
-
-      <button class="btn btn-amber" id="btn">Kirim Permintaan</button>
-      <p id="msg"></p>
-    </div>
-    <p style="text-align:center;margin-top:16px"><a href="/login">Sudah jadi pengajar? Masuk</a></p>
+<body data-page="auth">
+<div id="hdr"></div>
+<div class="wrap">
+  <div class="hero">
+    <div class="ar">هَلْ مِن مُّبَلِّغٍ عَنِّي</div>
+    <h1>Mulai Mengajar</h1>
+    <p>Bagikan ilmumu. Cukup 3 langkah: identitas, bukti sanad, lalu setor bacaan Al-Hajj 1–5 untuk direviu para pengajar.</p>
+    <div id="heroWave"></div>
   </div>
-  <script>
-    // username live check
-    const unameEl = document.getElementById('username'), uhint = document.getElementById('uhint'), btn = document.getElementById('btn');
-    let uState = 'empty';
-    unameEl.addEventListener('input', () => {
-      const u = unameEl.value.trim().toLowerCase();
-      if (!u) { uState='empty'; uhint.textContent='3-20 karakter: huruf kecil, angka, underscore.'; uhint.className='hint'; btn.disabled=false; return; }
-      if (!/^[a-z0-9_]{3,20}$/.test(u)) { uState='bad'; uhint.textContent='Format salah: 3-20 huruf kecil/angka/underscore.'; uhint.className='hint bad'; btn.disabled=false; return; }
-      uhint.textContent='mengecek…'; btn.disabled=true; uState='checking';
-      clearTimeout(window._t); window._t=setTimeout(async () => {
-        const d = await (await fetch('/api/auth/check-username?u='+encodeURIComponent(u))).json();
-        uState = d.available ? 'ok' : 'bad';
-        uhint.textContent = d.available ? '✓ tersedia' : '✗ sudah diambil';
-        uhint.className = 'hint ' + (d.available ? 'ok' : 'bad');
-        btn.disabled = false;
-      }, 400);
-    });
 
-    // recorder
-    let mediaRecorder, chunks=[], audioBlob=null;
-    const recBtn=document.getElementById('recBtn'), recStatus=document.getElementById('recStatus'), player=document.getElementById('player');
-    recBtn.onclick = async () => {
-      if (mediaRecorder && mediaRecorder.state==='recording') {
-        mediaRecorder.stop(); return;
-      }
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({audio:true});
-        mediaRecorder = new MediaRecorder(stream); chunks=[];
-        mediaRecorder.ondataavailable = e => chunks.push(e.data);
-        mediaRecorder.onstop = () => {
-          audioBlob = new Blob(chunks, {type:'audio/webm'});
-          player.src = URL.createObjectURL(audioBlob); player.style.display='block';
-          recStatus.textContent='✓ terekam, siap kirim'; recBtn.textContent='● Rekam Ulang'; recBtn.classList.remove('recording');
-        };
-        mediaRecorder.start(); recBtn.textContent='■ Stop'; recBtn.classList.add('recording'); recStatus.textContent='merekam…';
-      } catch(e) { recStatus.textContent='Gagal akses mic: '+e.message; }
-    };
+  <div class="card" id="wizard"></div>
+  <p class="hint" style="text-align:center;margin-top:14px">Sudah jadi pengajar? <a href="/login">Masuk di sini</a></p>
+  <div class="foot">ponpes.org — platform tahsin & ngaji online gratis</div>
+</div>
+<script src="/assets/app.js"></script>
+<script>
+document.getElementById('heroWave').outerHTML = PP.wave(30);
+const box = document.getElementById('wizard');
+let step = 1, userId = null, uState = 'empty', blob = null, mr = null, chunks = [], rec = false, t0, timer;
+const form = { name: '', username: '', email: '', wa: '', pass: '', bukti: 'sanad', sanadUrl: '', mahadText: '', certUrl: '' };
 
-    async function daftar() {
-      if (uState!=='ok') { msg.textContent='Username belum tersedia/valid.'; msg.className='bad'; return; }
-      if (!audioBlob) { msg.textContent='Wajib rekam bacaan Al-Hajj 1-5.'; msg.className='bad'; return; }
-      const bukti = document.querySelector('input[name=bukti]:checked');
-      if (!bukti) { msg.textContent='Pilih jenis bukti (sanad / Ma\'had / sertifikat).'; msg.className='bad'; return; }
-      if (bukti.value==='sanad' && !sanadUrl.value.trim()) { msg.textContent='Isi URL sertifikat sanad.'; msg.className='bad'; return; }
-      if (bukti.value==='mahad' && !mahadText.value.trim()) { msg.textContent='Isi riwayat Ma\'had.'; msg.className='bad'; return; }
-      if (bukti.value==='cert' && !certUrl.value.trim()) { msg.textContent='Isi URL sertifikat.'; msg.className='bad'; return; }
+function dots() { return '<div style="display:flex;gap:6px;align-items:center;margin-bottom:18px">'
+  + [1, 2, 3].map(n => '<span style="width:' + (n === step ? 26 : 9) + 'px;height:9px;border-radius:9px;background:' + (n <= step ? 'var(--amber)' : 'var(--line2)') + ';transition:.3s"></span>').join('')
+  + '<span class="sub" style="margin-left:6px">Langkah ' + step + ' dari 3</span></div>'; }
 
-      btn.disabled=true; msg.textContent='Mengirim…'; msg.className='muted';
-      const fd = new FormData();
-      fd.append('name', name.value); fd.append('username', unameEl.value.trim().toLowerCase());
-      fd.append('email', email.value); fd.append('wa_number', wa.value); fd.append('password', pass.value);
-      fd.append('role','guru'); fd.append('become_student', document.getElementById('chkStudent')?.checked || false);
-      fd.append('sanadUrl', bukti.value==='sanad' ? sanadUrl.value.trim() : '');
-      fd.append('mahadText', bukti.value==='mahad' ? mahadText.value.trim() : '');
-      fd.append('certUrl', bukti.value==='cert' ? certUrl.value.trim() : '');
-      fd.append('audio', audioBlob, 'hajj15.webm');
+function draw() {
+  box.innerHTML = dots() + [step1, step2, step3][step - 1]();
+  if (step === 1) { name.value = form.name; uname.value = form.username; email.value = form.email; wa.value = form.wa; pass.value = form.pass; }
+}
+function step1() {
+  return '<div class="card-t">Langkah 1 · Identitas</div><div class="card-s">Isi datamu — username jadi alamat profilmu: ponpes.org/@username</div>'
+    + f('Nama lengkap', '<input id="name" class="input" placeholder="mis: Aisyah binti Yusuf">')
+    + f('Username', '<div class="uwrap"><span class="pre">@</span><input id="uname" class="input" maxlength="20" placeholder="ustz_aisyah"></div><p class="hint" id="uhint">3–20 huruf kecil, angka, atau underscore</p>')
+    + f('Email', '<input id="email" type="email" class="input" placeholder="nama@email.com">')
+    + f('Nomor WhatsApp', '<input id="wa" class="input" placeholder="628123...">')
+    + f('Password', '<input id="pass" type="password" class="input" placeholder="minimal 6 karakter">')
+    + '<button class="btn btn-primary btn-block" style="margin-top:8px" onclick="next1()">Lanjut →</button>';
+}
+function step2() {
+  return '<div class="card-t">Langkah 2 · Bukti Keilmuan</div><div class="card-s">Pilih salah satu: sertifikat sanad, riwayat Ma’had, atau sertifikat lain.</div>'
+    + '<div class="seg" style="margin-bottom:14px">'
+    + ['sanad|Sertifikat Sanad', 'mahad|Riwayat Ma\'had', 'cert|Sertifikat Lain'].map(function (o) { const v = o.split('|')[0];
+      return '<button onclick="pickBukti(\'' + v + '\')" aria-selected="' + (form.bukti === v) + '">' + o.split('|')[1] + '</button>'; }).join('') + '</div>'
+    + (form.bukti === 'sanad' ? f('URL sertifikat sanad', '<input id="sanadUrl" class="input" placeholder="https://... (Google Drive / link gambar)">') : '')
+    + (form.bukti === 'mahad' ? f('Riwayat belajar', '<textarea id="mahadText" class="input" placeholder="Contoh: Santri Ma\'had Al-Furqan 2015–2020, sanad tahsin dari Ustadz Yusuf, 6 tahun"></textarea>') : '')
+    + (form.bukti === 'cert' ? f('URL sertifikat', '<input id="certUrl" class="input" placeholder="https://...">') : '')
+    + '<div style="display:flex;gap:9px"><button class="btn btn-ghost" onclick="step=1;draw()">← Kembali</button><button class="btn btn-primary" style="flex:1" onclick="next2()">Lanjut →</button></div>';
+}
+function step3() {
+  const au = blob ? '<div class="item" style="margin-top:12px"><div class="sub">Pratinjau rekaman</div><audio controls src="' + URL.createObjectURL(blob) + '"></audio></div>' : '';
+  return '<div class="card-t">Langkah 3 · Setor Bacaan</div><div class="card-s">Rekam bacaan <b>Al-Hajj ayat 1–5</b>. Para pengajar akan menyimak sebelum menyetujui.</div>'
+    + '<div class="quote">وَأَقِيمُوا وُجُوهَكُمۡ عِندَ كُلِّ مَسْجِدٍ‬</div>'
+    + '<div class="rec"><div class="eq" id="eq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>'
+    + '<button class="rec-orb" id="recBtn" onclick="toggleRec()">REKAM</button><div class="rec-time" id="recTime">00:00</div></div>'
+    + '<p class="hint" id="recStatus" style="text-align:center">Tekan tombol lalu baca Al-Hajj 1–5</p>' + au
+    + '<div class="note" style="margin-top:14px;margin-bottom:0">📩 Setelah kirim, semua pengajar terdaftar bisa mereviu. Cukup <b>1 ACC</b> — kamu langsung jadi pengajar.</div>'
+    + '<div style="display:flex;gap:9px;margin-top:14px"><button class="btn btn-ghost" onclick="step=2;draw()">← Kembali</button><button class="btn btn-gold" style="flex:1" id="subBtn" onclick="kirim()">Kirim Permintaan</button></div>';
+}
+function f(l, i) { return '<div class="field"><label>' + l + '</label>' + i + '</div>'; }
+function pickBukti(v) { form.sanadUrl = (sanadUrl && sanadUrl.value) || form.sanadUrl; form.mahadText = (mahadText && mahadText.value) || form.mahadText; form.certUrl = (certUrl && certUrl.value) || form.certUrl; form.bukti = v; draw(); }
 
-      const r = await fetch('/api/auth/register', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:name.value,email:email.value,wa_number:wa.value,password:pass.value,role:'guru',username:unameEl.value.trim().toLowerCase()})});
-      const reg = await r.json();
-      if (!reg.success) { msg.textContent=reg.error; msg.className='bad'; btn.disabled=false; return; }
-      fd.set('userId', reg.user.id);
-      const v = await fetch('/api/guru/verify', {method:'POST',body:fd});
-      const vd = await v.json();
-      if (vd.success) { msg.textContent='Terkirim! Menunggu review dari para guru. Cukup 1 yang ACC, kamu lolos.'; msg.className='ok'; setTimeout(()=>location.href='/login',2200); }
-      else { msg.textContent=vd.error||'Gagal'; msg.className='bad'; btn.disabled=false; }
-    }
-    btn.onclick = daftar;
-  </script>
+let tt;
+function checkU(v) {
+  uState = 'checking'; const h = document.getElementById('uhint'); h.textContent = 'mengecek…'; h.className = 'hint';
+  clearTimeout(tt); tt = setTimeout(async () => {
+    const d = await (await fetch('/api/auth/check-username?u=' + encodeURIComponent(v))).json();
+    if (v !== uname.value.trim().toLowerCase()) return;
+    uState = d.available ? 'ok' : 'bad';
+    h.textContent = d.available ? '✓ @' + v + ' tersedia' : '✗ @' + v + ' sudah diambil';
+    h.className = 'hint ' + (d.available ? 'ok' : 'bad');
+  }, 450);
+}
+document.addEventListener('input', function (e) {
+  if (e.target.id === 'uname') { const v = e.target.value.trim().toLowerCase();
+    if (!v) { uState = 'empty'; document.getElementById('uhint').textContent = '3–20 huruf kecil, angka, atau underscore'; document.getElementById('uhint').className = 'hint'; return; }
+    if (!/^[a-z0-9_]{3,20}$/.test(v)) { uState = 'bad'; document.getElementById('uhint').textContent = 'Format salah: 3–20 huruf kecil, angka, underscore'; document.getElementById('uhint').className = 'hint bad'; return; }
+    checkU(v); }
+});
+function next1() {
+  form.name = name.value.trim(); form.username = uname.value.trim().toLowerCase(); form.email = email.value.trim(); form.wa = wa.value.trim(); form.pass = pass.value;
+  if (!form.name || !form.email || form.pass.length < 6) return alert('Lengkapi nama, email, dan password (min 6 karakter).');
+  if (uState !== 'ok') return alert('Username belum tersedia / masih dicek.');
+  step = 2; draw();
+}
+function next2() {
+  if (form.bukti === 'sanad') { form.sanadUrl = (sanadUrl || {}).value || ''; if (!form.sanadUrl.trim()) return alert('Isi URL sertifikat sanad.'); }
+  if (form.bukti === 'mahad') { form.mahadText = (mahadText || {}).value || ''; if (!form.mahadText.trim()) return alert('Isi riwayat Ma\'had.'); }
+  if (form.bukti === 'cert') { form.certUrl = (certUrl || {}).value || ''; if (!form.certUrl.trim()) return alert('Isi URL sertifikat.'); }
+  step = 3; draw();
+}
+function tick() { const s = Math.floor((Date.now() - t0) / 1000); recTime.textContent = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
+async function toggleRec() {
+  if (!rec) {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mime = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+      mr = new MediaRecorder(stream, { mimeType: mime }); chunks = [];
+      mr.ondataavailable = e => chunks.push(e.data);
+      mr.onstop = () => { blob = new Blob(chunks, { type: mime }); stream.getTracks().forEach(t => t.stop()); draw(); };
+      mr.start(); rec = true; t0 = Date.now(); timer = setInterval(tick, 250);
+      recBtn.textContent = 'SELESAI'; recBtn.classList.add('on'); eq.classList.add('on'); recStatus.textContent = 'Merekam…';
+    } catch (e) { recStatus.textContent = 'Gagal akses mic: ' + e.message; }
+  } else { mr.stop(); rec = false; clearInterval(timer); }
+}
+async function kirim() {
+  if (!blob) return alert('Rekam bacaan Al-Hajj 1–5 dulu.');
+  const btn = document.getElementById('subBtn'); btn.disabled = true; btn.textContent = 'Mendaftar…';
+  const reg = await (await fetch('/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: form.name, username: form.username, email: form.email, wa_number: form.wa, password: form.pass, role: 'guru' }) })).json();
+  if (!reg.success) { btn.disabled = false; btn.textContent = 'Kirim Permintaan'; return alert(reg.error); }
+  userId = reg.user.id;
+  btn.textContent = 'Mengirim bacaan…';
+  const fd = new FormData();
+  fd.append('userId', userId);
+  fd.append('sanadUrl', form.bukti === 'sanad' ? form.sanadUrl : '');
+  fd.append('mahadText', form.bukti === 'mahad' ? form.mahadText : '');
+  fd.append('certUrl', form.bukti === 'cert' ? form.certUrl : '');
+  fd.append('audio', blob, 'al-hajj-1-5.webm');
+  const v = await (await fetch('/api/guru/verify', { method: 'POST', body: fd })).json();
+  if (!v.success) { btn.disabled = false; btn.textContent = 'Kirim Permintaan'; return alert(v.error || 'Gagal'); }
+  box.innerHTML = '<div class="empty"><span class="big">🎉</span><h3 style="margin-bottom:6px">Terima kasih, ' + PP.esc(form.name.split(' ')[0]) + '!</h3>'
+    + '<p>Permintaanmu terkirim. Para pengajar akan menyimak bacaan Al-Hajj 1–5-mu.<br>Cukup <b>1 guru ACC</b> — kamu resmi jadi pengajar.</p>'
+    + '<button class="btn btn-primary btn-block" style="margin-top:18px;max-width:280px" onclick="location.href=\'/login\'">Ke Halaman Masuk</button></div>';
+}
+draw();
+</script>
 </body>
 </html>
