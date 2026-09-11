@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
   name TEXT NOT NULL,
   email TEXT UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
-  role TEXT NOT NULL CHECK(role IN ('murid','guru_pending','guru','guru_verifier')),
+  role TEXT NOT NULL DEFAULT 'murid',
   wa_number TEXT,                 -- E.164, buat notif
   referral_code TEXT UNIQUE,      -- kode unik referrer
   referred_by TEXT,               -- user_id yang mengajak

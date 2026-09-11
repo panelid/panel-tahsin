@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daftar Jadi Pengajar — ponpes.org</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Literata:opsz,wght@7..72,600&display=swap" rel="stylesheet">
+  <style>
+    :root{--base:#F6F5EF;--teal:#1E4640;--amber:#E3A23B;--ink:#1C2420;--soft:#E7EEE6;--muted:#5A655F;--line:#D9DED8}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--base);color:var(--ink);font-size:16px;line-height:1.7;padding:24px 16px}
+    .wrap{max-width:480px;margin:0 auto}
+    h1{font-family:'Literata',serif;font-size:26px;margin-bottom:6px}
+    p.lead{color:var(--muted);margin-bottom:20px}
+    .box{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px}
+    .ipt{width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:12px;font-family:'Plus Jakarta Sans';font-size:14px;background:#fff;color:var(--ink);margin:8px 0}
+    .ipt:focus{outline:2px solid var(--amber)}
+    .btn{display:inline-flex;align-items:center;justify-content:center;font-weight:600;font-size:15px;border-radius:12px;padding:12px 20px;text-decoration:none;cursor:pointer;border:1px solid transparent;font-family:'Plus Jakarta Sans';width:100%}
+    .btn-amber{background:var(--amber);color:#221A06}
+    .btn-amber:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(227,162,59,.35)}
+    a{color:var(--teal);font-weight:600;text-decoration:none}
+    .back{display:inline-block;margin-bottom:12px;font-size:14px}
+    #msg{font-size:14px;margin-top:10px;min-height:20px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <a href="/" class="back">← ponpes.org</a>
+    <h1>Daftar Jadi Pengajar</h1>
+    <p class="lead">Isi data & kirim contoh bacaan. Tim akan verifikasi lalu aktifkan sebagai pengajar.</p>
+    <div class="box">
+      <input id="name" class="ipt" placeholder="nama lengkap">
+      <input id="email" class="ipt" type="email" placeholder="email">
+      <input id="wa" class="ipt" placeholder="whatsapp (62...)">
+      <input id="pass" class="ipt" type="password" placeholder="password">
+      <input id="demo" class="ipt" placeholder="URL demo audio bacaan (opsional)">
+      <input id="cert" class="ipt" placeholder="URL sertifikat (opsional)">
+      <button class="btn btn-amber" onclick="daftar()">Kirim Permintaan</button>
+      <p id="msg"></p>
+    </div>
+    <p style="text-align:center;margin-top:16px"><a href="/login.html">Sudah jadi pengajar? Masuk</a></p>
+  </div>
+  <script>
+    async function daftar() {
+      const body = { name:name.value, email:email.value, wa_number:wa.value, password:pass.value, role:'guru', demoAudioUrl:demo.value, certUrl:cert.value };
+      const r = await fetch('/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+      const d = await r.json();
+      if (d.success) {
+        // submit verification
+        await fetch('/api/guru/verify', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ userId:d.user.id, demoAudioUrl:demo.value, certUrl:cert.value }) });
+        msg.textContent = 'Permintaan terkirim! Tim akan verifikasi.';
+        msg.style.color = 'var(--teal)';
+        setTimeout(()=>location.href='/login.html', 1800);
+      } else { msg.textContent = d.error; msg.style.color = '#c0392b'; }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Verifikasi Guru | ponpes.org</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Literata:opsz,wght@7..72,600&display=swap" rel="stylesheet">
+  <style>
+    :root{--base:#F6F5EF;--teal:#1E4640;--amber:#E3A23B;--ink:#1C2420;--soft:#E7EEE6;--muted:#5A655F;--line:#D9DED8}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--base);color:var(--ink);font-size:16px;line-height:1.7;padding:24px 16px}
+    .wrap{max-width:680px;margin:0 auto}
+    h1{font-family:'Literata',serif;font-size:26px;margin-bottom:6px}
+    .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin:12px 0}
+    .row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;border-radius:10px;padding:9px 16px;cursor:pointer;border:1px solid transparent;font-family:'Plus Jakarta Sans'}
+    .btn-teal{background:var(--teal);color:#fff}
+    .btn-amber{background:var(--amber);color:#221A06}
+    .muted{color:var(--muted);font-size:14px}
+    a{color:var(--teal);font-weight:600;text-decoration:none}
+    .back{display:inline-block;margin-bottom:12px;font-size:14px}
+    #login{margin:20px 0}
+    .ipt{padding:9px 12px;border:1px solid var(--line);border-radius:10px;font-family:'Plus Jakarta Sans';font-size:14px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <a href="/" class="back">← ponpes.org</a>
+    <h1>Admin Verifikasi Guru</h1>
+    <div id="login">
+      <p class="muted">Masuk sebagai admin:</p>
+      <input id="adminId" class="ipt" placeholder="admin user id" style="width:280px">
+      <button class="btn btn-teal" onclick="load()">Lihat Antrian</button>
+    </div>
+    <div id="app"></div>
+  </div>
+  <script>
+    async function load() {
+      const adminId = document.getElementById('adminId').value;
+      if (!adminId) { alert('Isi admin id dulu'); return; }
+      const r = await fetch('/api/admin/guru-pending'); const list = await r.json();
+      let html = '<h2 style="margin:16px 0 8px">Menunggu ('+list.length+')</h2>';
+      if (!list.length) html += '<p class="muted">Kosong.</p>';
+      list.forEach(g => {
+        html += '<div class="card"><p><b>'+g.name+'</b></p>'+
+          (g.demo_audio_url?'<p class="muted">Demo: <a href="'+g.demo_audio_url+'" target="_blank">play</a></p>':'')+
+          (g.cert_url?'<p class="muted">Sertifikat: <a href="'+g.cert_url+'" target="_blank">lihat</a></p>':'')+
+          '<div class="row"><button class="btn btn-teal" onclick="act(\''+g.id+'\',\'approve\','+adminId+')">Setujui</button>'+
+          '<button class="btn btn-amber" onclick="act(\''+g.id+'\',\'reject\','+adminId+')">Tolak</button></div></div>';
+      });
+      document.getElementById('app').innerHTML = html;
+    }
+    async function act(verId, action, adminId) {
+      await fetch('/api/admin/guru-pending', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({adminId, verificationId:verId, action})});
+      load();
+    }
+  </script>
+</body>
+</html>
