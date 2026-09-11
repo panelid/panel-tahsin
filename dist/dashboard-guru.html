@@ -30,13 +30,30 @@
 <body>
   <div class="wrap">
     <a href="/" class="back">← ponpes.org</a>
-    <h1>Dashboard Pengajar</h1>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <h1 style="margin:0">Dashboard Pengajar</h1>
+      <span id="learnTab" style="display:none"></span>
+    </div>
     <div id="app"></div>
   </div>
   <script>
+    const me = JSON.parse(localStorage.getItem('user') || '{}');
+    const tab = document.getElementById('learnTab');
+    if (me.is_student) {
+      tab.style.display = 'inline-block';
+      tab.innerHTML = '<a href="/dashboard-murid" class="btn" style="background:var(--amber);color:#221A06">📖 Mode Belajar</a> <button class="btn" style="background:#fff;color:var(--muted);border-color:var(--line)" onclick="toggleStud(false)">Matikan</button>';
+    } else if (me.role === 'guru' && me.id) {
+      tab.style.display = 'inline-block';
+      tab.innerHTML = '<button class="btn" style="background:#fff;color:var(--teal);border-color:var(--teal)" onclick="toggleStud(true)">+ Aktifkan Mode Belajar</button>';
+    }
+    async function toggleStud(on) {
+      await fetch('/api/guru/toggle-student', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ userId: me.id, on }) });
+      me.is_student = on; localStorage.setItem('user', JSON.stringify(me));
+      location.reload();
+    }
     const TRACKS = [['iqro','Iqro'],['fatihah','Al-Fatihah'],['juz_amma','Juz Amma'],['tilawah','Tilawah'],['hafalan','Hafalan']];
     async function load() {
-      const r = await fetch('/api/guru/pending'); const list = await r.json();
+      const r = await fetch('/api/guru/pending'); const list = (await r.json()).filter(s => s.user_id !== me.id);
       let html = '<h2>Setoran Menunggu Review ('+list.length+')</h2>';
       if (!list.length) html += '<p class="muted">Kosong.</p>';
       list.forEach(s => {

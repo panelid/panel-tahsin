@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
   email TEXT UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
   role TEXT NOT NULL DEFAULT 'murid',
+  is_student INTEGER DEFAULT 0,    -- guru yang juga aktif sebagai murid (dual role)
   wa_number TEXT,                 -- E.164, buat notif
   referral_code TEXT UNIQUE,      -- kode unik referrer
   username TEXT UNIQUE,               -- username publik (ponpes.org/@username)
