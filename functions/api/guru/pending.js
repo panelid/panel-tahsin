@@ -3,7 +3,7 @@ export async function onRequestGet(context) {
   const { env } = context;
   const db = env.DB;
   const rows = await db.prepare(`
-    SELECT s.id, s.user_id, u.name as murid, s.track_id, s.unit_ref, s.created_at
+    SELECT s.id, s.user_id, u.name as murid, s.track_id, s.unit_ref, s.status, s.audio_url, s.created_at
     FROM setoran s JOIN users u ON u.id = s.user_id
     WHERE s.status = 'pending'
     ORDER BY s.created_at DESC LIMIT 50
