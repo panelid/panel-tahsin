@@ -47,7 +47,14 @@
       document.getElementById('app').innerHTML = html;
     }
     async function review(id) {
-      await fetch('/api/review/submit', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({setoranId:id,unitRef:document.getElementById('unit_'+id).value,score:document.getElementById('score_'+id).value,catatan:document.getElementById('cat_'+id).value})});
+      const unitRef = document.getElementById('unit_'+id).value;
+      const score = Number(document.getElementById('score_'+id).value) || 0;
+      const catatan = document.getElementById('cat_'+id).value;
+      await fetch('/api/review/submit', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+        setoran_id: id,
+        unit_ref: unitRef,
+        reviews: [{ ayat_number: 1, score: score, catatan_teks: catatan }]
+      })});
       load();
     }
     load();
