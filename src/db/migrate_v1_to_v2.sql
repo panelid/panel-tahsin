@@ -6,6 +6,8 @@ ALTER TABLE users ADD COLUMN wa_number TEXT;
 ALTER TABLE users ADD COLUMN referral_code TEXT;
 ALTER TABLE users ADD COLUMN referred_by TEXT;
 ALTER TABLE users ADD COLUMN is_admin INTEGER DEFAULT 0;
+ALTER TABLE users ADD COLUMN username TEXT;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username ON users(username);
 
 -- 2. Update role check: guru_pending + guru_verifier (D1 tidak support ALTER CHECK, buat ulang tidak bisa drop-add di SQLite mudah)
 -- Workaround: buat tabel baru, copy, drop lama, rename

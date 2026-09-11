@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
   role TEXT NOT NULL DEFAULT 'murid',
   wa_number TEXT,                 -- E.164, buat notif
   referral_code TEXT UNIQUE,      -- kode unik referrer
+  username TEXT UNIQUE,               -- username publik (ponpes.org/@username)
   referred_by TEXT,               -- user_id yang mengajak
   is_admin INTEGER DEFAULT 0,     -- @sobur = 1
   created_at TEXT DEFAULT (datetime('now'))

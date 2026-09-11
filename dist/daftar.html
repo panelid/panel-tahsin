@@ -3,114 +3,115 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daftar — Panel Tahsin</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: { extend: { colors: { teal: { 50:'#f0fdfa',100:'#ccfbf1',200:'#99f6e4',500:'#14b8a6',600:'#0d9488',700:'#0f766e' }, gold: { 500:'#d4a843',600:'#c8923d' } } } }
-    }
-  </script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>* { font-family: 'Inter', sans-serif; }</style>
+  <title>Daftar — ponpes.org</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Literata:opsz,wght@7..72,600&display=swap" rel="stylesheet">
+  <style>
+    :root{--base:#F6F5EF;--teal:#1E4640;--amber:#E3A23B;--ink:#1C2420;--soft:#E7EEE6;--muted:#5A655F;--line:#D9DED8}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--base);color:var(--ink);font-size:16px;line-height:1.7;padding:24px 16px}
+    .wrap{max-width:440px;margin:0 auto}
+    h1{font-family:'Literata',serif;font-size:28px;margin-bottom:4px}
+    p.lead{color:var(--muted);margin-bottom:20px}
+    .box{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px}
+    label{display:block;font-size:13px;font-weight:600;margin:14px 0 4px;color:var(--teal)}
+    .ipt{width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:12px;font-family:'Plus Jakarta Sans';font-size:15px;background:#fff;color:var(--ink)}
+    .ipt:focus{outline:2px solid var(--amber)}
+    .uwrap{position:relative}
+    .uprefix{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;pointer-events:none}
+    .ipt.user{padding-left:34px}
+    .hint{font-size:12px;margin-top:4px;min-height:16px}
+    .ok{color:#1E8E4E}.bad{color:#c0392b}.mut{color:var(--muted)}
+    .btn{display:inline-flex;align-items:center;justify-content:center;width:100%;font-weight:600;font-size:15px;border-radius:12px;padding:13px 20px;text-decoration:none;cursor:pointer;border:1px solid transparent;font-family:'Plus Jakarta Sans';margin-top:18px}
+    .btn-amber{background:var(--amber);color:#221A06}
+    .btn-amber:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 18px rgba(227,162,59,.35)}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
+    a{color:var(--teal);font-weight:600;text-decoration:none}
+    .back{display:inline-block;margin-bottom:12px;font-size:14px}
+    .wave{display:flex;align-items:flex-end;gap:3px;height:22px;margin:10px 0 4px}
+    .wave span{width:4px;background:var(--teal);border-radius:2px;opacity:.25;height:100%}
+    .wave span:nth-child(odd){opacity:.5}
+  </style>
 </head>
-<body class="bg-slate-50 min-h-screen flex items-center justify-center px-4">
-
-  <div class="w-full max-w-md">
-    <div class="text-center mb-8">
-      <div class="w-14 h-14 rounded-2xl bg-teal-600 flex items-center justify-center mx-auto mb-4">
-        <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-      </div>
-      <h1 class="text-2xl font-bold text-slate-800">Buat Akun Panel Tahsin</h1>
-      <p class="text-sm text-slate-500 mt-1">Pengajar? <a href="/daftar-guru" style="color:var(--teal)">Daftar jadi pengajar</a><br>Sudah punya akun? <a href="/login" class="text-teal-600 font-medium hover:underline">Masuk di sini</a></p>
-    </div>
-
-    <div class="bg-white rounded-2xl p-8 border border-slate-100 shadow-sm">
-      <div id="error-msg" class="hidden bg-red-50 text-red-600 text-sm px-4 py-3 rounded-xl mb-4 border border-red-100"></div>
-      <div id="success-msg" class="hidden bg-teal-50 text-teal-700 text-sm px-4 py-3 rounded-xl mb-4 border border-teal-100"></div>
-
-      <form id="registerForm" class="space-y-5">
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1.5">Nama Lengkap</label>
-          <input type="text" id="name" required placeholder="Nama lengkap" class="w-full px-4 py-3 rounded-xl border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500 transition">
+<body>
+  <div class="wrap">
+    <a href="/" class="back">← ponpes.org</a>
+    <h1>Daftar Gratis</h1>
+    <div class="wave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <p class="lead">Belajar tahsin & ngaji online. 100% gratis, tanpa biaya.</p>
+    <div class="box">
+      <form id="f" novalidate>
+        <label>Nama</label>
+        <input id="name" class="ipt" placeholder="nama lengkap" required>
+        <label>Username publik</label>
+        <div class="uwrap">
+          <span class="uprefix">@</span>
+          <input id="username" class="ipt user" placeholder="pilih_username" autocomplete="off" required>
         </div>
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
-          <input type="email" id="email" required placeholder="email@contoh.com" class="w-full px-4 py-3 rounded-xl border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500 transition">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
-          <input type="password" id="password" required minlength="6" placeholder="Minimal 6 karakter" class="w-full px-4 py-3 rounded-xl border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500 transition">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1.5">Daftar Sebagai</label>
-          <div class="grid grid-cols-2 gap-3">
-            <label class="relative cursor-pointer">
-              <input type="radio" name="role" value="murid" checked class="peer sr-only">
-              <div class="border-2 border-slate-200 peer-checked:border-teal-600 peer-checked:bg-teal-50 rounded-xl p-4 text-center transition">
-                <div class="text-2xl mb-1">📖</div>
-                <div class="font-semibold text-slate-800 text-sm">Murid</div>
-                <div class="text-xs text-slate-500">Setor bacaan</div>
-              </div>
-            </label>
-            <label class="relative cursor-pointer">
-              <input type="radio" name="role" value="guru" class="peer sr-only">
-              <div class="border-2 border-slate-200 peer-checked:border-gold-600 peer-checked:bg-yellow-50 rounded-xl p-4 text-center transition">
-                <div class="text-2xl mb-1">🎓</div>
-                <div class="font-semibold text-slate-800 text-sm">Guru</div>
-                <div class="text-xs text-slate-500">Review setoran</div>
-              </div>
-            </label>
-          </div>
-        </div>
-        <button type="submit" id="submitBtn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3.5 rounded-xl transition shadow-md shadow-teal-600/20">
-          Daftar Sekarang
-        </button>
+        <div id="uhint" class="hint mut">3-20 huruf/angka/underscore. Ini profil kamu: ponpes.org/@username</div>
+        <label>Email</label>
+        <input id="email" class="ipt" type="email" placeholder="email@contoh.com" required>
+        <label>WhatsApp</label>
+        <input id="wa" class="ipt" placeholder="62812xxxx (opsional)">
+        <label>Password</label>
+        <input id="password" class="ipt" type="password" placeholder="minimal 6 huruf" required>
+        <label>Daftar sebagai</label>
+        <select id="role" class="ipt">
+          <option value="murid">Santri / Murid</option>
+          <option value="guru">Pengajar</option>
+        </select>
+        <button type="submit" id="btn" class="btn btn-amber" disabled>Daftar Sekarang</button>
+        <p id="msg" style="font-size:14px;margin-top:10px;min-height:18px"></p>
       </form>
+      <p style="text-align:center;margin-top:14px;font-size:14px">Sudah punya akun? <a href="/login">Masuk</a></p>
     </div>
   </div>
-
   <script>
-    const API_BASE = '';
-    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    const $ = id => document.getElementById(id);
+    let unameOk = false, checkTimer = null;
+
+    $('username').addEventListener('input', e => {
+      const v = e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 20);
+      e.target.value = v;
+      clearTimeout(checkTimer);
+      const hint = $('uhint');
+      if (!v) { hint.className = 'hint mut'; hint.textContent = '3-20 huruf/angka/underscore. Ini profil kamu: ponpes.org/@username'; unameOk = false; updateBtn(); return; }
+      if (!/^[a-z0-9_]{3,20}$/.test(v)) { hint.className = 'hint bad'; hint.textContent = 'Minimal 3 huruf, hanya a-z 0-9 _'; unameOk = false; updateBtn(); return; }
+      hint.className = 'hint mut'; hint.textContent = 'Mengecek ketersediaan…';
+      checkTimer = setTimeout(async () => {
+        try {
+          const r = await fetch('/api/auth/check-username?u=' + encodeURIComponent(v));
+          const d = await r.json();
+          if (d.available) { hint.className = 'hint ok'; hint.textContent = '✓ @' + v + ' tersedia'; unameOk = true; }
+          else { hint.className = 'hint bad'; hint.textContent = '✗ @' + v + ' sudah diambil'; unameOk = false; }
+        } catch { hint.className = 'hint bad'; hint.textContent = 'Gagal cek, coba lagi'; unameOk = false; }
+        updateBtn();
+      }, 400);
+    });
+
+    function updateBtn() {
+      const filled = $('name').value && $('email').value && $('password').value.length >= 6;
+      $('btn').disabled = !(filled && unameOk);
+    }
+    ['name','email','password'].forEach(id => $(id).addEventListener('input', updateBtn));
+
+    $('f').addEventListener('submit', async e => {
       e.preventDefault();
-      const name = document.getElementById('name').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      const role = document.querySelector('input[name="role"]:checked').value;
-      const errorEl = document.getElementById('error-msg');
-      const successEl = document.getElementById('success-msg');
-      const btn = document.getElementById('submitBtn');
-
-      errorEl.classList.add('hidden');
-      successEl.classList.add('hidden');
-      btn.disabled = true; btn.textContent = 'Mendaftarkan...';
-
+      const btn = $('btn'); btn.disabled = true; btn.textContent = 'Mendaftarkan…';
+      const body = {
+        name: $('name').value, email: $('email').value, password: $('password').value,
+        role: $('role').value, wa_number: $('wa').value || null,
+        username: $('username').value
+      };
       try {
-        const res = await fetch(`${API_BASE}/api/auth/register`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, password, role })
-        });
+        const res = await fetch('/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
         const data = await res.json();
-        if (!data.success) {
-          errorEl.textContent = data.error || 'Gagal mendaftar';
-          errorEl.classList.remove('hidden');
-          btn.disabled = false; btn.textContent = 'Daftar Sekarang';
-          return;
-        }
-        // simpan uid + langsung ke dashboard (skip login, akun baru)
+        if (!data.success) { $('msg').style.color = '#c0392b'; $('msg').textContent = data.error; btn.disabled = false; btn.textContent = 'Daftar Sekarang'; return; }
         localStorage.setItem('uid', data.user.id);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        successEl.textContent = 'Berhasil! Mengarahkan ke dashboard...';
-        successEl.classList.remove('hidden');
-        setTimeout(() => window.location.href = '/dashboard-murid?uid=' + data.user.id, 1200);
-      } catch (err) {
-        errorEl.textContent = 'Terjadi kesalahan. Coba lagi.';
-        errorEl.classList.remove('hidden');
-        btn.disabled = false; btn.textContent = 'Daftar Sekarang';
-      }
+        $('msg').style.color = '#1E8E4E'; $('msg').textContent = 'Berhasil! Mengarahkan…';
+        setTimeout(() => location.href = '/dashboard-murid?uid=' + data.user.id, 900);
+      } catch { $('msg').style.color = '#c0392b'; $('msg').textContent = 'Terjadi kesalahan. Coba lagi.'; btn.disabled = false; btn.textContent = 'Daftar Sekarang'; }
     });
   </script>
-
 </body>
 </html>
