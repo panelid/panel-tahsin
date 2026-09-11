@@ -21,7 +21,7 @@ export async function onRequestGet(context) {
     "SELECT t.name as track, e.current_unit, e.status FROM enrollments e JOIN tracks t ON t.id = e.track_id WHERE e.user_id = ?"
   ).bind(user.id).all();
   const setoran = await db.prepare(
-    "SELECT s.track_id, s.status, s.created_at FROM setoran s WHERE s.user_id = ? ORDER BY s.created_at DESC LIMIT 5"
+    "SELECT s.track_id, s.status, s.created_at, s.audio_url FROM setoran s WHERE s.user_id = ? ORDER BY s.created_at DESC LIMIT 5"
   ).bind(user.id).all();
 
   // progress: % enrollment yang status active vs total
@@ -30,7 +30,12 @@ export async function onRequestGet(context) {
   const progress = tracks.length ? Math.round((activeCount / tracks.length) * 100) : 0;
 
   const rows = tracks.map(e => `<div class="track"><span>${e.track}</span><span class="muted">${e.status}${e.current_unit ? ' · ' + e.current_unit : ''}</span></div>`).join('') || '<p class="muted">Belum mulai track.</p>';
-  const sets = (setoran.results || []).map(s => `<div class="track"><span>${s.track_id}</span><span class="muted">${s.status}</span></div>`).join('') || '<p class="muted">Belum ada setoran.</p>';
+  const trackNames = { iqro:'Iqro', fatihah:'Al-Fatihah', juz_amma:'Juz Amma', tilawah:'Tilawah', hafalan:'Hafalan' };
+  const sets = (setoran.results || []).map(s => {
+    const tn = trackNames[s.track_id] || s.track_id || '-';
+    const audio = s.audio_url ? `<audio controls src="${s.audio_url}" style="width:100%;margin-top:8px"></audio>` : '';
+    return `<div class="track"><div><span>${tn}</span><span class="muted">${s.status}</span></div>${audio}</div>`;
+  }).join('') || '<p class="muted">Belum ada setoran.</p>';
 
   const html = `<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${user.name} · Ponpes Digital</title>

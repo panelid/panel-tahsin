@@ -3,25 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Guru — ponpes.org</title>
+  <title>Dashboard Pengajar — ponpes.org</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Literata:opsz,wght@7..72,600&display=swap" rel="stylesheet">
   <style>
     :root{--base:#F6F5EF;--teal:#1E4640;--amber:#E3A23B;--ink:#1C2420;--soft:#E7EEE6;--muted:#5A655F;--line:#D9DED8}
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--base);color:var(--ink);font-size:16px;line-height:1.7;padding:24px 16px}
+    body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--base);color:var(--ink);font-size:16px;line-height:1.7;padding:20px 14px}
     .wrap{max-width:680px;margin:0 auto}
-    h1{font-family:'Literata',serif;font-size:28px;margin-bottom:4px}
-    h2{font-size:18px;color:var(--teal);margin:20px 0 12px}
+    h1{font-family:'Literata',serif;font-size:26px;margin-bottom:4px}
+    h2{font-size:17px;color:var(--teal);margin:20px 0 10px}
     .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
     .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
     .ipt{padding:9px 12px;border:1px solid var(--line);border-radius:10px;font-family:'Plus Jakarta Sans';font-size:14px;background:#fff;color:var(--ink)}
     .ipt:focus{outline:2px solid var(--amber)}
     .btn{display:inline-flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;border-radius:10px;padding:9px 16px;text-decoration:none;cursor:pointer;border:1px solid transparent;font-family:'Plus Jakarta Sans';background:var(--teal);color:#fff}
-    .btn:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(30,70,64,.3)}
+    .btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 14px rgba(30,70,64,.25)}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
     .muted{color:var(--muted);font-size:14px}
     a{color:var(--teal);font-weight:600;text-decoration:none}
-    .back{display:inline-block;margin-bottom:12px;font-size:14px}
+    .back{display:inline-block;margin-bottom:10px;font-size:14px}
+    audio{width:100%;margin:8px 0}
+    .badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:#FCEFD6;color:#9a6b15}
   </style>
 </head>
 <body>
@@ -31,28 +34,34 @@
     <div id="app"></div>
   </div>
   <script>
+    const TRACKS = [['iqro','Iqro'],['fatihah','Al-Fatihah'],['juz_amma','Juz Amma'],['tilawah','Tilawah'],['hafalan','Hafalan']];
     async function load() {
       const r = await fetch('/api/guru/pending'); const list = await r.json();
       let html = '<h2>Setoran Menunggu Review ('+list.length+')</h2>';
       if (!list.length) html += '<p class="muted">Kosong.</p>';
       list.forEach(s => {
+        const opts = TRACKS.map(t => '<option value="'+t[0]+'"'+(s.track_id===t[0]?' selected':'')+'>'+t[1]+'</option>').join('');
+        const audio = s.audio_url ? '<audio controls src="'+s.audio_url+'"></audio>' : '<p class="muted">audio tidak tersedia</p>';
         html += '<div class="card" id="'+s.id+'">'+
-          '<p><b>'+s.murid+'</b> — '+s.track_id+' '+(s.unit_ref||'')+' <small class="muted">'+s.created_at+'</small></p>'+
-          '<div class="row">'+
-          '<input id="unit_'+s.id+'" value="'+(s.unit_ref||'')+'" class="ipt" placeholder="unit">'+
-          '<input id="score_'+s.id+'" type="number" min="1" max="10" placeholder="skor" class="ipt" style="width:90px">'+
+          '<p><b>'+s.murid+'</b> <span class="badge">'+s.status+'</span></p>'+
+          '<p class="muted">'+(s.unit_ref||'')+' · '+(s.created_at||'')+'</p>'+
+          audio +
+          '<div class="row"><label class="muted">Track</label><select id="track_'+s.id+'" class="ipt">'+opts+'</select>'+
+          '<input id="unit_'+s.id+'" value="'+(s.unit_ref||'')+'" class="ipt" placeholder="unit (cth: Iqro 3 hal 10)" style="flex:1;min-width:160px">'+
+          '<input id="score_'+s.id+'" type="number" min="1" max="10" placeholder="skor 1-10" class="ipt" style="width:90px">'+
           '<input id="cat_'+s.id+'" placeholder="catatan" class="ipt" style="flex:1;min-width:140px">'+
-          '<button onclick="review(\''+s.id+'\')" class="btn">Review</button></div></div>';
+          '<button class="btn" onclick="review(\''+s.id+'\')">Kirim Review</button></div></div>';
       });
       document.getElementById('app').innerHTML = html;
     }
     async function review(id) {
+      const trackId = document.getElementById('track_'+id).value;
       const unitRef = document.getElementById('unit_'+id).value;
       const score = Number(document.getElementById('score_'+id).value) || 0;
       const catatan = document.getElementById('cat_'+id).value;
+      const btn = event.target; btn.disabled = true;
       await fetch('/api/review/submit', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
-        setoran_id: id,
-        unit_ref: unitRef,
+        setoran_id: id, track_id: trackId, unit_ref: unitRef,
         reviews: [{ ayat_number: 1, score: score, catatan_teks: catatan }]
       })});
       load();
