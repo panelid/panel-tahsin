@@ -41,14 +41,14 @@ async function load() {
     if (d.error) { app.innerHTML = '<div class="empty"><span class="big">🙏</span>' + PP.esc(d.error) + '</div>'; return; }
     const nm = d.user.name.split(' ')[0];
     document.getElementById('heroName').textContent = 'Assalamu’alaikum, ' + nm;
-    const enr = d.enrollments || [], set = d.setoran || [];
-    const active = enr.filter(e => e.status === 'active');
+    const set = d.setoran || [];
+    const tracksDone = new Set(set.map(s => s.track_id));
     const rev = set.filter(s => s.status === 'reviewed').length;
     const waiting = set.filter(s => s.status !== 'reviewed').length;
 
     let h = '';
     h += '<div class="stats">'
-      + '<div class="stat"><b>' + active.length + '</b><span>Track</span></div>'
+      + '<div class="stat"><b>' + tracksDone.size + '</b><span>Track</span></div>'
       + '<div class="stat"><b>' + set.length + '</b><span>Setoran</span></div>'
       + '<div class="stat"><b>' + rev + '</b><span>Direview</span></div></div>';
 
@@ -63,8 +63,7 @@ async function load() {
       + '<div id="liveBtnWrap"></div></div>';
 
     // ---- SIMPLE RECORDER ----
-    const opts = (active.length ? active.map(e => [e.track_id || TRACKS.find(t => t[1] === e.track)[0], e.track, e.current_unit]) : TRACKS)
-      .map(t => '<option value="' + PP.esc(t[0]) + '">' + PP.esc(t[1]) + (t[2] ? ' · ' + PP.esc(t[2]) : '') + '</option>').join('');
+    const opts = TRACKS.map(t => '<option value="' + PP.esc(t[0]) + '">' + PP.esc(t[1]) + '</option>').join('');
     h += '<div class="card" id="rekam">'
       + '<div class="card-t">🎙 Rekam Setoran</div><div class="card-s">Tap tombol, baca dengan tartil, lalu kirim. Ustadz mereview-nya nanti.</div>'
       + '<div class="field"><label>Pelajaran</label><select id="recTrack" class="input">' + opts + '</select></div>'
@@ -87,9 +86,10 @@ async function load() {
     });
     h += '</div>';
 
-    // ---- LEARNING PATH ----
+    // ---- LEARNING PATH (bersih: 5 track inti, status by progress) ----
+    const doneTracks = new Set(set.filter(s => s.status === 'reviewed').map(s => s.track_id));
+    const path = TRACKS.map((t, i) => ({ track: t[1], status: doneTracks.has(t[0]) ? 'done' : (i === 0 ? 'active' : '') }));
     h += '<div class="card"><div class="card-t">🗂 Perjalanan Belajar</div>';
-    const path = enr.length ? enr : [{track:'Iqro',status:'active'},{track:'Al-Fatihah',status:'pending'},{track:'Juz Amma',status:'pending'}];
     h += '<div class="path">' + path.map((e, i) => {
       const cls = e.status === 'done' ? 'done' : (e.status === 'active' ? 'cur' : '');
       return '<div class="step ' + cls + '"><div class="dot">' + (e.status === 'done' ? '✓' : i + 1) + '</div><div class="lab">' + PP.esc(e.track) + '</div>' + (i < path.length - 1 ? '<div class="bar"></div>' : '') + '</div>';
