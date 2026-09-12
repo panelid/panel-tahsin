@@ -25,7 +25,8 @@ export async function onRequest(context) {
       return json({ session: s || null, messages: msgs.results || [] });
     }
     if (guruId) {
-      const pend = await db.prepare("SELECT s.id, s.murid_id, u.name as murid_name, u.username as murid_username, s.created_at FROM live_sessions s JOIN users u ON u.id=s.murid_id WHERE s.guru_id = ? AND s.status='pending' ORDER BY s.created_at DESC").bind(guruId).all();
+      const active = url.searchParams.get('active');
+      const pend = await db.prepare("SELECT s.id, s.murid_id, u.name as murid_name, u.username as murid_username, s.created_at FROM live_sessions s JOIN users u ON u.id=s.murid_id WHERE s.guru_id = ? AND s.status" + (active ? "='active'" : "='pending'") + " ORDER BY s.created_at DESC").bind(guruId).all();
       return json(pend.results || []);
     }
     if (muridId) {

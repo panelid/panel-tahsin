@@ -6,7 +6,7 @@
 <title>Dashboard Pengajar — ponpes.org</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Literata:opsz,wght@7..72,500;7..72,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Literata:opsz,wght@7..72,500;7..72,600&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/app.css">
 </head>
 <body data-page="guru">
@@ -15,8 +15,8 @@
 <div class="wrap">
   <div class="hero">
     <div class="ar">خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ</div>
-    <h1 id="heroName">Dashboard Pengajar</h1>
-    <p id="heroSub">Reviu setoran santri dan bantu mereka bergerak maju.</p>
+    <h1 id="heroName">Assalamu’alaikum, Ustadz</h1>
+    <p id="heroSub">Reviu setoran santri, bimbing mereka, dan buka sesi live bila sempat.</p>
     <div id="heroWave"></div>
   </div>
   <div class="seg" role="tablist" id="seg"></div>
@@ -29,10 +29,14 @@ const app = document.getElementById('app'), seg = document.getElementById('seg')
 document.getElementById('heroWave').outerHTML = PP.wave(30);
 if (PP.me.name) document.getElementById('heroName').textContent = 'Ahlan, Ustadz ' + PP.me.name.split(' ')[0];
 const TRACKS = [['iqro','Iqro'],['fatihah','Al-Fatihah'],['juz_amma','Juz Amma'],['tilawah','Tilawah'],['hafalan','Hafalan']];
-let tab = 'setoran', counts = { setoran: 0, calon: 0, angkat: 0, belajar: 0 };
+let tab = 'setoran', counts = { setoran: 0, calon: 0, angkat: 0, live: 0 };
+
+// ── presence: tandai online ──
+fetch('/api/presence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: PP.me.id, role: 'guru' }) });
+setInterval(() => fetch('/api/presence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: PP.me.id, role: 'guru' }) }), 45000);
 
 function renderSeg() {
-  const tabs = [['setoran', 'Setoran Santri'], ['calon', 'Calon Guru'], ['angkat', 'Angkat Murid'], ['live', 'Live Ngaji']];
+  const tabs = [['setoran', 'Setoran'], ['calon', 'Calon Guru'], ['angkat', 'Angkat Murid'], ['live', 'Live Ngaji']];
   if (PP.me.is_student) tabs.push(['belajar', 'Mode Belajar']);
   seg.innerHTML = tabs.map(t => '<button role="tab" aria-selected="' + (t[0] === tab) + '" onclick="go(\'' + t[0] + '\')">' + t[1]
     + (counts[t[0]] ? '<span class="n">' + counts[t[0]] + '</span>' : '') + '</button>').join('');
@@ -44,39 +48,38 @@ async function render() {
   if (tab === 'setoran') return renderSetoran();
   if (tab === 'calon') return renderCalon();
   if (tab === 'angkat') return renderAngkat();
-  if (tab === 'live') return renderLive();
+  if (tab === 'live') return renderLiveHome();
   if (tab === 'belajar') { location.href = '/dashboard-murid'; return; }
 }
 
-// ───── SETORAN SANTRI ─────
+// ───── SETORAN ─────
 async function renderSetoran() {
   const all = await (await fetch('/api/guru/pending')).json();
   const list = all.filter(s => s.user_id !== PP.me.id);
   counts.setoran = list.length; renderSeg();
   let h = '<div class="stats">'
     + '<div class="stat"><b>' + list.length + '</b><span>Menunggu</span></div>'
-    + '<div class="stat"><b>' + all.length + '</b><span>Total antri</span></div>'
+    + '<div class="stat"><b>' + all.length + '</b><span>Antrian</span></div>'
     + '<div class="stat"><b>' + new Set(all.map(s => s.murid)).size + '</b><span>Santri</span></div></div>';
   if (!list.length) { app.innerHTML = h + '<div class="empty"><span class="big">✅</span>Semua setoran sudah direviu. Barakallahu fiik.</div>'; return; }
   h += list.map((s, i) => {
     const opts = TRACKS.map(t => '<option value="' + t[0] + '"' + (s.track_id === t[0] ? ' selected' : '') + '>' + t[1] + '</option>').join('');
     const au = s.audio_url ? '<audio controls preload="none" src="' + s.audio_url + '"></audio>' : '<p class="sub">audio tidak tersedia</p>';
     return '<div class="card" style="animation-delay:' + (i * 50) + 'ms">'
-      + '<div class="item-h"><b style="font-size:17px">🎧 ' + PP.esc(s.murid) + '</b><span class="badge b-pend">Menunggu</span></div>'
+      + '<div class="item-h"><b style="font-size:17px">🎧 ' + PP.esc(s.murid) + '</b><span class="badge b-pend">menunggu</span></div>'
       + '<div class="sub">' + PP.esc(s.unit_ref || '') + (s.created_at ? ' · ' + PP.fmt(s.created_at) : '') + '</div>' + au
-      + '<div class="row" style="margin-top:14px">'
-      + '<div style="flex:1;min-width:130px"><label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Pelajaran</label><select id="tr_' + s.id + '" class="input" style="margin-top:4px">' + opts + '</select></div>'
-      + '<div style="flex:1;min-width:150px"><label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Unit</label><input id="un_' + s.id + '" class="input" value="' + PP.esc(s.unit_ref || '') + '" style="margin-top:4px"></div>'
-      + '<div style="width:96px"><label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Skor</label><input id="sc_' + s.id + '" type="number" min="1" max="10" placeholder="1-10" class="input" style="margin-top:4px"></div>'
+      + '<div class="row" style="margin-top:12px">'
+      + '<div style="flex:1;min-width:120px"><label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Pelajaran</label><select id="tr_' + s.id + '" class="input" style="margin-top:4px">' + opts + '</select></div>'
+      + '<div style="flex:1;min-width:140px"><label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Unit</label><input id="un_' + s.id + '" class="input" value="' + PP.esc(s.unit_ref || '') + '" style="margin-top:4px"></div>'
+      + '<div style="width:92px"><label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Skor</label><input id="sc_' + s.id + '" type="number" min="1" max="10" placeholder="1-10" class="input" style="margin-top:4px"></div>'
       + '</div>'
       + '<input id="ct_' + s.id + '" class="input" placeholder="Catatan untuk santri…" style="margin-top:9px">'
-      + '<button class="btn btn-primary btn-block" style="margin-top:12px" onclick="kirimReviu(\'' + s.id + '\')">Kirim Reviu</button>'
-      + '</div>';
+      + '<button class="btn btn-primary btn-block" style="margin-top:12px" onclick="kirimReviu(\'' + s.id + '\')">Kirim Reviu</button></div>';
   }).join('');
   app.innerHTML = h;
 }
 async function kirimReviu(id) {
-  const btn = event.target; btn.disabled = true; btn.textContent = 'Mengirim…';
+  event.target.disabled = true; event.target.textContent = 'Mengirim…';
   await fetch('/api/review/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
     setoran_id: id, track_id: document.getElementById('tr_' + id).value, unit_ref: document.getElementById('un_' + id).value,
     reviews: [{ ayat_number: 1, score: Number(document.getElementById('sc_' + id).value) || 0, catatan_teks: document.getElementById('ct_' + id).value }]
@@ -88,14 +91,11 @@ async function kirimReviu(id) {
 async function renderCalon() {
   const list = await (await fetch('/api/guru/queue')).json();
   counts.calon = list.length; renderSeg();
-  let h = '<div class="note">Dengerin bacaan <b>Al-Hajj 1–5</b> dan cek bukti sanad/Ma’had. <b>Cukup 1 guru ACC</b>, calon langsung jadi pengajar.</div>';
+  let h = '<div class="note">Dengerin bacaan <b>Al-Hajj 1–5</b> dan cek bukti sanad/Ma’had. <b>Cukup 1 guru ACC</b>, dia resmi jadi pengajar.</div>';
   if (!list.length) { app.innerHTML = h + '<div class="empty"><span class="big">🎓</span>Tidak ada calon menunggu.</div>'; return; }
   h += list.map((c, i) => {
-    let bukti;
-    if (c.sanad_url) bukti = '<a href="' + PP.esc(c.sanad_url) + '" target="_blank">📜 Sertifikat Sanad</a>';
-    else if (c.mahad_text) bukti = '🏫 ' + PP.esc(c.mahad_text);
-    else if (c.cert_url) bukti = '<a href="' + PP.esc(c.cert_url) + '" target="_blank">📄 Sertifikat</a>';
-    else bukti = '<span class="sub">tanpa bukti tertulis</span>';
+    let bukti = c.sanad_url ? '<a href="' + PP.esc(c.sanad_url) + '" target="_blank">📜 Sertifikat Sanad</a>'
+      : c.mahad_text ? '🏫 ' + PP.esc(c.mahad_text) : c.cert_url ? '<a href="' + PP.esc(c.cert_url) + '" target="_blank">📄 Sertifikat</a>' : '<span class="sub">tanpa bukti tertulis</span>';
     const au = c.demo_audio_url ? '<audio controls preload="none" src="' + c.demo_audio_url + '"></audio>' : '<p class="sub">tidak ada audio</p>';
     return '<div class="card" style="animation-delay:' + (i * 50) + 'ms">'
       + '<div class="item-h"><b style="font-size:17px">' + PP.esc(c.name) + '</b><span class="badge b-pend">' + c.acc_count + ' ACC · ' + c.rej_count + ' tolak</span></div>'
@@ -122,7 +122,7 @@ async function renderAngkat() {
   const list = (await (await fetch('/api/guru/murid?guruId=' + encodeURIComponent(PP.me.id))).json()).filter(m => m.role !== 'guru');
   counts.angkat = list.length; renderSeg();
   let h = '<div class="card"><div class="card-t">🎓 Angkat Murid Jadi Guru</div><div class="card-s">Murid bimbinganmu yang sudah layak bisa langsung kamu angkat jadi pengajar.</div>';
-  if (!list.length) h += '<div class="empty"><span class="big">👥</span>Belum ada murid bimbingan. Bagikan referral / profil @username-mu agar santri mendaftar lewat kamu.</div>';
+  if (!list.length) h += '<div class="empty"><span class="big">👥</span>Belum ada murid bimbingan. Bagikan referral-mu agar santri mendaftar lewat kamu.</div>';
   else h += list.map(m => '<div class="track"><div class="ico">🧕</div><div style="flex:1"><div class="nm">' + PP.esc(m.name) + '</div><div class="sub">' + PP.esc(m.email) + '</div></div>'
     + '<button class="btn btn-gold btn-sm" onclick="angkat(\'' + m.id + '\',\'' + PP.esc(m.name).replace(/'/g, '') + '\')">Angkat</button></div>').join('');
   h += '</div><p class="hint" id="promMsg" style="text-align:center"></p>';
@@ -136,38 +136,36 @@ async function angkat(id, nm) {
   else { m.textContent = d.error || 'Gagal'; m.className = 'hint bad'; }
 }
 
-
-// ───── LIVE: guru dapat notif, respon, balas ─────
-let gLiveSid = null, gLiveTimer = null, gLiveAfter = '1970-01-01', gBlob = null, gMr = null, gChunks = [], gRec = false, gT0, gTick, gPollTimer;
-async function guruPollLive() {
-  if (!PP.me.id) return;
-  const list = await (await fetch('/api/live?guruId=' + encodeURIComponent(PP.me.id))).json();
-  if (list.length && !gLiveSid) {
-    const r = list[0];
-    const t = document.getElementById('liveToast');
-    t.innerHTML = '<div class="toast"><h3>🎙 Ngaji Live 1-on-1</h3><p class="sub">' + PP.esc(r.murid_name) + (r.murid_username ? ' (@' + r.murid_username + ')' : '') + ' meminta sesi ngaji live bersamamu.</p>'
-      + '<button class="btn btn-primary" onclick="guruRespond(\'' + r.id + '\',true)">✓ Terima</button>'
-      + '<button class="btn btn-ghost" onclick="guruRespond(\'' + r.id + '\',false)">Nanti dulu</button></div>';
-  }
-  gPollTimer = setTimeout(guruPollLive, 5000);
+// ───── LIVE NGAIJI (guru) ─────
+let gLiveSid = null, gLiveTimer = null, gLiveAfter = '1970-01-01', gBlob = null, gMr = null, gChunks = [], gRec = false, gT0, gTick;
+async function renderLiveHome() {
+  // cek sesi aktif / pending
+  const pending = await (await fetch('/api/live?guruId=' + encodeURIComponent(PP.me.id))).json();
+  counts.live = pending.length; renderSeg();
+  if (pending.length) { guruRespondUI(pending[0]); return; }
+  // sesi aktif milik sendiri?
+  const my = await (await fetch('/api/live?guruId=' + encodeURIComponent(PP.me.id) + '&active=1')).json().catch(() => []);
+  if (my.length) { gLiveSid = my[0].id; openGuruLive(); return; }
+  app.innerHTML = '<div class="live-card"><div class="lt">🎙 Live Ngaji 1-on-1</div>'
+    + '<div class="ls"><span class="live-pulse"></span>Kamu terlihat <b>online</b> oleh santri. Bila ada yang minta sesi, notif akan muncul di sini.</div>'
+    + '<div class="sub" style="margin-top:10px">Santri akan melihat nama & foto profilmu di daftar "Ustadz Online" dan bisa minta ngaji live kapan saja.</div></div>';
+}
+function guruRespondUI(r) {
+  document.getElementById('liveToast').innerHTML = '<div class="toast"><h3>🎙 Ngaji Live 1-on-1</h3><p class="sub">' + PP.esc(r.murid_name) + (r.murid_username ? ' (@' + r.murid_username + ')' : '') + ' meminta sesi ngaji live bersamamu.</p>'
+    + '<button class="btn btn-primary" onclick="guruRespond(\'' + r.id + '\',true)">✓ Terima</button>'
+    + '<button class="btn btn-ghost" onclick="guruRespond(\'' + r.id + '\',false)">Nanti dulu</button></div>';
 }
 async function guruRespond(sid, accept) {
   const d = await (await fetch('/api/live', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'respond', sessionId: sid, accept }) })).json();
   document.getElementById('liveToast').innerHTML = '';
-  if (accept) { gLiveSid = sid; openGuruLive(); } else { alert('Permintaan ditolak. Murid akan diberi tahu.'); }
-  guruPollLive();
+  if (accept) { gLiveSid = sid; tab = 'live'; renderSeg(); openGuruLive(); } else { alert('Permintaan ditolak. Santri diberi tahu.'); renderLiveHome(); }
 }
 function openGuruLive() {
-  location.hash = '#live'; tab = 'live'; renderSeg(); render();
-}
-async function renderLive() {
-  const d = await (await fetch('/api/live?sessionId=' + gLiveSid)).json();
-  let h = '<div class="card"><div class="card-t">🎙 Sesi Live Aktif</div><div class="card-s">Dengarkan bacaan murid, lalu rekam koreksimu.</div>';
-  h += '<div id="gMsgs" style="max-height:260px;overflow:auto;margin-bottom:12px"></div>';
-  h += '<div class="rec"><div class="eq" id="geq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><button class="rec-orb" id="grec" onclick="gToggle()">REKAM</button></div>';
-  h += '<button class="btn btn-primary btn-block" id="gsend" style="margin-top:10px" disabled onclick="gSend()">Kirim Koreksi</button>';
-  h += '<button class="btn btn-ghost btn-block" style="margin-top:8px" onclick="gEnd()">Akhiri Sesi</button></div>';
-  app.innerHTML = h;
+  app.innerHTML = '<div class="card"><div class="card-t">🎙 Sesi Live Aktif</div><div class="card-s">Dengarkan bacaan murid, lalu rekam koreksimu.</div>'
+    + '<div id="gMsgs" style="max-height:280px;overflow:auto;margin-bottom:12px"></div>'
+    + '<div class="rec"><div class="eq" id="geq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><button class="rec-orb" id="grec" onclick="gToggle()">REKAM</button></div>'
+    + '<button class="btn btn-primary btn-block" id="gsend" style="margin-top:10px" disabled onclick="gSend()">Kirim Koreksi</button>'
+    + '<button class="btn btn-ghost btn-block" style="margin-top:8px" onclick="gEnd()">Akhiri Sesi</button></div>';
   gLiveAfter = '1970-01-01'; gPoll();
 }
 async function gPoll() {
@@ -177,8 +175,7 @@ async function gPoll() {
   const box = document.getElementById('gMsgs');
   (d.messages || []).forEach(m => {
     const w = document.createElement('div'); w.className = 'item'; w.style.animation = 'none';
-    const who = m.sender === 'guru' ? '🎓 Kamu' : '🧕 Murid';
-    w.innerHTML = '<div class="sub">' + who + '</div>' + (m.audio_url ? '<audio controls preload="none" src="' + m.audio_url + '"></audio>' : '') + (m.text ? '<div>' + PP.esc(m.text) + '</div>' : '');
+    w.innerHTML = '<div class="sub">' + (m.sender === 'guru' ? '🎓 Kamu' : '🧕 Murid') + '</div>' + (m.audio_url ? '<audio controls preload="none" src="' + m.audio_url + '"></audio>' : '') + (m.text ? '<div>' + PP.esc(m.text) + '</div>' : '');
     box.appendChild(w); box.scrollTop = box.scrollHeight; gLiveAfter = m.created_at;
   });
   gLiveTimer = setTimeout(gPoll, 2500);
@@ -205,8 +202,15 @@ async function gSend() {
 }
 async function gEnd() { await fetch('/api/live', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'end', sessionId: gLiveSid }) }); location.reload(); }
 
-renderSeg(); render(); guruPollLive();
+// ── poll pending live tiap 5s (toast otomatis) ──
+async function pollPending() {
+  if (!PP.me.id) return;
+  const list = await (await fetch('/api/live?guruId=' + encodeURIComponent(PP.me.id))).json();
+  if (list.length && tab !== 'live') guruRespondUI(list[0]);
+  setTimeout(pollPending, 5000);
+}
 
+renderSeg(); render(); pollPending();
 </script>
 </body>
 </html>

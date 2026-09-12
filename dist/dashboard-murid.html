@@ -6,18 +6,23 @@
 <title>Dashboard Santri — ponpes.org</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Literata:opsz,wght@7..72,500;7..72,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Literata:opsz,wght@7..72,500;7..72,600&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/app.css">
 </head>
 <body data-page="murid" data-tab="home">
 <div id="hdr"></div>
 <div class="wrap">
   <div class="hero">
-    <div class="ar">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
-    <h1 id="heroName">Dashboard Santri</h1>
-    <p>Rencanakan setoranmu. Rekam bacaan, kirim, lalu tunggu review dari pengajar.</p>
+    <div class="ar">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّرَّحِيمِ</div>
+    <h1 id="heroName">Assalamu’alaikum</h1>
+    <p id="heroSub">Baca, rekam, dan ustadz akan mereview-nya. Santai, tapi istiqomah.</p>
     <div id="heroWave"></div>
   </div>
+
+  <div id="ustripWrap" style="display:none">
+    <div class="ustrip" id="ustrip"></div>
+  </div>
+
   <div id="app"><p class="muted" style="text-align:center;padding:30px">Memuat…</p></div>
 </div>
 <nav id="nav"></nav>
@@ -28,164 +33,133 @@ const uid = new URLSearchParams(location.search).get('uid') || localStorage.getI
 if (uid) localStorage.setItem('uid', uid);
 if (!uid) location.href = '/login';
 document.getElementById('heroWave').outerHTML = PP.wave(30);
-
-let TRACKS = [['iqro','Iqro','📗'],['fatihah','Al-Fatihah','🕌'],['juz_amma','Juz Amma','🌙'],['tilawah','Tilawah','🎧'],['hafalan','Hafalan','📿']];
+const TRACKS = [['iqro','Iqro','📗'],['fatihah','Al-Fatihah','🕌'],['juz_amma','Juz Amma','🌙'],['tilawah','Tilawah','🎧'],['hafalan','Hafalan','📿']];
 
 async function load() {
   try {
     const d = await (await fetch('/api/enroll/' + uid)).json();
     if (d.error) { app.innerHTML = '<div class="empty"><span class="big">🙏</span>' + PP.esc(d.error) + '</div>'; return; }
-    document.getElementById('heroName').textContent = 'Assalamu’alaikum, ' + d.user.name.split(' ')[0];
-
-    const enr = d.enrollments || [];
+    const nm = d.user.name.split(' ')[0];
+    document.getElementById('heroName').textContent = 'Assalamu’alaikum, ' + nm;
+    const enr = d.enrollments || [], set = d.setoran || [];
     const active = enr.filter(e => e.status === 'active');
-    const done = enr.filter(e => e.status === 'done').length;
-    const set = d.setoran || [];
     const rev = set.filter(s => s.status === 'reviewed').length;
-
-    // ---- LIVE NGAI 1-on-1 ----
-    h += '<div class="card" id="liveCard">'
-      + '<div class="card-t">🎙 Ngaji Live Koreksi 1-on-1</div>'
-      + '<div class="card-s">Minta sesi ngaji live ke pengajar. Bila dia online & merespons, kamu bisa langsung baca & dikoreksi.</div>'
-      + '<div id="liveStatus"></div>'
-      + '<div class="field" style="margin-top:12px"><label>Pilih pengajar</label><select id="guruSel" class="input"></select></div>'
-      + '<button class="btn btn-gold btn-block" id="liveBtn" onclick="startLive()">Minta Sesi Live</button>'
-      + '<div id="liveBox" style="display:none;margin-top:14px"></div>'
-      + '</div>';
+    const waiting = set.filter(s => s.status !== 'reviewed').length;
 
     let h = '';
     h += '<div class="stats">'
-       + '<div class="stat"><b>' + active.length + '</b><span>Track aktif</span></div>'
-       + '<div class="stat"><b>' + set.length + '</b><span>Total setoran</span></div>'
-       + '<div class="stat"><b>' + rev + '</b><span>Reviu diterima</span></div></div>';
+      + '<div class="stat"><b>' + active.length + '</b><span>Track</span></div>'
+      + '<div class="stat"><b>' + set.length + '</b><span>Setoran</span></div>'
+      + '<div class="stat"><b>' + rev + '</b><span>Direview</span></div></div>';
 
-    // ---- REKAM ----
+    // ---- LIVE CARD (prominent) ----
+    h += '<div class="live-card" id="liveCard">'
+      + '<div class="lt">🎙 Ngaji Live Koreksi 1-on-1</div>'
+      + '<div class="ls" id="liveSub">Pilih ustadz yang sedang online, lalu minta sesi. Nanti kamu bisa baca & langsung dikoreksi.</div>'
+      + '<div id="liveBtnWrap"></div></div>';
+
+    // ---- SIMPLE RECORDER ----
     const opts = (active.length ? active.map(e => [e.track_id || TRACKS.find(t => t[1] === e.track)[0], e.track, e.current_unit]) : TRACKS)
       .map(t => '<option value="' + PP.esc(t[0]) + '">' + PP.esc(t[1]) + (t[2] ? ' · ' + PP.esc(t[2]) : '') + '</option>').join('');
     h += '<div class="card" id="rekam">'
-      + '<div class="card-t">🎙 Rekam Setoran</div><div class="card-s">Pilih pelajaran, tekan tombol, baca dengan tartil.</div>'
+      + '<div class="card-t">🎙 Rekam Setoran</div><div class="card-s">Tap tombol, baca dengan tartil, lalu kirim. Ustadz mereview-nya nanti.</div>'
       + '<div class="field"><label>Pelajaran</label><select id="recTrack" class="input">' + opts + '</select></div>'
-      + '<div class="field"><label>Unit / halaman</label><input id="recUnit" class="input" placeholder="cth: Iqro 3 halaman 10"></div>'
+      + '<div class="field"><label>Unit / halaman (opsional)</label><input id="recUnit" class="input" placeholder="cth: Iqro 3 hal 10"></div>'
       + '<div class="rec"><div class="eq" id="eq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>'
-      + '<button class="rec-orb" id="recBtn" onclick="toggleRec()">REKAM</button>'
-      + '<div class="rec-time" id="recTime">00:00</div></div>'
-      + '<p class="hint" id="recStatus" style="text-align:center">Tekan tombol untuk mulai merekam.</p>'
+      + '<button class="rec-orb" id="recBtn" onclick="toggleRec()">REKAM</button><div class="rec-time" id="recTime">00:00</div></div>'
+      + '<p class="hint" id="recStatus" style="text-align:center">Tekan tombol untuk mulai</p>'
       + '<div id="preview"></div>'
-      + '<button class="btn btn-primary btn-block" id="submitBtn" style="margin-top:14px" disabled onclick="submitSetoran()">Kirim Setoran</button>'
+      + '<button class="btn btn-primary btn-block" id="submitBtn" style="margin-top:12px" disabled onclick="submitSetoran()">Kirim Setoran</button>'
       + '</div>';
 
     // ---- SETORAN ----
     h += '<div class="card"><div class="card-t">📚 Setoranku</div>';
     if (!set.length) h += '<div class="empty"><span class="big">🎙</span>Belum ada setoran. Mulai rekam bacaanmu!</div>';
-    set.slice(0, 8).forEach((s, i) => {
-      const b = s.status === 'reviewed' ? '<span class="badge b-ok">Direview</span>' : '<span class="badge b-pend">Menunggu</span>';
+    set.slice(0, 6).forEach((s, i) => {
+      const b = s.status === 'reviewed' ? '<span class="badge b-ok">✓ direview</span>' : '<span class="badge b-pend">⏳ menunggu</span>';
       const au = s.audio_url ? '<audio controls preload="none" src="' + s.audio_url + '"></audio>' : '';
       h += '<div class="item" style="animation-delay:' + (i * 45) + 'ms"><div class="item-h"><b>' + PP.esc(s.track_id || '-') + '</b>' + b + '</div>'
         + '<div class="sub">' + PP.esc(s.unit_ref || '') + (s.created_at ? ' · ' + PP.fmt(s.created_at) : '') + '</div>' + au + '</div>';
     });
     h += '</div>';
 
-    // ---- TRACK ----
+    // ---- LEARNING PATH ----
     h += '<div class="card"><div class="card-t">🗂 Perjalanan Belajar</div>';
-    if (!enr.length) h += '<div class="empty"><span class="big">🌱</span>Belum mulai track apa pun.</div>';
-    enr.forEach(e => {
-      const pct = e.status === 'done' ? 100 : 30;
-      h += '<div class="track"><div class="ico">' + (TRACKS.find(t => t[1] === e.track)?.[2] || '📖') + '</div>'
-        + '<div style="flex:1"><div class="nm">' + PP.esc(e.track) + '</div><div class="sub">' + (e.current_unit ? 'Unit: ' + PP.esc(e.current_unit) : 'Aktif') + '</div>'
-        + '<div class="bar"><i style="width:' + pct + '%"></i></div></div>'
-        + '<span class="badge ' + (e.status === 'done' ? 'b-ok' : 'b-pend') + '">' + (e.status === 'done' ? 'Selesai' : 'Aktif') + '</span></div>';
-    });
-    h += '</div><div class="foot">ponpes.org — platform tahsin & ngaji online gratis</div>';
+    const path = enr.length ? enr : [{track:'Iqro',status:'active'},{track:'Al-Fatihah',status:'pending'},{track:'Juz Amma',status:'pending'}];
+    h += '<div class="path">' + path.map((e, i) => {
+      const cls = e.status === 'done' ? 'done' : (e.status === 'active' ? 'cur' : '');
+      return '<div class="step ' + cls + '"><div class="dot">' + (e.status === 'done' ? '✓' : i + 1) + '</div><div class="lab">' + PP.esc(e.track) + '</div>' + (i < path.length - 1 ? '<div class="bar"></div>' : '') + '</div>';
+    }).join('') + '</div></div>';
+
+    h += '<div class="foot">ponpes.org — platform tahsin & ngaji online gratis</div>';
     app.innerHTML = h;
+    loadGurus();
+    checkLive();
   } catch (e) { app.innerHTML = '<div class="empty">Gagal memuat: ' + PP.esc(e.message) + '</div>'; }
 }
 
-let mr, chunks = [], recording = false, blob = null, t0, timer;
-function tick() { const s = Math.floor((Date.now() - t0) / 1000); document.getElementById('recTime').textContent = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
-async function toggleRec() {
-  if (!recording) {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mime = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
-      mr = new MediaRecorder(stream, { mimeType: mime }); chunks = [];
-      mr.ondataavailable = e => chunks.push(e.data);
-      mr.onstop = () => {
-        blob = new Blob(chunks, { type: mime });
-        document.getElementById('preview').innerHTML = '<div class="item" style="margin-top:12px"><div class="sub">Pratinjau hasil rekaman</div><audio controls src="' + URL.createObjectURL(blob) + '"></audio></div>';
-        document.getElementById('submitBtn').disabled = false;
-        document.getElementById('recStatus').textContent = 'Rekaman siap (' + Math.round(blob.size / 1024) + ' KB) — kirim atau rekam ulang.';
-        stream.getTracks().forEach(t => t.stop());
-      };
-      mr.start(); recording = true; t0 = Date.now(); timer = setInterval(tick, 250);
-      document.getElementById('recBtn').textContent = 'SELESAI'; document.getElementById('recBtn').classList.add('on');
-      document.getElementById('eq').classList.add('on'); document.getElementById('recStatus').textContent = 'Merekam… baca dengan tartil.';
-    } catch (e) { document.getElementById('recStatus').textContent = 'Gagal akses mic: ' + e.message; }
-  } else {
-    mr.stop(); recording = false; clearInterval(timer);
-    document.getElementById('recBtn').textContent = 'REKAM'; document.getElementById('recBtn').classList.remove('on');
-    document.getElementById('eq').classList.remove('on');
-  }
-}
-async function submitSetoran() {
-  if (!blob) return;
-  const btn = document.getElementById('submitBtn'); btn.disabled = true; btn.textContent = 'Mengirim…';
-  const fd = new FormData();
-  fd.append('audio', blob, 'setoran.webm'); fd.append('user_id', uid);
-  fd.append('track_id', recTrack.value); fd.append('unit_ref', recUnit.value);
-  try {
-    const d = await (await fetch('/api/setoran/upload', { method: 'POST', body: fd })).json();
-    if (!d.success) throw new Error(d.error);
-    blob = null; recTime.textContent = '00:00';
-    load();
-  } catch (e) { btn.disabled = false; btn.textContent = 'Kirim Setoran'; document.getElementById('recStatus').textContent = 'Gagal: ' + e.message; }
-}
-
-// ───── LIVE NGAI 1-on-1 (murid) ─────
+// ── live ngaji (murid) ──
 let liveSid = null, liveTimer = null, liveAfter = '1970-01-01', liveBlob = null, liveMr = null, liveChunks = [], liveRec = false, liveT0, liveTick;
 async function loadGurus() {
-  const gurus = await (await fetch('/api/enroll/' + uid)).json();
-  const sel = document.getElementById('guruSel');
-  // murid punya guru dari review/setoran → kita ambil semua guru yang pernah review setoran dia
-  const list = await (await fetch('/api/guru/murid?guruId=__all__')).json().catch(() => []); // fallback
-  const g = (await (await fetch('/api/guru/list')).json().catch(() => ({ gurus: [] }))).gurus || [];
-  if (!g.length) { sel.innerHTML = '<option>belum ada pengajar</option>'; return; }
-  sel.innerHTML = g.map(x => '<option value="' + x.id + '">' + PP.esc(x.name) + (x.username ? ' (@' + x.username + ')' : '') + '</option>').join('');
-  checkLive();
+  const online = await (await fetch('/api/presence?list=1')).json();
+  const list = online.online || [];
+  const wrap = document.getElementById('ustripWrap');
+  const strip = document.getElementById('ustrip');
+  if (!list.length) { wrap.style.display = 'none'; return; }
+  wrap.style.display = '';
+  strip.innerHTML = '<span class="t">Ustadz Online</span>' + list.map(g =>
+    '<div class="us" onclick="quickLive(\'' + g.id + '\')"><div class="ring">' + PP.esc((g.name || '?').charAt(0).toUpperCase()) + '<span class="dot on"></span></div><div class="nm">' + PP.esc((g.name || '').split(' ')[0]) + '</div></div>'
+  ).join('');
 }
 async function checkLive() {
   const s = await (await fetch('/api/live?muridId=' + uid)).json();
-  const st = document.getElementById('liveStatus');
+  const sub = document.getElementById('liveSub'), btnw = document.getElementById('liveBtnWrap');
   if (!s) {
-    st.innerHTML = '<div class="note">Belum ada sesi. Pilih pengajar lalu tekan "Minta Sesi Live".</div>';
-    liveBtn.style.display = ''; liveBtn.disabled = false; liveBtn.textContent = 'Minta Sesi Live';
-    document.getElementById('liveBox').style.display = 'none'; liveSid = null;
+    btnw.innerHTML = '<button class="btn btn-gold btn-block" onclick="openLivePicker()">Mulai Ngaji Live</button>';
+    sub.innerHTML = 'Pilih ustadz yang sedang online di atas, atau tekan tombol untuk pilih dari daftar.';
+    liveSid = null;
   } else if (s.status === 'pending') {
-    st.innerHTML = '<div class="note">⏳ Menunggu ustadz merespons… (sesi akan otomatis buka bila diterima)</div>';
-    liveBtn.style.display = 'none';
+    btnw.innerHTML = '<button class="btn btn-ghost btn-block" disabled>⏳ Menunggu ustadz…</button>';
+    sub.innerHTML = 'Permintaan terkirim. Ustadz akan dapat notif — sesi otomatis buka bila diterima.';
   } else if (s.status === 'rejected') {
-    st.innerHTML = '<div class="hint bad">Ustadz belum bisa sekarang. Coba lagi nanti.</div>';
-    liveBtn.style.display = ''; liveBtn.disabled = false; liveBtn.textContent = 'Minta Sesi Live'; liveSid = null;
+    btnw.innerHTML = '<button class="btn btn-gold btn-block" onclick="openLivePicker()">Minta Lagi</button>';
+    sub.innerHTML = 'Ustadz belum bisa sekarang. Coba lagi nanti ya.';
+    liveSid = null;
   } else if (s.status === 'active') {
-    st.innerHTML = '<div class="hint ok">✅ Sesi live aktif! Baca, lalu tekan kirim untuk dikoreksi.</div>';
-    liveBtn.style.display = 'none'; liveSid = s.id; openLiveBox();
+    sub.innerHTML = '<span class="live-pulse"></span>Sesi live aktif! Baca, lalu kirim untuk dikoreksi.';
+    btnw.innerHTML = '<button class="btn btn-primary btn-block" onclick="openLiveBox()">Masuk Sesi Live</button>';
+    liveSid = s.id;
   }
   if (liveSid) pollLive();
 }
-async function startLive() {
-  const gid = guruSel.value; if (!gid) return alert('Pilih pengajar dulu.');
+function openLivePicker() {
+  const online = (async () => { const o = await (await fetch('/api/presence?list=1')).json(); return o.online || []; })();
+  online.then(list => {
+    const all = (async () => { const g = await (await fetch('/api/guru/list')).json(); return g.gurus || []; })();
+    all.then(g => {
+      const sel = '<select id="guruPick" class="input" style="margin:10px 0">' + g.map(x => '<option value="' + x.id + '">' + PP.esc(x.name) + (x.username ? ' (@' + x.username + ')' : '') + '</option>').join('') + '</select>';
+      app.insertAdjacentHTML('afterbegin', '<div class="card" id="pickCard"><div class="card-t">Pilih Ustadz</div>' + sel + '<button class="btn btn-gold btn-block" onclick="startLive()">Minta Sesi Live</button><button class="btn btn-ghost btn-block" onclick="document.getElementById(\'pickCard\').remove()">Batal</button></div>');
+    });
+  });
+}
+async function quickLive(gid) {
   const d = await (await fetch('/api/live', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'start', muridId: uid, guruId: gid }) })).json();
   if (!d.success) return alert(d.error);
-  liveBtn.disabled = true; liveBtn.textContent = 'Meminta…';
   checkLive();
 }
-function openLiveBox() {
-  const box = document.getElementById('liveBox'); box.style.display = '';
-  if (box.dataset.open === liveSid) return; box.dataset.open = liveSid;
-  box.innerHTML = '<div id="liveMsgs" style="max-height:240px;overflow:auto;margin-bottom:10px"></div>'
-    + '<div class="rec"><div class="eq" id="leq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>'
-    + '<button class="rec-orb" id="lrec" onclick="liveToggle()">REKAM</button></div>'
+async function startLive() {
+  const gid = document.getElementById('guruPick').value; if (!gid) return alert('Pilih ustadz.');
+  const d = await (await fetch('/api/live', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'start', muridId: uid, guruId: gid }) })).json();
+  if (!d.success) return alert(d.error);
+  const pc = document.getElementById('pickCard'); if (pc) pc.remove();
+  checkLive();
+}
+async function openLiveBox() { /* replace app with live view */
+  app.innerHTML = '<div class="card"><div class="card-t">🎙 Sesi Live Aktif</div><div class="card-s">Baca lalu tekan kirim. Ustadz akan membalas koreksinya.</div>'
+    + '<div id="liveMsgs" style="max-height:280px;overflow:auto;margin-bottom:12px"></div>'
+    + '<div class="rec"><div class="eq" id="leq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><button class="rec-orb" id="lrec" onclick="liveToggle()">REKAM</button></div>'
     + '<button class="btn btn-primary btn-block" id="lsend" style="margin-top:10px" disabled onclick="liveSend()">Kirim Bacaan</button>'
-    + '<button class="btn btn-ghost btn-block" style="margin-top:8px" onclick="liveEnd()">Akhiri Sesi</button>';
+    + '<button class="btn btn-ghost btn-block" style="margin-top:8px" onclick="liveEnd()">Akhiri Sesi</button></div>';
   liveAfter = '1970-01-01'; pollLive();
 }
 async function pollLive() {
@@ -194,11 +168,9 @@ async function pollLive() {
   if (d.session && d.session.status !== 'active') { alert('Sesi diakhiri.'); location.reload(); return; }
   const box = document.getElementById('liveMsgs');
   (d.messages || []).forEach(m => {
-    const wrap = document.createElement('div'); wrap.className = 'item'; wrap.style.animation = 'none';
-    const who = m.sender === 'guru' ? '🎓 Ustadz' : '🧕 Kamu';
-    wrap.innerHTML = '<div class="sub">' + who + '</div>' + (m.audio_url ? '<audio controls preload="none" src="' + m.audio_url + '"></audio>' : '') + (m.text ? '<div>' + PP.esc(m.text) + '</div>' : '');
-    box.appendChild(wrap); box.scrollTop = box.scrollHeight;
-    liveAfter = m.created_at;
+    const w = document.createElement('div'); w.className = 'item'; w.style.animation = 'none';
+    w.innerHTML = '<div class="sub">' + (m.sender === 'guru' ? '🎓 Ustadz' : '🧕 Kamu') + '</div>' + (m.audio_url ? '<audio controls preload="none" src="' + m.audio_url + '"></audio>' : '') + (m.text ? '<div>' + PP.esc(m.text) + '</div>' : '');
+    box.appendChild(w); box.scrollTop = box.scrollHeight; liveAfter = m.created_at;
   });
   liveTimer = setTimeout(pollLive, 2500);
 }
@@ -224,11 +196,41 @@ async function liveSend() {
 }
 async function liveEnd() { await fetch('/api/live', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'end', sessionId: liveSid }) }); location.reload(); }
 
-// patch load() agar memuat daftar guru + poll live
-const _load = load;
-load = async function () { await _load(); loadGurus(); };
+// ── recorder ──
+let mr, chunks = [], recording = false, blob = null, t0, timer;
+function tick() { const s = Math.floor((Date.now() - t0) / 1000); recTime.textContent = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
+async function toggleRec() {
+  if (!recording) {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mime = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+      mr = new MediaRecorder(stream, { mimeType: mime }); chunks = [];
+      mr.ondataavailable = e => chunks.push(e.data);
+      mr.onstop = () => {
+        blob = new Blob(chunks, { type: mime });
+        document.getElementById('preview').innerHTML = '<div class="item" style="margin-top:12px"><div class="sub">Pratinjau rekaman</div><audio controls src="' + URL.createObjectURL(blob) + '"></audio></div>';
+        submitBtn.disabled = false; recStatus.textContent = 'Rekaman siap (' + Math.round(blob.size / 1024) + ' KB).';
+        stream.getTracks().forEach(t => t.stop());
+      };
+      mr.start(); recording = true; t0 = Date.now(); timer = setInterval(tick, 250);
+      recBtn.textContent = 'SELESAI'; recBtn.classList.add('on'); eq.classList.add('on'); recStatus.textContent = 'Merekam… baca dengan tartil.';
+    } catch (e) { recStatus.textContent = 'Gagal akses mic: ' + e.message; }
+  } else { mr.stop(); recording = false; clearInterval(timer); recBtn.textContent = 'REKAM'; recBtn.classList.remove('on'); eq.classList.remove('on'); }
+}
+async function submitSetoran() {
+  if (!blob) return;
+  submitBtn.disabled = true; submitBtn.textContent = 'Mengirim…';
+  const fd = new FormData(); fd.append('audio', blob, 'setoran.webm'); fd.append('user_id', uid);
+  fd.append('track_id', recTrack.value); fd.append('unit_ref', recUnit.value);
+  try {
+    const d = await (await fetch('/api/setoran/upload', { method: 'POST', body: fd })).json();
+    if (!d.success) throw new Error(d.error);
+    blob = null; recTime.textContent = '00:00'; load();
+  } catch (e) { submitBtn.disabled = false; submitBtn.textContent = 'Kirim Setoran'; recStatus.textContent = 'Gagal: ' + e.message; }
+}
 load();
-
+// presence: kasih tahu server kita online (biar ustadz lihat murid? opsional) + refresh ustrip tiap 20s
+setInterval(loadGurus, 20000);
 </script>
 </body>
 </html>
