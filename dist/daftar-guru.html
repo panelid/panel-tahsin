@@ -49,7 +49,7 @@ function step1() {
     + '<button class="btn btn-primary btn-block" style="margin-top:8px" onclick="next1()">Lanjut →</button>';
 }
 function step2() {
-  return '<div class="card-t">Langkah 2 · Bukti Keilmuan</div><div class="card-s">Pilih salah satu: sertifikat sanad, riwayat Ma’had, atau sertifikat lain.</div>'
+  return '<div class="card-t">Langkah 2 · Bukti Keilmuan <span style="font-size:12px;color:var(--muted)">(opsional)</span></div><div class="card-s">Biar reviu lebih cepat, tambahkan sanad / riwayat Ma’had. Tapi <b>gak wajib</b> — yang utama kamu rekam bacaan Al-Hajj 1–5.</div>'
     + '<div class="seg" style="margin-bottom:14px">'
     + ['sanad|Sertifikat Sanad', 'mahad|Riwayat Ma\'had', 'cert|Sertifikat Lain'].map(function (o) { const v = o.split('|')[0];
       return '<button onclick="pickBukti(\'' + v + '\')" aria-selected="' + (form.bukti === v) + '">' + o.split('|')[1] + '</button>'; }).join('') + '</div>'
@@ -95,9 +95,9 @@ function next1() {
   step = 2; draw();
 }
 function next2() {
-  if (form.bukti === 'sanad') { form.sanadUrl = (sanadUrl || {}).value || ''; if (!form.sanadUrl.trim()) return alert('Isi URL sertifikat sanad.'); }
-  if (form.bukti === 'mahad') { form.mahadText = (mahadText || {}).value || ''; if (!form.mahadText.trim()) return alert('Isi riwayat Ma\'had.'); }
-  if (form.bukti === 'cert') { form.certUrl = (certUrl || {}).value || ''; if (!form.certUrl.trim()) return alert('Isi URL sertifikat.'); }
+  if (form.bukti === 'sanad') form.sanadUrl = (sanadUrl || {}).value || '';
+  if (form.bukti === 'mahad') form.mahadText = (mahadText || {}).value || '';
+  if (form.bukti === 'cert') form.certUrl = (certUrl || {}).value || '';
   step = 3; draw();
 }
 function tick() { const s = Math.floor((Date.now() - t0) / 1000); recTime.textContent = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }

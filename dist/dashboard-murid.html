@@ -52,6 +52,10 @@ async function load() {
       + '<div class="stat"><b>' + set.length + '</b><span>Setoran</span></div>'
       + '<div class="stat"><b>' + rev + '</b><span>Direview</span></div></div>';
 
+    // ---- BACAAN SELANJUTNYA (curriculum + audio acuan) ----
+    const goal = d.user.goal || 'read', lvl = d.user.level || 'beginner';
+    h += '<div class="card" id="nextCard" style="border-color:var(--mint2);background:linear-gradient(160deg,#fff,var(--mint))"><div class="card-t">📖 Bacaan Selanjutnya</div><div class="card-s" id="nextSub">Menyiapkan panduan untukmu…</div></div>';
+
     // ---- LIVE CARD (prominent) ----
     h += '<div class="live-card" id="liveCard">'
       + '<div class="lt">🎙 Ngaji Live Koreksi 1-on-1</div>'
@@ -95,7 +99,23 @@ async function load() {
     app.innerHTML = h;
     loadGurus();
     checkLive();
+    loadNext(goal, lvl);
   } catch (e) { app.innerHTML = '<div class="empty">Gagal memuat: ' + PP.esc(e.message) + '</div>'; }
+}
+async function loadNext(goal, lvl) {
+  const c = await (await fetch('/api/curriculum?goal=' + encodeURIComponent(goal) + '&level=' + encodeURIComponent(lvl))).json().catch(() => null);
+  const card = document.getElementById('nextCard'); if (!card) return;
+  if (!c) { card.remove(); return; }
+  const first = (c.plan || [])[0]; if (!first) { card.remove(); return; }
+  let html = '<div class="track" style="border:none;padding-bottom:6px"><div class="ico">📖</div><div style="flex:1"><div class="nm">' + PP.esc(first.name) + '</div><div class="sub">' + PP.esc(first.note || '') + '</div></div></div>';
+  if (c.refAudio && c.refAudio.url) {
+    html += '<div class="sub" style="margin:2px 0 4px">🎧 <b>Audio acuan</b> — dengar dulu, lalu rekam di bawah:</div><audio controls preload="none" src="' + c.refAudio.url + '"></audio>';
+  } else {
+    html += '<div class="sub">Rekam bacaan di atas, ustadz akan mereview-nya.</div>';
+  }
+  html += '<details style="margin-top:8px"><summary style="cursor:pointer;color:var(--ever);font-weight:600;font-size:13px">Lihat rencana lengkap</summary><div style="margin-top:8px">'
+    + (c.plan || []).map(p => '<div class="sub">• ' + PP.esc(p.name) + (p.note ? ' — ' + PP.esc(p.note) : '') + '</div>').join('') + '</div></details>';
+  document.getElementById('nextSub').outerHTML = html.replace(/^<div class="track"[^>]*>/, '<div>').replace(/<\/div>$/, '');
 }
 
 // ── live ngaji (murid) ──
@@ -105,7 +125,11 @@ async function loadGurus() {
   const list = online.online || [];
   const wrap = document.getElementById('ustripWrap');
   const strip = document.getElementById('ustrip');
-  if (!list.length) { wrap.style.display = 'none'; return; }
+  if (!list.length) {
+    wrap.style.display = '';
+    strip.innerHTML = '<span class="t">Ustadz</span><div class="empty" style="padding:6px 0"><span class="sub">Belum ada ustadz online. Rekam setoran — ustadz akan mereview-nya nanti, atau kirim undangan ke ustadzmu.</span></div>';
+    return;
+  }
   wrap.style.display = '';
   strip.innerHTML = '<span class="t">Ustadz Online</span>' + list.map(g =>
     '<div class="us" onclick="quickLive(\'' + g.id + '\')"><div class="ring">' + PP.esc((g.name || '?').charAt(0).toUpperCase()) + '<span class="dot on"></span></div><div class="nm">' + PP.esc((g.name || '').split(' ')[0]) + '</div></div>'

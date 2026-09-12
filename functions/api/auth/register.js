@@ -12,12 +12,14 @@ import { sendWA, notifyMuridReviewed, notifyUstadzNewSetoran } from '../../../sr
 export async function onRequestPost(context) {
   const { env, request } = context
   try {
-    const { name, email, password, role, wa_number, ref, username, become_student } = await request.json()
+    const { name, email, password, role, wa_number, ref, username, become_student, goal, level } = await request.json()
     if (!name || !email || !password || !role) return json({ success: false, error: 'Semua field wajib diisi' }, 400)
     if (!['murid', 'guru'].includes(role)) return json({ success: false, error: 'Role tidak valid' }, 400)
     const isStudent = role === 'guru' && become_student ? 1 : 0
     const uname = (username || '').toString().trim().toLowerCase()
     if (!/^[a-z0-9_]{3,20}$/.test(uname)) return json({ success: false, error: 'Username 3-20 huruf/angka/underscore' }, 400)
+    const ggoal = ['read','tartil','hafalan','koreksi'].includes(goal) ? goal : 'read'
+    const glevel = ['beginner','basic','fluent'].includes(level) ? level : 'beginner'
     const db = env.DB
     const existingEmail = await db.prepare("SELECT id FROM users WHERE email = ?").bind(email).first()
     if (existingEmail) return json({ success: false, error: 'Email sudah terdaftar' }, 400)
@@ -32,8 +34,8 @@ export async function onRequestPost(context) {
       if (refUser) referredBy = refUser.id
     }
     const pwHash = await hashPassword(password)
-    await db.prepare("INSERT INTO users (id, name, email, password_hash, role, wa_number, referral_code, referred_by, username, is_student) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
-      .bind(id, name, email, pwHash, role, wa_number || null, referralCode, referredBy, uname, isStudent).run()
+    await db.prepare("INSERT INTO users (id, name, email, password_hash, role, wa_number, referral_code, referred_by, username, is_student, goal, level) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+      .bind(id, name, email, pwHash, role, wa_number || null, referralCode, referredBy, uname, isStudent, ggoal, glevel).run()
     if (referredBy) {
       await db.prepare("INSERT INTO referrals (id, referrer_id, referred_id) VALUES (?, ?, ?)")
         .bind('ref_' + Date.now(), referredBy, id).run()

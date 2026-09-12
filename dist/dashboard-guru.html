@@ -30,14 +30,14 @@ const app = document.getElementById('app'), seg = document.getElementById('seg')
 document.getElementById('heroWave').outerHTML = PP.wave(30);
 if (PP.me.name) document.getElementById('heroName').textContent = 'Ahlan, Ustadz ' + PP.me.name.split(' ')[0];
 const TRACKS = [['iqro','Iqro'],['fatihah','Al-Fatihah'],['juz_amma','Juz Amma'],['tilawah','Tilawah'],['hafalan','Hafalan']];
-let tab = 'setoran', counts = { setoran: 0, calon: 0, angkat: 0, live: 0 };
+let tab = 'setoran', counts = { setoran: 0, calon: 0, live: 0 };
 
 // ── presence: tandai online ──
 fetch('/api/presence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: PP.me.id, role: 'guru' }) });
 setInterval(() => fetch('/api/presence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: PP.me.id, role: 'guru' }) }), 45000);
 
 function renderSeg() {
-  const tabs = [['setoran', 'Setoran'], ['calon', 'Calon Guru'], ['angkat', 'Angkat Murid'], ['live', 'Live Ngaji']];
+  const tabs = [['setoran', 'Setoran'], ['calon', 'Calon Guru'], ['live', 'Live Ngaji']];
   if (PP.me.is_student) tabs.push(['belajar', 'Mode Belajar']);
   seg.innerHTML = tabs.map(t => '<button role="tab" aria-selected="' + (t[0] === tab) + '" onclick="go(\'' + t[0] + '\')">' + t[1]
     + (counts[t[0]] ? '<span class="n">' + counts[t[0]] + '</span>' : '') + '</button>').join('');
@@ -48,7 +48,6 @@ async function render() {
   app.innerHTML = '<p class="muted" style="text-align:center;padding:20px">Memuat…</p>';
   if (tab === 'setoran') return renderSetoran();
   if (tab === 'calon') return renderCalon();
-  if (tab === 'angkat') return renderAngkat();
   if (tab === 'live') return renderLiveHome();
   if (tab === 'belajar') { location.href = '/dashboard-murid'; return; }
 }
@@ -116,25 +115,6 @@ async function vote(vid, decision) {
   if (d.error) return alert(d.error);
   if (d.status === 'approved') alert('MasyaAllah, calon ini resmi jadi guru 🎉');
   renderCalon();
-}
-
-// ───── ANGKAT MURID ─────
-async function renderAngkat() {
-  const list = (await (await fetch('/api/guru/murid?guruId=' + encodeURIComponent(PP.me.id))).json()).filter(m => m.role !== 'guru');
-  counts.angkat = list.length; renderSeg();
-  let h = '<div class="card"><div class="card-t">🎓 Angkat Murid Jadi Guru</div><div class="card-s">Murid bimbinganmu yang sudah layak bisa langsung kamu angkat jadi pengajar.</div>';
-  if (!list.length) h += '<div class="empty"><span class="big">👥</span>Belum ada murid bimbingan. Bagikan referral-mu agar santri mendaftar lewat kamu.</div>';
-  else h += list.map(m => '<div class="track"><div class="ico">🧕</div><div style="flex:1"><div class="nm">' + PP.esc(m.name) + '</div><div class="sub">' + PP.esc(m.email) + '</div></div>'
-    + '<button class="btn btn-gold btn-sm" onclick="angkat(\'' + m.id + '\',\'' + PP.esc(m.name).replace(/'/g, '') + '\')">Angkat</button></div>').join('');
-  h += '</div><p class="hint" id="promMsg" style="text-align:center"></p>';
-  app.innerHTML = h;
-}
-async function angkat(id, nm) {
-  if (!confirm('Angkat ' + nm + ' menjadi pengajar?')) return;
-  const d = await (await fetch('/api/guru/promote', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ promoterId: PP.me.id, muridId: id }) })).json();
-  const m = document.getElementById('promMsg');
-  if (d.success) { m.textContent = '✓ ' + nm + ' resmi jadi guru.'; m.className = 'hint ok'; renderAngkat(); }
-  else { m.textContent = d.error || 'Gagal'; m.className = 'hint bad'; }
 }
 
 // ───── LIVE NGAIJI (guru) ─────

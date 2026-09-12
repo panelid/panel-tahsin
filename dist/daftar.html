@@ -30,6 +30,21 @@
         <button id="r_guru" aria-selected="false" onclick="setRole('guru')">🎓 Pengajar</button>
       </div>
     </div>
+    <div class="field" id="onbGoal"><label>Tujuan belajar</label>
+      <div class="seg" style="margin:6px 0 0">
+        <button id="g_read" aria-selected="true" onclick="setGoal('read')">📖 Bisa baca</button>
+        <button id="g_tartil" aria-selected="false" onclick="setGoal('tartil')">🎯 Tartil</button>
+        <button id="g_hafalan" aria-selected="false" onclick="setGoal('hafalan')">📿 Hafal</button>
+        <button id="g_koreksi" aria-selected="false" onclick="setGoal('koreksi')">✨ Koreksi</button>
+      </div>
+    </div>
+    <div class="field" id="onbLevel"><label>Level sekarang</label>
+      <select id="level" class="input">
+        <option value="beginner">Belum bisa / baru mulai</option>
+        <option value="basic">Bisa tapi belum tartil</option>
+        <option value="fluent">Lancar, mau naik level</option>
+      </select>
+    </div>
     <div class="field"><label>Kode referral (opsional)</label><input id="ref" class="input" placeholder="kode dari teman / ustadz"></div>
     <p class="hint bad" id="err" style="min-height:20px"></p>
     <button class="btn btn-primary btn-block" id="btn">Daftar Sekarang</button>
@@ -40,12 +55,18 @@
 <script src="/assets/app.js"></script>
 <script>
 document.getElementById('heroWave').outerHTML = PP.wave(24);
-let role = 'murid', uState = 'empty';
+let role = 'murid', uState = 'empty', goal = 'read';
 const REF = new URLSearchParams(location.search).get('ref') || new URLSearchParams(location.search).get('u') || '';
 if (REF) ref.value = REF;
 function setRole(r) {
   role = r; r_murid.setAttribute('aria-selected', r === 'murid'); r_guru.setAttribute('aria-selected', r === 'guru');
   btn.textContent = r === 'guru' ? 'Lanjut ke Form Pengajar' : 'Daftar Sekarang';
+  document.getElementById('onbGoal').style.display = r === 'murid' ? '' : 'none';
+  document.getElementById('onbLevel').style.display = r === 'murid' ? '' : 'none';
+}
+function setGoal(g) {
+  goal = g;
+  ['read','tartil','hafalan','koreksi'].forEach(x => document.getElementById('g_' + x).setAttribute('aria-selected', x === g));
 }
 let tt;
 document.addEventListener('input', function (e) {
@@ -70,7 +91,7 @@ async function daftar() {
   btn.disabled = true; btn.textContent = 'Membuat akun…';
   try {
     const d = await (await fetch('/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name.value.trim(), username: username.value.trim().toLowerCase(), email: email.value.trim(), wa_number: wa.value.trim(), password: pass.value, role: 'murid', ref: ref.value.trim() }) })).json();
+      body: JSON.stringify({ name: name.value.trim(), username: username.value.trim().toLowerCase(), email: email.value.trim(), wa_number: wa.value.trim(), password: pass.value, role: 'murid', ref: ref.value.trim(), goal: goal, level: level.value }) })).json();
     if (!d.success) throw new Error(d.error || 'Gagal daftar');
     localStorage.setItem('user', JSON.stringify(d.user));
     localStorage.setItem('uid', d.user.id);
