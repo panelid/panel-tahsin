@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Literata:opsz,wght@7..72,500;7..72,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/app.css">
+<script src="/assets/rec.js" defer></script>
 </head>
 <body data-page="auth">
 <div id="hdr"></div>
@@ -100,18 +101,19 @@ function next2() {
   step = 3; draw();
 }
 function tick() { const s = Math.floor((Date.now() - t0) / 1000); recTime.textContent = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
+function setEq(el, lvl) { if (!el) return; const bars = el.children; for (let i = 0; i < bars.length; i++) { const h = 9 + (lvl * 28 * (0.5 + Math.abs(Math.sin(i * 1.3)))); bars[i].style.height = Math.min(30, h) + 'px'; } }
 async function toggleRec() {
   if (!rec) {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mime = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
-      mr = new MediaRecorder(stream, { mimeType: mime }); chunks = [];
-      mr.ondataavailable = e => chunks.push(e.data);
-      mr.onstop = () => { blob = new Blob(chunks, { type: mime }); stream.getTracks().forEach(t => t.stop()); draw(); };
-      mr.start(); rec = true; t0 = Date.now(); timer = setInterval(tick, 250);
-      recBtn.textContent = 'SELESAI'; recBtn.classList.add('on'); eq.classList.add('on'); recStatus.textContent = 'Merekam…';
+      const r = await HiRec.start({ onTick: t => recTime.textContent = String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(Math.floor(t % 60)).padStart(2, '0'), onLevel: l => setEq(eq, l) });
+      rec = true; t0 = Date.now(); recBtn.textContent = 'SELESAI'; recBtn.classList.add('on'); eq.classList.add('on'); recStatus.textContent = 'Merekam… baca Al-Hajj 1–5 dengan tartil.';
     } catch (e) { recStatus.textContent = 'Gagal akses mic: ' + e.message; }
-  } else { mr.stop(); rec = false; clearInterval(timer); }
+  } else {
+    recBtn.textContent = 'Memproses…'; recBtn.disabled = true;
+    const r = await HiRec.stop(); blob = r.blob; rec = false; setEq(eq, 0);
+    recBtn.textContent = 'REKAM'; recBtn.classList.remove('on'); eq.classList.remove('on'); recBtn.disabled = false;
+    draw();
+  }
 }
 async function kirim() {
   if (!blob) return alert('Rekam bacaan Al-Hajj 1–5 dulu.');

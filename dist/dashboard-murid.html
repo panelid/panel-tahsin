@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Literata:opsz,wght@7..72,500;7..72,600&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/app.css">
-</head>
+<script src="/assets/rec.js" defer></script>
 <body data-page="murid" data-tab="home">
 <div id="hdr"></div>
 <div class="wrap">
@@ -177,15 +177,14 @@ async function pollLive() {
 async function liveToggle() {
   if (!liveRec) {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mime = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
-      liveMr = new MediaRecorder(stream, { mimeType: mime }); liveChunks = [];
-      liveMr.ondataavailable = e => liveChunks.push(e.data);
-      liveMr.onstop = () => { liveBlob = new Blob(liveChunks, { type: mime }); stream.getTracks().forEach(t => t.stop()); lsend.disabled = false; };
-      liveMr.start(); liveRec = true; liveT0 = Date.now(); liveTick = setInterval(() => { const s = Math.floor((Date.now() - liveT0) / 1000); lrec.textContent = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }, 250);
-      lrec.textContent = 'SELESAI'; lrec.classList.add('on'); leq.classList.add('on');
+      const r = await HiRec.start({ onTick: t => lrec.textContent = fmt(t), onLevel: l => setEq(leq, l) });
+      liveRec = true; lrec.textContent = 'SELESAI'; lrec.classList.add('on'); leq.classList.add('on');
     } catch (e) { alert('Gagal mic: ' + e.message); }
-  } else { liveMr.stop(); liveRec = false; clearInterval(liveTick); lrec.textContent = 'REKAM'; lrec.classList.remove('on'); leq.classList.remove('on'); }
+  } else {
+    lrec.textContent = 'Memproses…'; lrec.disabled = true;
+    const r = await HiRec.stop(); liveBlob = r.blob; liveRec = false; setEq(leq, 0);
+    lsend.disabled = false; lrec.textContent = 'REKAM'; lrec.classList.remove('on'); leq.classList.remove('on'); lrec.disabled = false;
+  }
 }
 async function liveSend() {
   if (!liveBlob) return; lsend.disabled = true; lsend.textContent = 'Mengirim…';
@@ -196,26 +195,27 @@ async function liveSend() {
 }
 async function liveEnd() { await fetch('/api/live', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'end', sessionId: liveSid }) }); location.reload(); }
 
-// ── recorder ──
-let mr, chunks = [], recording = false, blob = null, t0, timer;
-function tick() { const s = Math.floor((Date.now() - t0) / 1000); recTime.textContent = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
+// ── recorder (HiRec) ──
+let recording = false, blob = null;
+function fmt(s) { return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
+function setEq(el, lvl) { if (!el) return; const bars = el.children; for (let i = 0; i < bars.length; i++) { const h = 9 + (lvl * 28 * (0.5 + Math.abs(Math.sin(i * 1.3)))); bars[i].style.height = Math.min(30, h) + 'px'; } }
 async function toggleRec() {
   if (!recording) {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mime = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
-      mr = new MediaRecorder(stream, { mimeType: mime }); chunks = [];
-      mr.ondataavailable = e => chunks.push(e.data);
-      mr.onstop = () => {
-        blob = new Blob(chunks, { type: mime });
-        document.getElementById('preview').innerHTML = '<div class="item" style="margin-top:12px"><div class="sub">Pratinjau rekaman</div><audio controls src="' + URL.createObjectURL(blob) + '"></audio></div>';
-        submitBtn.disabled = false; recStatus.textContent = 'Rekaman siap (' + Math.round(blob.size / 1024) + ' KB).';
-        stream.getTracks().forEach(t => t.stop());
-      };
-      mr.start(); recording = true; t0 = Date.now(); timer = setInterval(tick, 250);
+      recBtn.disabled = true;
+      const r = await HiRec.start({ onTick: t => recTime.textContent = fmt(t), onLevel: l => setEq(eq, l) });
+      recording = true; recBtn.disabled = false;
       recBtn.textContent = 'SELESAI'; recBtn.classList.add('on'); eq.classList.add('on'); recStatus.textContent = 'Merekam… baca dengan tartil.';
-    } catch (e) { recStatus.textContent = 'Gagal akses mic: ' + e.message; }
-  } else { mr.stop(); recording = false; clearInterval(timer); recBtn.textContent = 'REKAM'; recBtn.classList.remove('on'); eq.classList.remove('on'); }
+    } catch (e) { recStatus.textContent = 'Gagal akses mic: ' + e.message; recBtn.disabled = false; }
+  } else {
+    recBtn.disabled = true; recBtn.textContent = 'Memproses…';
+    const r = await HiRec.stop();
+    blob = r.blob; recording = false;
+    setEq(eq, 0);
+    document.getElementById('preview').innerHTML = '<div class="item" style="margin-top:12px"><div class="sub">Pratinjau rekaman (' + Math.round(r.size / 1024) + ' KB)</div><audio controls src="' + r.url + '"></audio></div>';
+    submitBtn.disabled = false; recStatus.textContent = 'Rekaman siap — klik Kirim Setoran.';
+    recBtn.textContent = 'REKAM'; recBtn.classList.remove('on'); eq.classList.remove('on'); recBtn.disabled = false;
+  }
 }
 async function submitSetoran() {
   if (!blob) return;

@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Literata:opsz,wght@7..72,500;7..72,600&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/app.css">
+<script src="/assets/rec.js" defer></script>
 </head>
 <body data-page="guru">
 <div id="hdr"></div>
@@ -180,18 +181,19 @@ async function gPoll() {
   });
   gLiveTimer = setTimeout(gPoll, 2500);
 }
+function fmt(s) { return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
+function setEq(el, lvl) { if (!el) return; const bars = el.children; for (let i = 0; i < bars.length; i++) { const h = 9 + (lvl * 28 * (0.5 + Math.abs(Math.sin(i * 1.3)))); bars[i].style.height = Math.min(30, h) + 'px'; } }
 async function gToggle() {
   if (!gRec) {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mime = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
-      gMr = new MediaRecorder(stream, { mimeType: mime }); gChunks = [];
-      gMr.ondataavailable = e => gChunks.push(e.data);
-      gMr.onstop = () => { gBlob = new Blob(gChunks, { type: mime }); stream.getTracks().forEach(t => t.stop()); gsend.disabled = false; };
-      gMr.start(); gRec = true; gT0 = Date.now(); gTick = setInterval(() => { const s = Math.floor((Date.now() - gT0) / 1000); grec.textContent = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }, 250);
-      grec.textContent = 'SELESAI'; grec.classList.add('on'); geq.classList.add('on');
+      await HiRec.start({ onTick: t => grec.textContent = fmt(t), onLevel: l => setEq(geq, l) });
+      gRec = true; grec.textContent = 'SELESAI'; grec.classList.add('on'); geq.classList.add('on');
     } catch (e) { alert('Gagal mic: ' + e.message); }
-  } else { gMr.stop(); gRec = false; clearInterval(gTick); grec.textContent = 'REKAM'; grec.classList.remove('on'); geq.classList.remove('on'); }
+  } else {
+    grec.textContent = 'Memproses…'; grec.disabled = true;
+    const r = await HiRec.stop(); gBlob = r.blob; gRec = false; setEq(geq, 0);
+    gsend.disabled = false; grec.textContent = 'REKAM'; grec.classList.remove('on'); geq.classList.remove('on'); grec.disabled = false;
+  }
 }
 async function gSend() {
   if (!gBlob) return; gsend.disabled = true; gsend.textContent = 'Mengirim…';
