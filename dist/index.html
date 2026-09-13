@@ -402,6 +402,20 @@
   document.querySelectorAll('.pc-btn').forEach(function(b){
     b.addEventListener('click',function(){ toggleWave(b.dataset.wave,null); });
   });
+
+  // sudah login? swap semua tombol "Daftar Gratis" -> "Dashboard"
+  (function(){
+    try {
+      var uid = localStorage.getItem('uid'); if (!uid) return;
+      var u = {}; try { u = JSON.parse(localStorage.getItem('user') || '{}'); } catch (e) {}
+      var dest = u.role === 'guru' ? '/dashboard-guru' : '/dashboard-murid';
+      var label = 'Dashboard' + (u.name ? ' · ' + u.name.split(' ')[0] : '');
+      document.querySelectorAll('a[href="/daftar"]').forEach(function(a){
+        if (!/daftar gratis/i.test(a.textContent)) return;
+        a.href = dest; a.textContent = label; a.classList.remove('btn-amber'); a.classList.add('btn-primary');
+      });
+    } catch (e) {}
+  })();
 </script>
 </body>
 </html>

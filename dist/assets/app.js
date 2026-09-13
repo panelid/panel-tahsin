@@ -11,7 +11,7 @@
       '<a href="/" class="brand"><span class="brand-mark">◈</span>ponpes<span style="opacity:.6;font-weight:400">.org</span></a>' +
       '<span class="spacer"></span>' +
       (me.name
-        ? '<a class="chip" href="/u/@' + (me.username || '') + '"><span class="av">' + av + '</span>' + me.name.split(' ')[0] + '</a>'
+        ? '<a class="chip" href="/@' + (me.username || '') + '"><span class="av">' + av + '</span>' + me.name.split(' ')[0] + '</a>'
         : '') +
       '</div>';
   }
@@ -20,13 +20,13 @@
     murid: [
       ['🏠', 'Beranda', '/dashboard-murid', 'home'],
       ['🎙', 'Setoran', '#rekam', 'rekam'],
-      ['👤', 'Profil', '/u/@' + (me.username || ''), 'me'],
+      ['👤', 'Profil', '/@' + (me.username || ''), 'me'],
     ],
     guru: [
       ['🏠', 'Beranda', '/dashboard-guru', 'home'],
       ['📚', 'Setoran', '#setoran', 'setoran'],
       ['🎓', 'Calon', '#calon', 'calon'],
-      ['👤', 'Profil', '/u/@' + (me.username || ''), 'me'],
+      ['👤', 'Profil', '/@' + (me.username || ''), 'me'],
     ],
   };
   const nav = document.getElementById('nav');
