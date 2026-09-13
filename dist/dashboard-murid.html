@@ -33,7 +33,7 @@ const uid = new URLSearchParams(location.search).get('uid') || localStorage.getI
 if (uid) localStorage.setItem('uid', uid);
 if (!uid) location.href = '/login';
 document.getElementById('heroWave').outerHTML = PP.wave(30);
-const TRACKS = [['iqro','Iqro','📗'],['fatihah','Al-Fatihah','🕌'],['juz_amma','Juz Amma','🌙'],['tilawah','Tilawah','🎧'],['hafalan','Hafalan','📿']];
+const TRACKS = [['fatihah','Al-Fatihah','🕌'],['iqro','Iqro','📗'],['juz_amma','Juz Amma','🌙'],['tilawah','Tilawah','🎧'],['hafalan','Hafalan','📿']];
 
 async function load() {
   try {
@@ -52,9 +52,8 @@ async function load() {
       + '<div class="stat"><b>' + set.length + '</b><span>Setoran</span></div>'
       + '<div class="stat"><b>' + rev + '</b><span>Direview</span></div></div>';
 
-    // ---- BACAAN SELANJUTNYA (curriculum + audio acuan) ----
-    const goal = d.user.goal || 'read', lvl = d.user.level || 'beginner';
-    h += '<div class="card" id="nextCard" style="border-color:var(--mint2);background:linear-gradient(160deg,#fff,var(--mint))"><div class="card-t">📖 Bacaan Selanjutnya</div><div class="card-s" id="nextSub">Menyiapkan panduan untukmu…</div></div>';
+    // ---- FOKUS UTAMA (Al-Fatihah dulu — wajib tiap rakaat; Juz Amma setelah lulus) ----
+    h += '<div class="card" id="nextCard" style="border-color:var(--mint2);background:linear-gradient(160deg,#fff,var(--mint))"><div class="card-t">🕌 Fokus Utama Kamu</div><div class="card-s" id="nextSub">Menyiapkan panduan untukmu…</div></div>';
 
     // ---- LIVE CARD (prominent) ----
     h += '<div class="live-card" id="liveCard">'
@@ -62,10 +61,10 @@ async function load() {
       + '<div class="ls" id="liveSub">Pilih ustadz yang sedang online, lalu minta sesi. Nanti kamu bisa baca & langsung dikoreksi.</div>'
       + '<div id="liveBtnWrap"></div></div>';
 
-    // ---- SIMPLE RECORDER ----
-    const opts = TRACKS.map(t => '<option value="' + PP.esc(t[0]) + '">' + PP.esc(t[1]) + '</option>').join('');
+    // ---- SIMPLE RECORDER (default: Al-Fatihah — wajib tiap shalat) ----
+    const opts = TRACKS.map(t => '<option value="' + PP.esc(t[0]) + '"' + (t[0] === 'fatihah' ? ' selected' : '') + '>' + PP.esc(t[1]) + '</option>').join('');
     h += '<div class="card" id="rekam">'
-      + '<div class="card-t">🎙 Rekam Setoran</div><div class="card-s">Tap tombol, baca dengan tartil, lalu kirim. Ustadz mereview-nya nanti.</div>'
+      + '<div class="card-t">🎙 Rekam Setoran</div><div class="card-s">Mulai dari <b>Al-Fatihah</b> — dibaca di tiap rakaat shalat 5 waktu. Lalu lanjut Iqro bila tahsinnya belum pas. Rekam, ustadz koreksi.</div>'
       + '<div class="field"><label>Pelajaran</label><select id="recTrack" class="input">' + opts + '</select></div>'
       + '<div class="field"><label>Unit / halaman (opsional)</label><input id="recUnit" class="input" placeholder="cth: Iqro 3 hal 10"></div>'
       + '<div class="rec"><div class="eq" id="eq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>'
@@ -91,20 +90,31 @@ async function load() {
     h += '<div class="card" id="visCard"><div class="card-t">🌐 Atur Tampilan Publik</div><div class="card-s">Kelola apa yang tampil di <b>ponpes.org/@' + PP.esc(d.user.username || d.user.id) + '</b></div>'
       + '<div id="visBody"><p class="sub" style="text-align:center">Memuat…</p></div></div>';
 
-    // ---- LEARNING PATH (bersih: 5 track inti, status by progress) ----
+    // ---- PERJALANAN BELAJAR (stage: Al-Fatihah + Iqro bareng -> Juz Amma) ----
     const doneTracks = new Set(set.filter(s => s.status === 'reviewed').map(s => s.track_id));
-    const path = TRACKS.map((t, i) => ({ track: t[1], status: doneTracks.has(t[0]) ? 'done' : (i === 0 ? 'active' : '') }));
-    h += '<div class="card"><div class="card-t">🗂 Perjalanan Belajar</div>';
-    h += '<div class="path">' + path.map((e, i) => {
-      const cls = e.status === 'done' ? 'done' : (e.status === 'active' ? 'cur' : '');
-      return '<div class="step ' + cls + '"><div class="dot">' + (e.status === 'done' ? '✓' : i + 1) + '</div><div class="lab">' + PP.esc(e.track) + '</div>' + (i < path.length - 1 ? '<div class="bar"></div>' : '') + '</div>';
+    const avgF = (function () {
+      const rs = set.filter(s => s.track_id === 'fatihah' && s.status === 'reviewed');
+      return rs.length ? (rs.reduce((a, s) => a + (s.avg_score || 0), 0) / rs.length) : null;
+    })();
+    const lulus = avgF != null && avgF >= 7;
+    const steps = [
+      { track: 'Al-Fatihah', status: lulus ? 'done' : 'cur', note: 'Tiap rakaat' },
+      { track: 'Iqro', status: lulus ? 'done' : 'cur', note: 'Barengan' },
+      { track: 'Juz Amma', status: lulus ? 'cur' : '', note: 'Surat shalat' },
+      { track: 'Tilawah', status: '', note: 'Kelancaran' }
+    ];
+    h += '<div class="card"><div class="card-t">🗂 Perjalanan Belajar</div>'
+      + '<div class="sub" style="margin-bottom:10px">' + (lulus ? 'Al-Fatihah lulus (' + Math.round(avgF) + '/10). Lanjut Juz Amma.' : 'Fokus perbaiki Al-Fatihah & Iqro bareng — jalan terus tiap hari.') + '</div>';
+    h += '<div class="path">' + steps.map((e, i) => {
+      const cls = e.status === 'done' ? 'done' : (e.status === 'cur' ? 'cur' : '');
+      return '<div class="step ' + cls + '"><div class="dot">' + (e.status === 'done' ? '✓' : i + 1) + '</div><div class="lab">' + PP.esc(e.track) + '</div><div class="sub" style="text-align:center;font-size:10.5px">' + e.note + '</div>' + (i < steps.length - 1 ? '<div class="bar"></div>' : '') + '</div>';
     }).join('') + '</div></div>';
 
     h += '<div class="foot">ponpes.org — platform tahsin & ngaji online gratis</div>';
     app.innerHTML = h;
     loadGurus();
     checkLive();
-    loadNext(goal, lvl);
+    loadNext();
     loadVis();
   } catch (e) { app.innerHTML = '<div class="empty">Gagal memuat: ' + PP.esc(e.message) + '</div>'; }
 }
@@ -138,19 +148,23 @@ async function saveBio() {
   if (d.success) { const b = document.getElementById('bioIn'); b.style.borderColor = 'var(--ever3)'; setTimeout(() => b.style.borderColor = '', 800); }
 }
 function selfId() { return uid; }
-async function loadNext(goal, lvl) {
-  const c = await (await fetch('/api/curriculum?goal=' + encodeURIComponent(goal) + '&level=' + encodeURIComponent(lvl))).json().catch(() => null);
+async function loadNext() {
+  const c = await (await fetch('/api/curriculum?uid=' + uid)).json().catch(() => null);
   const card = document.getElementById('nextCard'); if (!card) return;
-  if (!c) { card.remove(); return; }
-  const first = (c.plan || [])[0]; if (!first) { card.remove(); return; }
-  let html = '<div class="track" style="border:none;padding-bottom:6px"><div class="ico">📖</div><div style="flex:1"><div class="nm">' + PP.esc(first.name) + '</div><div class="sub">' + PP.esc(first.note || '') + '</div></div></div>';
+  if (!c || !(c.plan || []).length) { card.remove(); return; }
+  const dasar = c.stage === 'dasar';
+  const first = c.plan[0];
+  let html = '<div class="track" style="border:none;padding-bottom:6px"><div class="ico">' + (dasar ? '🕌' : '🌙') + '</div><div style="flex:1"><div class="nm">' + PP.esc(first.name) + '</div><div class="sub">' + PP.esc(first.note || '') + '</div></div></div>';
+  html += '<div class="hint" style="margin:2px 0 8px">' + (dasar
+    ? 'Kenapa Al-Fatihah dulu? Karena dibaca di <b>tiap rakaat</b> — minimal 17x sehari. Bacaan lain menyusul.'
+    : 'Al-Fatihah kamu sudah lulus. Lanjut <b>surat Juz Amma</b> yang sering dibaca dalam shalat.') + '</div>';
   if (c.refAudio && c.refAudio.url) {
     html += '<div class="sub" style="margin:2px 0 4px">🎧 <b>Audio acuan</b> — dengar dulu, lalu rekam di bawah:</div><audio controls preload="none" src="' + c.refAudio.url + '"></audio>';
   } else {
-    html += '<div class="sub">Rekam bacaan di atas, ustadz akan mereview-nya.</div>';
+    html += '<div class="sub">Rekam bacaan di bawah, ustadz akan mengoreksinya.</div>';
   }
-  html += '<details style="margin-top:8px"><summary style="cursor:pointer;color:var(--ever);font-weight:600;font-size:13px">Lihat rencana lengkap</summary><div style="margin-top:8px">'
-    + (c.plan || []).map(p => '<div class="sub">• ' + PP.esc(p.name) + (p.note ? ' — ' + PP.esc(p.note) : '') + '</div>').join('') + '</div></details>';
+  html += '<details style="margin-top:8px"><summary style="cursor:pointer;color:var(--ever);font-weight:600;font-size:13px">' + (dasar ? 'Rencana belajar' : 'Surat berikutnya') + '</summary><div style="margin-top:8px">'
+    + c.plan.map(p => '<div class="sub">• ' + PP.esc(p.name) + (p.note ? ' — ' + PP.esc(p.note) : '') + '</div>').join('') + '</div></details>';
   document.getElementById('nextSub').outerHTML = html.replace(/^<div class="track"[^>]*>/, '<div>').replace(/<\/div>$/, '');
 }
 
