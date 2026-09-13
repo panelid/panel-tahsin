@@ -81,7 +81,8 @@ async function load() {
     set.slice(0, 6).forEach((s, i) => {
       const b = s.status === 'reviewed' ? '<span class="badge b-ok">✓ direview</span>' : '<span class="badge b-pend">⏳ menunggu</span>';
       const au = s.audio_url ? '<audio controls preload="none" src="' + s.audio_url + '"></audio>' : '';
-      h += '<div class="item" style="animation-delay:' + (i * 45) + 'ms"><div class="item-h"><b>' + PP.esc(s.track_id || '-') + '</b>' + b + '</div>'
+      h += '<div class="item" id="st_' + s.id + '" style="animation-delay:' + (i * 45) + 'ms"><div class="item-h"><b>' + PP.esc(s.track_id || '-') + '</b>' + b
+        + (s.status !== 'reviewed' ? '<button class="del" title="Hapus setoran" onclick="delSetoran(\'' + s.id + '\')">🗑 hapus</button>' : '') + '</div>'
         + '<div class="sub">' + PP.esc(s.unit_ref || '') + (s.created_at ? ' · ' + PP.fmt(s.created_at) : '') + '</div>' + au + '</div>';
     });
     h += '</div>';
@@ -286,6 +287,12 @@ async function submitSetoran() {
     if (!d.success) throw new Error(d.error);
     blob = null; recTime.textContent = '00:00'; load();
   } catch (e) { submitBtn.disabled = false; submitBtn.textContent = 'Kirim Setoran'; recStatus.textContent = 'Gagal: ' + e.message; }
+}
+async function delSetoran(id) {
+  if (!confirm('Hapus setoran ini? Tidak bisa dibatalkan.')) return;
+  const d = await (await fetch('/api/setoran/' + id + '?uid=' + uid, { method: 'DELETE' })).json().catch(() => ({}));
+  if (d.error) return alert(d.error);
+  const el = document.getElementById('st_' + id); if (el) el.remove();
 }
 load();
 // presence: kasih tahu server kita online (biar ustadz lihat murid? opsional) + refresh ustrip tiap 20s
