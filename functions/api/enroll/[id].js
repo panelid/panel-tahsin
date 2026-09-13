@@ -7,7 +7,7 @@ export async function onRequestGet(context) {
   const user = await db.prepare("SELECT id, name, referral_code, goal, level FROM users WHERE id = ?").bind(id).first();
   if (!user) return json({ error: 'not found' }, 404);
   const enroll = await db.prepare("SELECT t.name as track, e.current_unit, e.status FROM enrollments e JOIN tracks t ON t.id=e.track_id WHERE e.user_id = ?").bind(id).all();
-  const setoran = await db.prepare("SELECT s.id, s.track_id, s.status, s.created_at, (SELECT AVG(ry.score) FROM review_ayat ry WHERE ry.setoran_id = s.id) AS avg_score, (SELECT dr.status FROM delete_requests dr WHERE dr.setoran_id = s.id AND dr.status = 'pending') AS del_req FROM setoran s WHERE s.user_id = ? ORDER BY s.created_at DESC LIMIT 10").bind(id).all();
+  const setoran = await db.prepare("SELECT s.id, s.track_id, s.unit_ref, s.audio_url, s.status, s.created_at, (SELECT AVG(ry.score) FROM review_ayat ry WHERE ry.setoran_id = s.id) AS avg_score, (SELECT dr.status FROM delete_requests dr WHERE dr.setoran_id = s.id AND dr.status = 'pending') AS del_req FROM setoran s WHERE s.user_id = ? ORDER BY s.created_at DESC LIMIT 10").bind(id).all();
   return json({ user, enrollments: enroll.results || [], setoran: setoran.results || [] });
 }
 

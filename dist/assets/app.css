@@ -93,6 +93,11 @@ select.input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
 textarea.input{min-height:82px;resize:vertical;line-height:1.6}
 .hint{font-size:12.5px;color:var(--muted);margin-top:5px}
 .hint.ok{color:var(--ok)} .hint.bad{color:var(--bad)}
+.pill{display:inline-block;background:var(--mint);border:1px solid var(--mint2);color:var(--ever);font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px}
+.tedit{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.tip{background:var(--surface);border:1px solid var(--line2);border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:700;color:var(--ink);cursor:pointer}
+.tip.cur{background:var(--ever);border-color:var(--ever);color:#fff}
+.tip:not(.cur):active{background:var(--mint)}
 .uwrap{display:flex;align-items:center;border:1.5px solid var(--line2);border-radius:var(--r-sm);background:#fff;transition:.18s}
 .uwrap:focus-within{border-color:var(--ever3);box-shadow:0 0 0 4px rgba(46,125,110,.14)}
 .uwrap .pre{padding-left:14px;font-weight:700;color:var(--muted)}

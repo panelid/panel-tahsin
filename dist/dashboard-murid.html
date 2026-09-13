@@ -80,12 +80,16 @@ async function load() {
     set.slice(0, 6).forEach((s, i) => {
       const b = s.status === 'reviewed' ? '<span class="badge b-ok">✓ direview</span>' : '<span class="badge b-pend">⏳ menunggu</span>';
       const au = s.audio_url ? '<audio controls preload="none" src="' + s.audio_url + '"></audio>' : '';
-      let act;
-      if (s.status !== 'reviewed') act = '<button class="del" title="Hapus setoran" onclick="delSetoran(\'' + s.id + '\')">🗑 hapus</button>';
+      const tn = (TRACKS.find(t => t[0] === s.track_id) || [, s.track_id || '-'])[1];
+      const ico = (TRACKS.find(t => t[0] === s.track_id) || [, , ''])[2];
+      let act = '';
+      if (s.status !== 'reviewed') act = '<button class="del" title="Ganti pelajaran" onclick="editTitle(\'' + s.id + '\')">✏ ganti</button> <button class="del" title="Hapus setoran" onclick="delSetoran(\'' + s.id + '\')">🗑 hapus</button>';
       else if (s.del_req) act = '<span class="badge b-pend">pengajuan hapus dikirim</span> <button class="del" onclick="cancelDelReq(\'' + s.id + '\')">batal</button>';
       else act = '<button class="del" title="Salah ACC? ajukan hapus" onclick="askDelReq(\'' + s.id + '\')">🗑 salah ACC?</button>';
-      h += '<div class="item" id="st_' + s.id + '" style="animation-delay:' + (i * 45) + 'ms"><div class="item-h"><b>' + PP.esc(s.track_id || '-') + '</b>' + b + act + '</div>'
-        + '<div class="sub">' + PP.esc(s.unit_ref || '') + (s.created_at ? ' · ' + PP.fmt(s.created_at) : '') + '</div>' + au + '</div>';
+      const unit = s.unit_ref ? '<span class="pill">📄 ' + PP.esc(s.unit_ref) + '</span>' : '';
+      h += '<div class="item" id="st_' + s.id + '" style="animation-delay:' + (i * 45) + 'ms"><div class="item-h"><b>' + ico + ' ' + PP.esc(tn) + '</b>' + b + act + '</div>'
+        + '<div class="sub">' + unit + (unit && s.created_at ? ' ' : '') + (s.created_at ? PP.fmt(s.created_at) : '') + '</div>' + au
+        + '<div class="tedit" id="te_' + s.id + '" style="display:none">' + TRACKS.map(t => '<button class="tip' + (t[0] === s.track_id ? ' cur' : '') + '" onclick="saveTitle(\'' + s.id + '\',\'' + t[0] + '\')">' + t[2] + ' ' + t[1] + '</button>').join('') + '</div></div>';
     });
     h += '</div>';
 
@@ -320,6 +324,15 @@ async function askDelReq(id) {
 }
 async function cancelDelReq(id) {
   await (await fetch('/api/setoran/delete-request', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'cancel', setoran_id: id, uid }) })).json();
+  load();
+}
+function editTitle(id) {
+  document.querySelectorAll('.tedit').forEach(x => x.style.display = 'none');
+  const el = document.getElementById('te_' + id); if (el) el.style.display = el.style.display === 'none' ? 'flex' : 'none';
+}
+async function saveTitle(id, track) {
+  const d = await (await fetch('/api/setoran/' + id, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ uid, track_id: track }) })).json();
+  if (d.error) return alert(d.error);
   load();
 }
 load();
