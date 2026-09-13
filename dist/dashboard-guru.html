@@ -129,7 +129,29 @@ async function renderLiveHome() {
   if (my.length) { gLiveSid = my[0].id; openGuruLive(); return; }
   app.innerHTML = '<div class="live-card"><div class="lt">🎙 Live Ngaji 1-on-1</div>'
     + '<div class="ls"><span class="live-pulse"></span>Kamu terlihat <b>online</b> oleh santri. Bila ada yang minta sesi, notif akan muncul di sini.</div>'
-    + '<div class="sub" style="margin-top:10px">Santri akan melihat nama & foto profilmu di daftar "Ustadz Online" dan bisa minta ngaji live kapan saja.</div></div>';
+    + '<div class="sub" style="margin-top:10px">Santri akan melihat nama & foto profilmu di daftar "Ustadz Online" dan bisa minta ngaji live kapan saja.</div></div>'
+    + '<div class="card" id="visCard"><div class="card-t">🌐 Atur Tampilan Publik</div><div class="card-s">Kelola apa yang tampil di profil publikmu</div><div id="visBody"><p class="sub" style="text-align:center">Memuat…</p></div></div>';
+  loadVisGuru();
+}
+async function loadVisGuru() {
+  const v = await (await fetch('/api/profile/visibility?uid=' + encodeURIComponent(PP.me.id))).json().catch(() => null);
+  const box = document.getElementById('visBody'); if (!box || !v) return;
+  const u = v.username || PP.me.id;
+  const toggles = [
+    ['profile_visible', 'Profil publik aktif', 'Orang bisa lihat profil kamu'],
+    ['show_progress', 'Tampilkan progres', 'Persen progres tahsin'],
+    ['show_setoran', 'Tampilkan setoran', 'Daftar bacaan yang dikirim'],
+    ['show_audio', 'Izinkan audio diputar', 'Audio setoran bisa didengar publik']
+  ];
+  let html = '<label style="font-size:12.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Bio singkat</label><input id="bioIn" class="input" maxlength="200" style="margin:5px 0 14px" placeholder="Cth: Ustadz tahsin di Ponpes Digital" value="' + PP.esc(v.bio || '') + '">';
+  html += toggles.map(t => {
+    const on = v[t[0]] ? 'on' : '';
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px dashed var(--line)"><div><div style="font-weight:600;font-size:14.5px">' + t[1] + '</div><div class="sub">' + t[2] + '</div></div>'
+      + '<button class="sw ' + on + '" onclick="visToggle(\'' + t[0] + '\', this)"><i></i></button></div>';
+  }).join('');
+  html += '<button class="btn btn-ghost btn-block" style="margin-top:12px" onclick="saveBio()">Simpan Bio</button>'
+    + '<a href="/@' + PP.esc(u) + '" class="btn btn-primary btn-block" style="margin-top:8px">Lihat Profil Publik →</a>';
+  box.innerHTML = html;
 }
 function guruRespondUI(r) {
   document.getElementById('liveToast').innerHTML = '<div class="toast"><h3>🎙 Ngaji Live 1-on-1</h3><p class="sub">' + PP.esc(r.murid_name) + (r.murid_username ? ' (@' + r.murid_username + ')' : '') + ' meminta sesi ngaji live bersamamu.</p>'
@@ -183,6 +205,16 @@ async function gSend() {
   gBlob = null; gsend.textContent = 'Kirim Koreksi'; gPoll();
 }
 async function gEnd() { await fetch('/api/live', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'end', sessionId: gLiveSid }) }); location.reload(); }
+
+async function visToggle(field, btn) {
+  const val = !btn.classList.contains('on');
+  const d = await (await fetch('/api/profile/visibility', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ uid: PP.me.id, field, value: val }) })).json();
+  if (d.success) btn.classList.toggle('on', !!val);
+}
+async function saveBio() {
+  const d = await (await fetch('/api/profile/visibility', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ uid: PP.me.id, bio: bioIn.value }) })).json();
+  if (d.success) { const b = document.getElementById('bioIn'); b.style.borderColor = 'var(--ever3)'; setTimeout(() => b.style.borderColor = '', 800); }
+}
 
 // ── poll pending live tiap 5s (toast otomatis) ──
 async function pollPending() {
