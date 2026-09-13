@@ -21,12 +21,14 @@
       ['🏠', 'Beranda', '/dashboard-murid', 'home'],
       ['🎙', 'Setoran', '#rekam', 'rekam'],
       ['👤', 'Profil', '/@' + (me.username || ''), 'me'],
+      ['🚪', 'Keluar', '#logout', 'logout'],
     ],
     guru: [
       ['🏠', 'Beranda', '/dashboard-guru', 'home'],
       ['📚', 'Setoran', '#setoran', 'setoran'],
       ['🎓', 'Calon', '#calon', 'calon'],
       ['👤', 'Profil', '/@' + (me.username || ''), 'me'],
+      ['🚪', 'Keluar', '#logout', 'logout'],
     ],
   };
   const nav = document.getElementById('nav');
@@ -42,6 +44,10 @@
 
   window.PP = {
     me: me,
+    logout: function () {
+      try { localStorage.removeItem('uid'); localStorage.removeItem('user'); localStorage.removeItem('tahsin_role'); } catch (e) {}
+      location.href = '/';
+    },
     esc: function (s) {
       return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
         return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
@@ -58,4 +64,9 @@
       catch (e) { return d; }
     },
   };
+
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href="#logout"]');
+    if (a) { e.preventDefault(); PP.logout(); }
+  });
 })();
