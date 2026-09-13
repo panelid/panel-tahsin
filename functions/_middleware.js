@@ -1,15 +1,20 @@
 // Middleware: intercept /@username -> public profile. Path static/known routes pass through.
 import { renderPublicProfile } from './u/profile.js';
 
-const KNOWN = ['/', '/login', '/daftar', '/daftar-guru', '/dashboard-murid', '/dashboard-guru', '/index.html', '/favicon.ico', '/robots.txt', '/assets', '/api', '/cdn-cgi'];
+const KNOWN = ['/', '/login', '/daftar', '/daftar-guru', '/dashboard-murid', '/dashboard-guru', '/index.html', '/favicon.ico', '/favicon.svg', '/robots.txt', '/sitemap.xml', '/assets', '/api', '/cdn-cgi', '/404.html'];
 function isKnown(path) {
   if (path.startsWith('/assets/') || path.startsWith('/api/') || path.startsWith('/cdn-cgi/')) return true;
   return KNOWN.includes(path);
 }
+const FAVICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#15403A"/><path d="M32 12l14 8v10c0 10-6 17-14 22-8-5-14-12-14-22V20z" fill="#C99A3F"/><path d="M32 20c-3 3-6 5-6 9a6 6 0 0012 0c0-4-3-6-6-9z" fill="#15403A"/></svg>';
 export async function onRequest(context) {
   const { request } = context;
   const url = new URL(request.url);
   const p = url.pathname;
+  // favicon: serve SVG betulan, bukan HTML
+  if (p === '/favicon.ico' || p === '/favicon.svg') {
+    return new Response(FAVICON_SVG, { status: 200, headers: { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=86400' } });
+  }
   if (p.startsWith('/@') && p.length > 2) {
     const username = p.slice(2);
     if (/^[a-z0-9_]{3,20}$/.test(username)) {
