@@ -30,14 +30,14 @@ const app = document.getElementById('app'), seg = document.getElementById('seg')
 document.getElementById('heroWave').outerHTML = PP.wave(30);
 if (PP.me.name) document.getElementById('heroName').textContent = 'Ahlan, Ustadz ' + PP.me.name.split(' ')[0];
 const TRACKS = [['iqro','Iqro'],['fatihah','Al-Fatihah'],['juz_amma','Juz Amma'],['tilawah','Tilawah'],['hafalan','Hafalan']];
-let tab = 'setoran', counts = { setoran: 0, calon: 0, live: 0 };
+let tab = 'setoran', counts = { setoran: 0, calon: 0, live: 0, hapus: 0 };
 
 // ── presence: tandai online ──
 fetch('/api/presence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: PP.me.id, role: 'guru' }) });
 setInterval(() => fetch('/api/presence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: PP.me.id, role: 'guru' }) }), 45000);
 
 function renderSeg() {
-  const tabs = [['setoran', 'Setoran'], ['calon', 'Calon Guru'], ['live', 'Live Ngaji']];
+  const tabs = [['setoran', 'Setoran'], ['calon', 'Calon Guru'], ['hapus', 'Hapus'], ['live', 'Live Ngaji']];
   if (PP.me.is_student) tabs.push(['belajar', 'Mode Belajar']);
   seg.innerHTML = tabs.map(t => '<button role="tab" aria-selected="' + (t[0] === tab) + '" onclick="go(\'' + t[0] + '\')">' + t[1]
     + (counts[t[0]] ? '<span class="n">' + counts[t[0]] + '</span>' : '') + '</button>').join('');
@@ -48,6 +48,7 @@ async function render() {
   app.innerHTML = '<p class="muted" style="text-align:center;padding:20px">Memuat…</p>';
   if (tab === 'setoran') return renderSetoran();
   if (tab === 'calon') return renderCalon();
+  if (tab === 'hapus') return renderHapus();
   if (tab === 'live') return renderLiveHome();
   if (tab === 'belajar') { location.href = '/dashboard-murid'; return; }
 }
@@ -85,6 +86,32 @@ async function kirimReviu(id) {
     reviews: [{ ayat_number: 1, score: Number(document.getElementById('sc_' + id).value) || 0, catatan_teks: document.getElementById('ct_' + id).value }]
   }) });
   renderSetoran();
+}
+
+// ───── PENGAJUAN HAPUS SETORAN ─────
+async function renderHapus() {
+  const d = await (await fetch('/api/setoran/delete-request?uid=' + encodeURIComponent(PP.me.id))).json();
+  const list = d.pending || [];
+  counts.hapus = list.length; renderSeg();
+  let h = '<div class="note">Santri mengajukan hapus setoran yang <b>sudah direview</b> — biasanya karena merasa ustadz salah ACC. Dengarkan ulang bacaannya, lalu putuskan.</div>';
+  if (!list.length) { app.innerHTML = h + '<div class="empty"><span class="big">🗑</span>Tidak ada pengajuan hapus.</div>'; return; }
+  h += list.map((r, i) => {
+    const au = r.audio_url ? '<audio controls preload="none" src="' + r.audio_url + '"></audio>' : '';
+    return '<div class="card" style="animation-delay:' + (i * 50) + 'ms">'
+      + '<div class="item-h"><b style="font-size:17px">🗑 ' + PP.esc(r.santri) + '</b><span class="badge b-pend">' + PP.esc(r.track_id || '-') + '</span></div>'
+      + '<div class="sub">' + PP.esc(r.unit_ref || '') + (r.created_at ? ' · ' + PP.fmt(r.created_at) : '') + '</div>'
+      + (r.reason ? '<div style="margin:10px 0;padding:10px 12px;background:var(--sand);border-radius:12px;font-size:14px">💬 ' + PP.esc(r.reason) + '</div>' : '')
+      + au
+      + '<div class="row" style="margin-top:12px"><button class="btn btn-danger" style="flex:1" onclick="decideDel(\'' + r.id + '\',true)">✓ Setuju hapus</button>'
+      + '<button class="btn btn-ghost" style="flex:1" onclick="decideDel(\'' + r.id + '\',false)">✗ Tolak</button></div></div>';
+  }).join('');
+  app.innerHTML = h;
+}
+async function decideDel(id, approve) {
+  if (approve && !confirm('Setuju hapus setoran ini? Riwayat reviu ikut terhapus permanen.')) return;
+  const d = await (await fetch('/api/setoran/delete-request', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'decide', id, uid: PP.me.id, approve }) })).json();
+  if (d.error) return alert(d.error);
+  renderHapus();
 }
 
 // ───── CALON GURU ─────

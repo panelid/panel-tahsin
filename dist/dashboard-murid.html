@@ -80,8 +80,11 @@ async function load() {
     set.slice(0, 6).forEach((s, i) => {
       const b = s.status === 'reviewed' ? '<span class="badge b-ok">✓ direview</span>' : '<span class="badge b-pend">⏳ menunggu</span>';
       const au = s.audio_url ? '<audio controls preload="none" src="' + s.audio_url + '"></audio>' : '';
-      h += '<div class="item" id="st_' + s.id + '" style="animation-delay:' + (i * 45) + 'ms"><div class="item-h"><b>' + PP.esc(s.track_id || '-') + '</b>' + b
-        + (s.status !== 'reviewed' ? '<button class="del" title="Hapus setoran" onclick="delSetoran(\'' + s.id + '\')">🗑 hapus</button>' : '') + '</div>'
+      let act;
+      if (s.status !== 'reviewed') act = '<button class="del" title="Hapus setoran" onclick="delSetoran(\'' + s.id + '\')">🗑 hapus</button>';
+      else if (s.del_req) act = '<span class="badge b-pend">pengajuan hapus dikirim</span> <button class="del" onclick="cancelDelReq(\'' + s.id + '\')">batal</button>';
+      else act = '<button class="del" title="Salah ACC? ajukan hapus" onclick="askDelReq(\'' + s.id + '\')">🗑 salah ACC?</button>';
+      h += '<div class="item" id="st_' + s.id + '" style="animation-delay:' + (i * 45) + 'ms"><div class="item-h"><b>' + PP.esc(s.track_id || '-') + '</b>' + b + act + '</div>'
         + '<div class="sub">' + PP.esc(s.unit_ref || '') + (s.created_at ? ' · ' + PP.fmt(s.created_at) : '') + '</div>' + au + '</div>';
     });
     h += '</div>';
@@ -307,6 +310,17 @@ async function delSetoran(id) {
   const d = await (await fetch('/api/setoran/' + id + '?uid=' + uid, { method: 'DELETE' })).json().catch(() => ({}));
   if (d.error) return alert(d.error);
   const el = document.getElementById('st_' + id); if (el) el.remove();
+}
+async function askDelReq(id) {
+  const reason = prompt('Kenapa mau dihapus?\ncth: "ustadz salah ACC, bacaanku masih banyak kesalahan"');
+  if (reason === null) return;
+  const d = await (await fetch('/api/setoran/delete-request', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'request', setoran_id: id, uid, reason }) })).json();
+  if (d.error) return alert(d.error);
+  load();
+}
+async function cancelDelReq(id) {
+  await (await fetch('/api/setoran/delete-request', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'cancel', setoran_id: id, uid }) })).json();
+  load();
 }
 load();
 // presence: kasih tahu server kita online (biar ustadz lihat murid? opsional) + refresh ustrip tiap 20s
