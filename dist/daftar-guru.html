@@ -105,7 +105,7 @@ function setEq(el, lvl) { if (!el) return; const bars = el.children; for (let i 
 async function toggleRec() {
   if (!rec) {
     try {
-      const r = await HiRec.start({ onTick: t => recTime.textContent = String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(Math.floor(t % 60)).padStart(2, '0'), onLevel: l => setEq(eq, l) });
+      const r = await HiRec.start({ onTick: t => recTime.textContent = (function(s){s=Math.floor(s);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');})(t), onLevel: l => setEq(eq, l) });
       rec = true; t0 = Date.now(); recBtn.textContent = 'SELESAI'; recBtn.classList.add('on'); eq.classList.add('on'); recStatus.textContent = 'Merekam… baca Al-Hajj 1–5 dengan tartil.';
     } catch (e) { recStatus.textContent = 'Gagal akses mic: ' + e.message; }
   } else {

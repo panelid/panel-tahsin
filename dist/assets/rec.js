@@ -43,7 +43,7 @@ window.HiRec = (function () {
     recorder.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
     recorder.start();
     startTime = Date.now();
-    if (onTick) timer = setInterval(() => onTick((Date.now() - startTime) / 1000), 200);
+    if (onTick) timer = setInterval(() => onTick(Math.floor((Date.now() - startTime) / 1000)), 250);
     return { mime: recorder.mimeType || SUPPORTED || 'audio/webm' };
   }
 

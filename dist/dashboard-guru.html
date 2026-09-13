@@ -183,7 +183,7 @@ async function gPoll() {
   });
   gLiveTimer = setTimeout(gPoll, 2500);
 }
-function fmt(s) { return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
+function fmt(s) { s = Math.floor(s); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
 function setEq(el, lvl) { if (!el) return; const bars = el.children; for (let i = 0; i < bars.length; i++) { const h = 9 + (lvl * 28 * (0.5 + Math.abs(Math.sin(i * 1.3)))); bars[i].style.height = Math.min(30, h) + 'px'; } }
 async function gToggle() {
   if (!gRec) {
