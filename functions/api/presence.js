@@ -1,7 +1,7 @@
 // GET /api/presence?guruId=x  -> online sejak
 // POST /api/presence {userId, role} -> upsert last_seen=now
 // GET /api/presence?list=1      -> guru online (last_seen < 90s)
-import { reqUid } from '../_auth.js';
+import { reqUid } from './_auth.js';
 export async function onRequest(context) {
   const { env, request } = context
   const db = env.DB
