@@ -1,5 +1,6 @@
 // GET /api/admin/guru-pending — list guru menunggu
 // POST /api/admin/guru-approve — body: {adminId, verificationId, action: approve|reject}
+import { reqUid } from '../_auth.js';
 export async function onRequestGet(context) {
   const { env } = context;
   const db = env.DB;
@@ -12,7 +13,9 @@ export async function onRequestGet(context) {
 export async function onRequestPost(context) {
   const { env, request } = context;
   const db = env.DB;
-  const { adminId, verificationId, action } = await request.json().catch(() => ({}));
+  const b = await request.json().catch(() => ({}));
+  const adminId = await reqUid(request, env) || b.adminId;
+  const { verificationId, action } = b;
   const admin = await db.prepare("SELECT is_admin FROM users WHERE id = ?").bind(adminId).first();
   if (!admin || !admin.is_admin) return json({ error: 'Forbidden' }, 403);
 

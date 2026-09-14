@@ -9,6 +9,7 @@ export async function onRequestPost(context) {
   const { env, request } = context
   try {
     const db = env.DB
+    const { notifyMuridReviewed } = await import('../../../src/utils/wa.js')
     const { setoran_id, reviews, unit_ref } = await request.json()
     if (!setoran_id || !reviews) return new Response(JSON.stringify({ success: false, error: 'Data tidak lengkap' }), { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
 

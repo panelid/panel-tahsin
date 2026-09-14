@@ -33,8 +33,8 @@ const TRACKS = [['iqro','Iqro'],['fatihah','Al-Fatihah'],['juz_amma','Juz Amma']
 let tab = 'setoran', counts = { setoran: 0, calon: 0, live: 0, hapus: 0 };
 
 // ── presence: tandai online ──
-fetch('/api/presence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: PP.me.id, role: 'guru' }) });
-setInterval(() => fetch('/api/presence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: PP.me.id, role: 'guru' }) }), 45000);
+authed('/api/presence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: PP.me.id, role: 'guru' }) });
+setInterval(() => authed('/api/presence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: PP.me.id, role: 'guru' }) }), 45000);
 
 function renderSeg() {
   const tabs = [['setoran', 'Setoran'], ['calon', 'Calon Guru'], ['hapus', 'Hapus'], ['live', 'Live Ngaji']];
@@ -81,7 +81,7 @@ async function renderSetoran() {
 }
 async function kirimReviu(id) {
   event.target.disabled = true; event.target.textContent = 'Mengirim…';
-  await fetch('/api/review/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+  await authed('/api/review/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
     setoran_id: id, track_id: document.getElementById('tr_' + id).value, unit_ref: document.getElementById('un_' + id).value,
     reviews: [{ ayat_number: 1, score: Number(document.getElementById('sc_' + id).value) || 0, catatan_teks: document.getElementById('ct_' + id).value }]
   }) });
@@ -90,7 +90,7 @@ async function kirimReviu(id) {
 
 // ───── PENGAJUAN HAPUS SETORAN ─────
 async function renderHapus() {
-  const d = await (await fetch('/api/setoran/delete-request?uid=' + encodeURIComponent(PP.me.id))).json();
+  const d = await (await authed('/api/setoran/delete-request?uid=' + encodeURIComponent(PP.me.id))).json();
   const list = d.pending || [];
   counts.hapus = list.length; renderSeg();
   let h = '<div class="note">Santri mengajukan hapus setoran yang <b>sudah direview</b> — biasanya karena merasa ustadz salah ACC. Dengarkan ulang bacaannya, lalu putuskan.</div>';
@@ -109,7 +109,7 @@ async function renderHapus() {
 }
 async function decideDel(id, approve) {
   if (approve && !confirm('Setuju hapus setoran ini? Riwayat reviu ikut terhapus permanen.')) return;
-  const d = await (await fetch('/api/setoran/delete-request', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'decide', id, uid: PP.me.id, approve }) })).json();
+  const d = await (await authed('/api/setoran/delete-request', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'decide', id, uid: PP.me.id, approve }) })).json();
   if (d.error) return alert(d.error);
   renderHapus();
 }
@@ -137,7 +137,7 @@ async function renderCalon() {
   app.innerHTML = h;
 }
 async function vote(vid, decision) {
-  const d = await (await fetch('/api/guru/review', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+  const d = await (await authed('/api/guru/review', { method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ guruId: PP.me.id, verificationId: vid, decision, catatan: (document.getElementById('vc_' + vid) || {}).value || '' }) })).json();
   if (d.error) return alert(d.error);
   if (d.status === 'approved') alert('MasyaAllah, calon ini resmi jadi guru 🎉');
@@ -161,7 +161,7 @@ async function renderLiveHome() {
   loadVisGuru();
 }
 async function loadVisGuru() {
-  const v = await (await fetch('/api/profile/visibility?uid=' + encodeURIComponent(PP.me.id))).json().catch(() => null);
+  const v = await (await authed('/api/profile/visibility?uid=' + encodeURIComponent(PP.me.id))).json().catch(() => null);
   const box = document.getElementById('visBody'); if (!box || !v) return;
   const u = v.username || PP.me.id;
   const toggles = [
@@ -186,7 +186,7 @@ function guruRespondUI(r) {
     + '<button class="btn btn-ghost" onclick="guruRespond(\'' + r.id + '\',false)">Nanti dulu</button></div>';
 }
 async function guruRespond(sid, accept) {
-  const d = await (await fetch('/api/live', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'respond', sessionId: sid, accept }) })).json();
+  const d = await (await authed('/api/live', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'respond', sessionId: sid, accept, userId: PP.me.id }) })).json();
   document.getElementById('liveToast').innerHTML = '';
   if (accept) { gLiveSid = sid; tab = 'live'; renderSeg(); openGuruLive(); } else { alert('Permintaan ditolak. Santri diberi tahu.'); renderLiveHome(); }
 }

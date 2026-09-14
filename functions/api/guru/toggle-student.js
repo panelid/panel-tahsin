@@ -1,8 +1,11 @@
 // POST /api/guru/toggle-student { userId, on:true|false } -> guru putuskan aktif/nonaktif mode murid
+import { reqUid } from '../_auth.js'
 export async function onRequestPost(context) {
   const { env, request } = context
   try {
-    const { userId, on } = await request.json()
+    const b = await request.json()
+    const userId = await reqUid(request, env) || b.userId
+    const on = b.on
     if (!userId) return json({ success: false, error: 'userId required' }, 400)
     const db = env.DB
     const user = await db.prepare("SELECT id, role, is_student FROM users WHERE id = ?").bind(userId).first()

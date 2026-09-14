@@ -122,14 +122,16 @@ async function kirim() {
     body: JSON.stringify({ name: form.name, username: form.username, email: form.email, wa_number: form.wa, password: form.pass, role: 'guru' }) })).json();
   if (!reg.success) { btn.disabled = false; btn.textContent = 'Kirim Permintaan'; return alert(reg.error); }
   userId = reg.user.id;
+  if (reg.token) { localStorage.setItem('token', reg.token); localStorage.setItem('uid', reg.user.id); localStorage.setItem('user', JSON.stringify(reg.user)); }
   btn.textContent = 'Mengirim bacaan…';
   const fd = new FormData();
   fd.append('userId', userId);
+  const tk = localStorage.getItem('token'); if (tk) fd.append('token', tk);
   fd.append('sanadUrl', form.bukti === 'sanad' ? form.sanadUrl : '');
   fd.append('mahadText', form.bukti === 'mahad' ? form.mahadText : '');
   fd.append('certUrl', form.bukti === 'cert' ? form.certUrl : '');
   fd.append('audio', blob, 'al-hajj-1-5.webm');
-  const v = await (await fetch('/api/guru/verify', { method: 'POST', body: fd })).json();
+  const v = await (await fetch('/api/guru/verify' + (tk ? '?token=' + encodeURIComponent(tk) : ''), { method: 'POST', body: fd })).json();
   if (!v.success) { btn.disabled = false; btn.textContent = 'Kirim Permintaan'; return alert(v.error || 'Gagal'); }
   box.innerHTML = '<div class="empty"><span class="big">🎉</span><h3 style="margin-bottom:6px">Terima kasih, ' + PP.esc(form.name.split(' ')[0]) + '!</h3>'
     + '<p>Permintaanmu terkirim. Para pengajar akan menyimak bacaan Al-Hajj 1–5-mu.<br>Cukup <b>1 guru ACC</b> — kamu resmi jadi pengajar.</p>'

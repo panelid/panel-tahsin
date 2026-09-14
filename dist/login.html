@@ -42,6 +42,7 @@ async function masuk() {
     if (!d.success) throw new Error(d.error || 'Gagal masuk');
     localStorage.setItem('user', JSON.stringify(d.user));
     localStorage.setItem('uid', d.user.id);
+    if (d.token) localStorage.setItem('token', d.token);
     location.href = (d.user.role === 'murid' || d.user.role === 'guru_pending') ? '/dashboard-murid?uid=' + d.user.id : '/dashboard-guru';
   } catch (x) { err.textContent = x.message; btn.disabled = false; btn.textContent = 'Masuk'; }
 }

@@ -1,10 +1,13 @@
 // POST /api/guru/review { guruId, verificationId, decision: 'acc'|'reject', catatan }
 import { sendWA } from '../../../src/utils/wa.js'
+import { reqUid } from '../_auth.js'
 export async function onRequestPost(context) {
   const { env, request } = context
   try {
     const db = env.DB
-    const { guruId, verificationId, decision, catatan } = await request.json()
+    const b = await request.json()
+    const guruId = await reqUid(request, env) || b.guruId
+    const { verificationId, decision, catatan } = b
     if (!guruId || !verificationId || !['acc', 'reject'].includes(decision)) return json({ error: 'bad request' }, 400)
     const guru = await db.prepare("SELECT id, role, name FROM users WHERE id = ?").bind(guruId).first()
     if (!guru || guru.role !== 'guru') return json({ error: 'hanya guru yang bisa review' }, 403)

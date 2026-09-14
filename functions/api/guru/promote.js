@@ -1,6 +1,7 @@
 // POST /api/guru/promote { promoterId, muridEmail|muridId }
 // Guru (atau admin) mengangkat murid jadi guru. Langsung aktif sebagai pengajar.
 import { sendWA } from '../../../src/utils/wa.js'
+import { reqUid } from '../_auth.js'
 export async function onRequestPost(context) {
   const { env, request } = context
   try {

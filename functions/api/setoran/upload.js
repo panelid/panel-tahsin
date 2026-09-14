@@ -18,7 +18,9 @@ export async function onRequestPost(context) {
 
     const formData = await request.formData()
     const file = formData.get('audio')
-    const userId = formData.get('user_id')
+    const bodyUid = formData.get('user_id')
+    const authUid = await reqUid(request, env)
+    const userId = authUid || bodyUid  // token preferred; fallback (deprecated) untuk kompat
     const trackId = formData.get('track_id') || null
     const unitRef = formData.get('unit_ref') || null
 

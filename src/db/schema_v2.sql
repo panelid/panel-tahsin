@@ -91,3 +91,8 @@ CREATE TABLE IF NOT EXISTS review_ayat (
   created_at TEXT DEFAULT (datetime('now')),
   FOREIGN KEY (setoran_id) REFERENCES setoran(id)
 );
+
+CREATE TABLE IF NOT EXISTS rate_limit (
+  key TEXT PRIMARY KEY,
+  ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

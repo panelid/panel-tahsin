@@ -76,6 +76,7 @@ async function daftar() {
     if (!d.success) throw new Error(d.error || 'Gagal daftar');
     localStorage.setItem('user', JSON.stringify(d.user));
     localStorage.setItem('uid', d.user.id);
+    if (d.token) localStorage.setItem('token', d.token);
     location.href = '/dashboard-murid?uid=' + d.user.id;
   } catch (x) { err.textContent = x.message; btn.disabled = false; btn.textContent = 'Daftar Sekarang'; }
 }

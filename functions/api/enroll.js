@@ -1,8 +1,11 @@
 // POST /api/enroll — murid pilih track + start unit
 export async function onRequestPost(context) {
-  const { env, request } = context;
+  import { reqUid } from './_auth.js';
+const { env, request } = context;
   const db = env.DB;
-  const { userId, trackId, currentUnit } = await request.json().catch(() => ({}));
+  const b = await request.json().catch(() => ({}));
+  const userId = await reqUid(request, env) || b.userId;
+  const trackId = b.trackId, currentUnit = b.currentUnit;
   if (!userId || !trackId) return json({ error: 'userId & trackId required' }, 400);
   const id = 'enr_' + Date.now();
   await db.prepare("INSERT INTO enrollments (id, user_id, track_id, current_unit, status) VALUES (?, ?, ?, ?, 'active')")

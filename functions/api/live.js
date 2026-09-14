@@ -1,6 +1,7 @@
 // Live ngaji 1-on-1: murid minta → guru respon (Terima/Tolak) → push-to-talk dua arah
 // Actions: start | respond | message | end | state
 import { sendWA } from '../../src/utils/wa.js'
+import { reqUid } from './_auth.js'
 
 function json(o, status = 200) {
   return new Response(JSON.stringify(o), { status, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
@@ -52,7 +53,7 @@ export async function onRequest(context) {
     if (g && g.wa_number) {
       try {
         const m = await db.prepare("SELECT name FROM users WHERE id = ?").bind(muridId).first();
-        await sendWA(env, g.wa_number, `🔔 *Ngaji Live 1-on-1*\n${m ? m.name : 'Seorang murid'} meminta sesi ngaji live bersamamu. Buka dashboard pengajar untuk merespons.`);
+        await sendWA(g.wa_number, `🔔 *Ngaji Live 1-on-1*\n${m ? m.name : 'Seorang murid'} meminta sesi ngaji live bersamamu. Buka dashboard pengajar untuk merespons.`);
       } catch (e) {}
     }
     return json({ success: true, sessionId: id });
@@ -68,7 +69,7 @@ export async function onRequest(context) {
     const m = await db.prepare("SELECT wa_number FROM users WHERE id = ?").bind(s.murid_id).first();
     if (m && m.wa_number) {
       try {
-        await sendWA(env, m.wa_number, accept ? '✅ Ustadz menerima sesi ngaji live-mu! Buka dashboard untuk mulai.' : '⏳ Maaf, ustadz belum bisa sekarang. Coba lagi nanti ya.');
+        await sendWA(m.wa_number, accept ? '✅ Ustadz menerima sesi ngaji live-mu! Buka dashboard untuk mulai.' : '⏳ Maaf, ustadz belum bisa sekarang. Coba lagi nanti ya.');
       } catch (e) {}
     }
     return json({ success: true, status });
@@ -77,11 +78,12 @@ export async function onRequest(context) {
   // 3. Kirim pesan (push-to-talk)
   if (action === 'message') {
     const { sessionId, sender, audio_url, text } = body;
+    const actor = await reqUid(request, env) || body.userId;
     const s = await db.prepare("SELECT * FROM live_sessions WHERE id = ? AND status='active'").bind(sessionId).first();
     if (!s) return json({ error: 'sesi tidak aktif' }, 400);
-    if (s.guru_id !== (sender === 'guru' ? body.userId : '') && s.murid_id !== (sender === 'murid' ? body.userId : '')) {
-      // basic auth: sender must match session party via userId
-    }
+    if (actor !== s.guru_id && actor !== s.murid_id) return json({ error: 'bukan peserta sesi' }, 403);
+    if (sender === 'guru' && actor !== s.guru_id) return json({ error: 'bukan guru sesi ini' }, 403);
+    if (sender === 'murid' && actor !== s.murid_id) return json({ error: 'bukan murid sesi ini' }, 403);
     const id = rid('lm');
     await db.prepare("INSERT INTO live_messages (id, session_id, sender, audio_url, text) VALUES (?,?,?,?,?)").bind(id, sessionId, sender, audio_url || null, text || null).run();
     return json({ success: true, id });

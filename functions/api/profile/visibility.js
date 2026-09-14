@@ -1,11 +1,12 @@
 // GET /api/profile/visibility?uid=x  -> state
 // POST /api/profile/visibility { uid, field, value }  -> update (field: profile_visible|show_progress|show_setoran|show_audio|bio)
 export async function onRequest(context) {
-  const { env, request } = context;
+  import { reqUid } from '../_auth.js';
+const { env, request } = context;
   const db = env.DB;
   if (!db) return json({ error: 'DB error' }, 500);
   const url = new URL(request.url);
-  const uid = url.searchParams.get('uid');
+  let uid = await reqUid(request, env) || url.searchParams.get('uid');
   if (request.method === 'GET') {
     if (!uid) return json({ error: 'uid required' }, 400);
     const u = await db.prepare("SELECT username, bio, profile_visible, show_progress, show_setoran, show_audio FROM users WHERE id = ?").bind(uid).first();

@@ -23,12 +23,14 @@ export async function onRequest(context) {
   if (request.method === 'POST') {
     let b = {}
     try { b = await request.json() } catch (e) {}
-    if (!b.userId) return json({ error: 'userId required' }, 400)
-    await db.prepare("UPDATE users SET last_seen = datetime('now') WHERE id = ?").bind(b.userId).run()
+    const uid = await reqUid(request, env) || b.userId
+    if (!uid) return json({ error: 'userId required' }, 400)
+    await db.prepare("UPDATE users SET last_seen = datetime('now') WHERE id = ?").bind(uid).run()
     return json({ success: true })
   }
   return json({ error: 'bad request' }, 400)
 }
+import { reqUid } from '../_auth.js'
 function json(o, status = 200) {
   return new Response(JSON.stringify(o), { status, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
 }

@@ -52,7 +52,8 @@
       document.getElementById('app').innerHTML = html;
     }
     async function act(verId, action, adminId) {
-      await fetch('/api/admin/guru-pending', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({adminId, verificationId:verId, action})});
+      const tk = localStorage.getItem('token');
+      await fetch('/api/admin/guru-pending' + (tk ? '?token=' + encodeURIComponent(tk) : ''), {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({adminId, verificationId:verId, action})});
       load();
     }
   </script>

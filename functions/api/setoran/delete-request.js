@@ -6,7 +6,8 @@ export async function onRequestPost(context) {
   const { env, request } = context;
   const db = env.DB;
   let b = {}; try { b = await request.json(); } catch (e) { }
-  const uid = b.uid, action = b.action;
+  const action = b.action;
+  const uid = await reqUid(request, env) || b.uid;
   if (!uid) return json({ error: 'uid required' }, 400);
 
   if (action === 'request') {

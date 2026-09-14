@@ -1,5 +1,6 @@
 // DELETE /api/setoran/{id}?uid=<user_id>          -> hapus setoran milik sendiri (hanya belum direview)
 // PATCH /api/setoran/{id}  { uid, track_id }       -> ganti judul/track (tap dari daftar, bukan ketik)
+import { reqUid } from '../_auth.js';
 const TRACKS = ['iqro', 'fatihah', 'juz_amma', 'tilawah', 'hafalan'];
 
 export async function onRequestDelete(context) {
@@ -7,7 +8,8 @@ export async function onRequestDelete(context) {
   const db = env.DB;
   if (!db) return json({ error: 'DB error' }, 500);
   const id = context.params.id;
-  const uid = new URL(request.url).searchParams.get('uid');
+  const q = new URL(request.url).searchParams.get('uid');
+  const uid = await reqUid(request, env) || q;
   if (!id || !uid) return json({ error: 'id & uid required' }, 400);
 
   const row = await db.prepare("SELECT id, user_id, status FROM setoran WHERE id = ?").bind(id).first();
@@ -24,6 +26,8 @@ export async function onRequestPatch(context) {
   if (!db) return json({ error: 'DB error' }, 500);
   const id = context.params.id;
   let b = {}; try { b = await request.json(); } catch (e) { }
+  const uid2 = await reqUid(request, env) || b.uid;
+  b.uid = uid2;
   if (!id || !b.uid) return json({ error: 'id & uid required' }, 400);
   if (!TRACKS.includes(b.track_id)) return json({ error: 'pelajaran tidak dikenal' }, 400);
 
