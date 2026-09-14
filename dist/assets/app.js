@@ -34,6 +34,7 @@
 
   const nav = document.getElementById('nav');
   if (nav) {
+    nav.className = 'nav';
     const list = items[me.role] || items.murid;
     nav.innerHTML = list.map(function (it) {
       const on = it[3] === page ? ' class="on"' : '';

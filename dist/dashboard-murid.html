@@ -129,7 +129,7 @@ async function load() {
   } catch (e) { app.innerHTML = '<div class="empty">Gagal memuat: ' + PP.esc(e.message) + '</div>'; }
 }
 async function loadVis() {
-  const v = await (await fetch('/api/profile/visibility?uid=' + uid)).json().catch(() => null);
+  const v = await (await authed('/api/profile/visibility?uid=' + uid)).json().catch(() => null);
   const box = document.getElementById('visBody'); if (!box || !v) return;
   const u = v.username || uid;
   const toggles = [
@@ -198,7 +198,7 @@ async function loadGurus() {
   ).join('');
 }
 async function checkLive() {
-  const s = await (await fetch('/api/live?muridId=' + uid)).json();
+  const s = await (await authed('/api/live?muridId=' + uid)).json();
   const sub = document.getElementById('liveSub'), btnw = document.getElementById('liveBtnWrap');
   if (!s) {
     btnw.innerHTML = '<button class="btn btn-gold btn-block" onclick="openLivePicker()">Mulai Ngaji Live</button>';
@@ -250,7 +250,7 @@ async function openLiveBox() { /* replace app with live view */
 }
 async function pollLive() {
   if (!liveSid) return;
-  const d = await (await fetch('/api/live?sessionId=' + liveSid + '&after=' + encodeURIComponent(liveAfter))).json();
+  const d = await (await authed('/api/live?sessionId=' + liveSid + '&after=' + encodeURIComponent(liveAfter))).json();
   if (d.session && d.session.status !== 'active') { alert('Sesi diakhiri.'); location.reload(); return; }
   const box = document.getElementById('liveMsgs');
   (d.messages || []).forEach(m => {

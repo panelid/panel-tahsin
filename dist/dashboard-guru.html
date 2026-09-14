@@ -27,6 +27,8 @@
 <script src="/assets/app.js"></script>
 <script>
 const app = document.getElementById('app'), seg = document.getElementById('seg');
+// user lama tanpa token -> auto logout supaya gak blank
+if (!PP.me.id || !PP.tk()) { localStorage.clear(); location.href = '/login'; }
 document.getElementById('heroWave').outerHTML = PP.wave(30);
 if (PP.me.name) document.getElementById('heroName').textContent = 'Ahlan, Ustadz ' + PP.me.name.split(' ')[0];
 const TRACKS = [['iqro','Iqro'],['fatihah','Al-Fatihah'],['juz_amma','Juz Amma'],['tilawah','Tilawah'],['hafalan','Hafalan']];
@@ -148,11 +150,11 @@ async function vote(vid, decision) {
 let gLiveSid = null, gLiveTimer = null, gLiveAfter = '1970-01-01', gBlob = null, gMr = null, gChunks = [], gRec = false, gT0, gTick;
 async function renderLiveHome() {
   // cek sesi aktif / pending
-  const pending = await (await fetch('/api/live?guruId=' + encodeURIComponent(PP.me.id))).json();
+  const pending = await (await PP.authed('/api/live?guruId=' + encodeURIComponent(PP.me.id))).json();
   counts.live = pending.length; renderSeg();
   if (pending.length) { guruRespondUI(pending[0]); return; }
   // sesi aktif milik sendiri?
-  const my = await (await fetch('/api/live?guruId=' + encodeURIComponent(PP.me.id) + '&active=1')).json().catch(() => []);
+  const my = await (await PP.authed('/api/live?guruId=' + encodeURIComponent(PP.me.id) + '&active=1')).json().catch(() => []);
   if (my.length) { gLiveSid = my[0].id; openGuruLive(); return; }
   app.innerHTML = '<div class="live-card"><div class="lt">🎙 Live Ngaji 1-on-1</div>'
     + '<div class="ls"><span class="live-pulse"></span>Kamu terlihat <b>online</b> oleh santri. Bila ada yang minta sesi, notif akan muncul di sini.</div>'
@@ -200,7 +202,7 @@ function openGuruLive() {
 }
 async function gPoll() {
   if (!gLiveSid) return;
-  const d = await (await fetch('/api/live?sessionId=' + gLiveSid + '&after=' + encodeURIComponent(gLiveAfter))).json();
+  const d = await (await PP.authed('/api/live?sessionId=' + gLiveSid + '&after=' + encodeURIComponent(gLiveAfter))).json();
   if (d.session && d.session.status !== 'active') { alert('Sesi diakhiri.'); location.reload(); return; }
   const box = document.getElementById('gMsgs');
   (d.messages || []).forEach(m => {
@@ -246,7 +248,7 @@ async function saveBio() {
 // ── poll pending live tiap 5s (toast otomatis) ──
 async function pollPending() {
   if (!PP.me.id) return;
-  const list = await (await fetch('/api/live?guruId=' + encodeURIComponent(PP.me.id))).json();
+  const list = await (await PP.authed('/api/live?guruId=' + encodeURIComponent(PP.me.id))).json();
   if (list.length && tab !== 'live') guruRespondUI(list[0]);
   setTimeout(pollPending, 5000);
 }
