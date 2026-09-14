@@ -1,7 +1,7 @@
 // GET /api/profile/visibility?uid=x  -> state
 // POST /api/profile/visibility { uid, field, value }  -> update (field: profile_visible|show_progress|show_setoran|show_audio|bio)
+import { reqUid } from '../_auth.js';
 export async function onRequest(context) {
-  import { reqUid } from '../_auth.js';
 const { env, request } = context;
   const db = env.DB;
   if (!db) return json({ error: 'DB error' }, 500);

@@ -2,6 +2,7 @@
 // POST {action:'request', setoran_id, uid, reason}  -> santri ajukan hapus setoran (mis. guru salah ACC)
 // POST {action:'cancel',  setoran_id, uid}          -> tarik pengajuan
 // POST {action:'decide',  id, uid, approve}         -> guru/admin putuskan; approve = setoran benar2 terhapus
+import { reqUid } from '../_auth.js';
 export async function onRequestPost(context) {
   const { env, request } = context;
   const db = env.DB;
