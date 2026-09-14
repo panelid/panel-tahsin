@@ -1,3 +1,6 @@
+// POST /api/setoran/upload — santri setor rekaman audio (multipart)
+import { reqUid } from '../_auth.js'
+import { notifyUstadzNewSetoran } from '../../../src/utils/wa.js'
 export async function onRequestOptions() {
   return new Response(null, {
     status: 204,
@@ -19,8 +22,7 @@ export async function onRequestPost(context) {
     const formData = await request.formData()
     const file = formData.get('audio')
     const bodyUid = formData.get('user_id')
-    const authUid = await reqUid(request, env)
-    const userId = authUid || bodyUid  // token preferred; fallback (deprecated) untuk kompat
+    const userId = await reqUid(request, env) || bodyUid
     const trackId = formData.get('track_id') || null
     const unitRef = formData.get('unit_ref') || null
 
@@ -44,33 +46,32 @@ export async function onRequestPost(context) {
 
     const setoranId = 'set_' + Date.now() + Math.random().toString(36).substring(2, 7)
 
-        await db.prepare(
-          "INSERT INTO setoran (id, user_id, track_id, unit_ref, audio_url, status) VALUES (?, ?, ?, ?, ?, 'pending')"
-        ).bind(setoranId, userId, trackId, unitRef, audioDataUrl).run()
+    await db.prepare(
+      "INSERT INTO setoran (id, user_id, track_id, unit_ref, audio_url, status) VALUES (?, ?, ?, ?, ?, 'pending')"
+    ).bind(setoranId, userId, trackId, unitRef, audioDataUrl).run()
 
-        // WA notif ke guru (cari guru pertama / INSTRUCTOR_WA env)
-        try {
-          const { notifyUstadzNewSetoran } = await import('../../../src/utils/wa.js')
-          const murid = await db.prepare("SELECT name FROM users WHERE id = ?").bind(userId).first()
-          const guru = await db.prepare("SELECT wa_number FROM users WHERE role = 'guru' AND wa_number IS NOT NULL LIMIT 1").first()
-          const instructorWa = env && env.INSTRUCTOR_WA
-          const target = instructorWa || (guru && guru.wa_number)
-          if (target) {
-            await notifyUstadzNewSetoran(target, murid ? murid.name : 'Santri', setoranId, env)
-          }
-        } catch (waErr) {
-          console.warn('[WA] notify skipped:', waErr.message)
-        }
+    // WA notif ke guru (cari guru pertama / INSTRUCTOR_WA env)
+    try {
+      const murid = await db.prepare("SELECT name FROM users WHERE id = ?").bind(userId).first()
+      const guru = await db.prepare("SELECT wa_number FROM users WHERE role = 'guru' AND wa_number IS NOT NULL LIMIT 1").first()
+      const instructorWa = env && env.INSTRUCTOR_WA
+      const target = instructorWa || (guru && guru.wa_number)
+      if (target) {
+        await notifyUstadzNewSetoran(target, murid ? murid.name : 'Santri', setoranId, env)
+      }
+    } catch (waErr) {
+      console.warn('[WA] notify skipped:', waErr.message)
+    }
 
-        return new Response(JSON.stringify({
-          success: true,
-          message: 'Setoran berhasil dikirim!',
-          setoran_id: setoranId,
-          audio_url: audioDataUrl
-        }), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-        })
+    return new Response(JSON.stringify({
+      success: true,
+      message: 'Setoran berhasil dikirim!',
+      setoran_id: setoranId,
+      audio_url: audioDataUrl
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+    })
 
   } catch (err) {
     return new Response(JSON.stringify({ success: false, error: err.message }), {
