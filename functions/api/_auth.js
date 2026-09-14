@@ -56,7 +56,7 @@ export async function limit(db, key, max, windowMin) {
   await db.prepare("DELETE FROM rate_limit WHERE ts < datetime('now', ?)").bind('-' + windowMin + ' minutes').run();
   const c = await db.prepare('SELECT COUNT(*) c FROM rate_limit WHERE key = ?').bind(key).first();
   if (c && c.c >= max) return false;
-  await db.prepare('INSERT INTO rate_limit (key) VALUES (?)').bind(key).run();
+  await db.prepare('INSERT OR IGNORE INTO rate_limit (key) VALUES (?)').bind(key).run();
   return true;
 }
 
