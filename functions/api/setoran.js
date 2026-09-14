@@ -1,3 +1,6 @@
+// GET /api/setoran?track_id= — HANYA setoran milik sendiri (token wajib).
+// Ustadz ambil antrian lewat /api/guru/pending, bukan sini.
+import { reqUid, roleOf } from './_auth.js';
 export async function onRequestOptions() {
   return new Response(null, {
     status: 204,
@@ -10,25 +13,21 @@ export async function onRequestGet(context) {
   try {
     const db = env.DB
     const url = new URL(request.url)
-    const userId = url.searchParams.get('user_id')
-    const role = url.searchParams.get('role')
-    const trackId = url.searchParams.get('track_id')
+    const uid = await reqUid(request, env)
+    if (!uid) return json({ error: 'login required' }, 401)
 
-    let query = "SELECT s.*, u.name as murid_name FROM setoran s JOIN users u ON s.user_id = u.id"
-    let stmt
-    if (role === 'murid' && userId) {
-      const clauses = ["s.user_id = ?"]
-      const binds = [userId]
-      if (trackId) { clauses.push("s.track_id = ?"); binds.push(trackId) }
-      stmt = db.prepare(query + " WHERE " + clauses.join(" AND ") + " ORDER BY s.created_at DESC").bind(...binds)
-    } else if (trackId) {
-      stmt = db.prepare(query + " WHERE s.track_id = ? ORDER BY s.created_at DESC").bind(trackId)
-    } else {
-      stmt = db.prepare(query + " ORDER BY s.created_at DESC")
-    }
-    const { results } = await stmt.all()
-    return new Response(JSON.stringify({ success: true, setoran: results }), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
+    let query = "SELECT s.*, u.name as murid_name FROM setoran s JOIN users u ON s.user_id = u.id WHERE s.user_id = ?"
+    const binds = [uid]
+    const trackId = url.searchParams.get('track_id')
+    if (trackId) { query += " AND s.track_id = ?"; binds.push(trackId) }
+    query += " ORDER BY s.created_at DESC"
+    const { results } = await db.prepare(query).bind(...binds).all()
+    return json({ success: true, setoran: results })
   } catch (err) {
-    return new Response(JSON.stringify({ success: false, error: err.message }), { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
+    return json({ success: false, error: err.message }, 500)
   }
+}
+
+function json(o, status = 200) {
+  return new Response(JSON.stringify(o), { status, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
 }

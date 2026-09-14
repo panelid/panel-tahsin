@@ -227,7 +227,7 @@ async function gToggle() {
 async function gSend() {
   if (!gBlob) return; gsend.disabled = true; gsend.textContent = 'Mengirim…';
   const fd = new FormData(); fd.append('audio', gBlob, 'live.webm'); fd.append('user_id', PP.me.id); fd.append('track_id', 'live'); fd.append('unit_ref', 'live-koreksi');
-  const d = await (await fetch('/api/setoran/upload', { method: 'POST', body: fd })).json();
+  const d = await (await authed('/api/setoran/upload', { method: 'POST', body: fd })).json();
   await fetch('/api/live', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'message', sessionId: gLiveSid, sender: 'guru', userId: PP.me.id, audio_url: d.audio_url }) });
   gBlob = null; gsend.textContent = 'Kirim Koreksi'; gPoll();
 }
