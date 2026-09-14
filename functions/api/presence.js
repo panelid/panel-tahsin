@@ -31,8 +31,6 @@ export async function onRequest(context) {
   }
   return json({ error: 'bad request' }, 400)
 }
-import { reqUid } from '../_auth.js'
-import { reqUid } from '../_auth.js';
 function json(o, status = 200) {
   return new Response(JSON.stringify(o), { status, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
 }
