@@ -38,7 +38,10 @@ const TRACKS = [['fatihah','Al-Fatihah','🕌'],['iqro','Iqro','📗'],['juz_amm
 async function load() {
   try {
     const d = await (await authed('/api/enroll/' + uid)).json();
-    if (d.error) { app.innerHTML = '<div class="empty"><span class="big">🙏</span>' + PP.esc(d.error) + '</div>'; return; }
+    if (d.error) {
+      if (d.error === 'login required' || d.error === 'bukan akunmu') { localStorage.clear(); location.href = '/login'; return; }
+      app.innerHTML = '<div class="empty"><span class="big">🙏</span>' + PP.esc(d.error) + '</div>'; return;
+    }
     const nm = d.user.name.split(' ')[0];
     document.getElementById('heroName').textContent = 'Assalamu’alaikum, ' + nm;
     const set = d.setoran || [];
