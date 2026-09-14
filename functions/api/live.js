@@ -20,17 +20,21 @@ export async function onRequest(context) {
     const muridId = url.searchParams.get('muridId');
     const sessionId = url.searchParams.get('sessionId');
     const after = url.searchParams.get('after') || '1970-01-01';
+    const me = await reqUid(request, env);
     if (sessionId) {
       const s = await db.prepare("SELECT * FROM live_sessions WHERE id = ?").bind(sessionId).first();
+      if (!me || !s || (me !== s.guru_id && me !== s.murid_id)) return json({ error: 'login required / bukan peserta' }, 401);
       const msgs = await db.prepare("SELECT id, sender, audio_url, text, created_at FROM live_messages WHERE session_id = ? AND created_at > ? ORDER BY created_at ASC").bind(sessionId, after).all();
       return json({ session: s || null, messages: msgs.results || [] });
     }
     if (guruId) {
+      if (me !== guruId) return json({ error: 'bukan akunmu' }, 403);
       const active = url.searchParams.get('active');
       const pend = await db.prepare("SELECT s.id, s.murid_id, u.name as murid_name, u.username as murid_username, s.created_at FROM live_sessions s JOIN users u ON u.id=s.murid_id WHERE s.guru_id = ? AND s.status" + (active ? "='active'" : "='pending'") + " ORDER BY s.created_at DESC").bind(guruId).all();
       return json(pend.results || []);
     }
     if (muridId) {
+      if (me !== muridId) return json({ error: 'bukan akunmu' }, 403);
       const s = await db.prepare("SELECT s.*, u.name as guru_name FROM live_sessions s JOIN users u ON u.id=s.guru_id WHERE s.murid_id = ? AND s.status IN ('pending','active') ORDER BY s.created_at DESC LIMIT 1").bind(muridId).first();
       return json(s || null);
     }

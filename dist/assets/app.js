@@ -31,21 +31,34 @@
       ['🚪', 'Keluar', '#logout', 'logout'],
     ],
   };
+
   const nav = document.getElementById('nav');
-  if (nav && items[page]) {
-    nav.className = 'nav';
-    nav.innerHTML = items[page]
-      .map(function (it) {
-        const on = it[3] === (document.body.dataset.tab || 'home') ? ' class="on"' : '';
-        return '<a href="' + it[2] + '"' + on + '><i>' + it[0] + '</i>' + it[1] + '</a>';
-      })
-      .join('');
+  if (nav) {
+    const list = items[me.role] || items.murid;
+    nav.innerHTML = list.map(function (it) {
+      const on = it[3] === page ? ' class="on"' : '';
+      return '<a href="' + it[2] + '"' + on + '><i>' + it[0] + '</i>' + it[1] + '</a>';
+    }).join('');
+  }
+
+  function tk() { return localStorage.getItem('token') || ''; }
+  function authed(u, opt) {
+    opt = opt || {};
+    opt.headers = Object.assign({}, opt.headers, tk() ? { 'x-auth-token': tk() } : {});
+    return fetch(u, opt);
   }
 
   window.PP = {
     me: me,
+    tk: tk,
+    authed: authed,
     logout: function () {
-      try { localStorage.removeItem('uid'); localStorage.removeItem('user'); localStorage.removeItem('tahsin_role'); } catch (e) {}
+      try {
+        localStorage.removeItem('uid');
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        localStorage.removeItem('tahsin_role');
+      } catch (e) {}
       location.href = '/';
     },
     esc: function (s) {
