@@ -6,3 +6,7 @@ pages_build_output_dir = "dist"
 binding = "DB"
 database_name = "panel-tahsin-db"
 database_id = "60791983-cb88-4ab8-a428-d9c9e1d5ec6a"
+
+# Auth signing secret (plaintext var — ganti ke secret di CF dashboard bila perlu)
+[vars]
+AUTH_SECRET = "ponpes-dev-secret-rotate-me"
