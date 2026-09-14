@@ -78,7 +78,7 @@ export async function onRequest(context) {
   // 3. Kirim pesan (push-to-talk)
   if (action === 'message') {
     const { sessionId, sender, audio_url, text } = body;
-    const actor = await reqUid(request, env) || body.userId;
+    const actor = await reqUid(request, env);
     const s = await db.prepare("SELECT * FROM live_sessions WHERE id = ? AND status='active'").bind(sessionId).first();
     if (!s) return json({ error: 'sesi tidak aktif' }, 400);
     if (actor !== s.guru_id && actor !== s.murid_id) return json({ error: 'bukan peserta sesi' }, 403);

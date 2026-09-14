@@ -4,7 +4,7 @@ export async function onRequestPost(context) {
   const { env, request } = context;
   const db = env.DB;
   const b = await request.json().catch(() => ({}));
-  const userId = await reqUid(request, env) || b.userId;
+  const userId = await reqUid(request, env);
   const trackId = b.trackId, currentUnit = b.currentUnit;
   if (!userId || !trackId) return json({ error: 'userId & trackId required' }, 400);
   const TRACKS = ['iqro', 'fatihah', 'juz_amma', 'tilawah', 'hafalan'];

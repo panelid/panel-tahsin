@@ -8,8 +8,8 @@ export async function onRequestPost(context) {
   const db = env.DB;
   let b = {}; try { b = await request.json(); } catch (e) { }
   const action = b.action;
-  const uid = await reqUid(request, env) || b.uid;
-  if (!uid) return json({ error: 'uid required' }, 400);
+  const uid = await reqUid(request, env);
+  if (!uid) return json({ error: 'login required' }, 401);
 
   if (action === 'request') {
     const s = await db.prepare("SELECT id, user_id, status FROM setoran WHERE id = ?").bind(b.setoran_id).first();

@@ -7,12 +7,12 @@ export async function onRequestPost(context) {
     const db = env.DB
     if (!db) return json({ error: 'DB error' }, 500)
     const fd = await request.formData()
-    const userId = (await reqUid(request, env)) || fd.get('userId')
+    const userId = await reqUid(request, env)
     const sanadUrl = fd.get('sanadUrl') || ''
     const mahadText = fd.get('mahadText') || ''
     const certUrl = fd.get('certUrl') || ''
     const audio = fd.get('audio') // wajib: bacaan Al-Hajj 1-5
-    if (!userId) return json({ error: 'userId required' }, 400)
+    if (!userId) return json({ error: 'login required' }, 401)
     if (!audio) return json({ error: 'Wajib setor bacaan Al-Hajj 1-5' }, 400)
     if (!sanadUrl && !mahadText && !certUrl) return json({ error: 'Upload sertifikat sanad ATAU isi riwayat Ma\'had' }, 400)
 

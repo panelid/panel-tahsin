@@ -24,8 +24,8 @@ export async function onRequest(context) {
   if (request.method === 'POST') {
     let b = {}
     try { b = await request.json() } catch (e) {}
-    const uid = await reqUid(request, env) || b.userId
-    if (!uid) return json({ error: 'userId required' }, 400)
+    const uid = await reqUid(request, env)
+    if (!uid) return json({ error: 'login required' }, 401)
     await db.prepare("UPDATE users SET last_seen = datetime('now') WHERE id = ?").bind(uid).run()
     return json({ success: true })
   }

@@ -9,8 +9,8 @@ export async function onRequestDelete(context) {
   if (!db) return json({ error: 'DB error' }, 500);
   const id = context.params.id;
   const q = new URL(request.url).searchParams.get('uid');
-  const uid = await reqUid(request, env) || q;
-  if (!id || !uid) return json({ error: 'id & uid required' }, 400);
+  const uid = await reqUid(request, env);
+  if (!id || !uid) return json({ error: 'login required' }, 401);
 
   const row = await db.prepare("SELECT id, user_id, status FROM setoran WHERE id = ?").bind(id).first();
   if (!row) return json({ error: 'setoran tidak ditemukan' }, 404);
@@ -26,9 +26,9 @@ export async function onRequestPatch(context) {
   if (!db) return json({ error: 'DB error' }, 500);
   const id = context.params.id;
   let b = {}; try { b = await request.json(); } catch (e) { }
-  const uid2 = await reqUid(request, env) || b.uid;
+  const uid2 = await reqUid(request, env);
   b.uid = uid2;
-  if (!id || !b.uid) return json({ error: 'id & uid required' }, 400);
+  if (!id || !b.uid) return json({ error: 'login required' }, 401);
   if (!TRACKS.includes(b.track_id)) return json({ error: 'pelajaran tidak dikenal' }, 400);
 
   const row = await db.prepare("SELECT id, user_id, status FROM setoran WHERE id = ?").bind(id).first();

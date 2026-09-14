@@ -4,9 +4,9 @@ export async function onRequestPost(context) {
   const { env, request } = context
   try {
     const b = await request.json()
-    const userId = await reqUid(request, env) || b.userId
+    const userId = await reqUid(request, env)
     const on = b.on
-    if (!userId) return json({ success: false, error: 'userId required' }, 400)
+    if (!userId) return json({ success: false, error: 'login required' }, 401)
     const db = env.DB
     const user = await db.prepare("SELECT id, role, is_student FROM users WHERE id = ?").bind(userId).first()
     if (!user) return json({ success: false, error: 'user tidak ditemukan' }, 404)

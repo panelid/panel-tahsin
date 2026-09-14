@@ -22,7 +22,8 @@ export async function onRequestPost(context) {
     const formData = await request.formData()
     const file = formData.get('audio')
     const bodyUid = formData.get('user_id')
-    const userId = await reqUid(request, env) || bodyUid
+    const userId = await reqUid(request, env)
+    if (!userId || (bodyUid && bodyUid !== userId)) return new Response(JSON.stringify({ success: false, error: 'Login tidak valid / kedaluwarsa. Masuk ulang.' }), { status: 401, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
     const trackId = formData.get('track_id') || null
     const unitRef = formData.get('unit_ref') || null
 
