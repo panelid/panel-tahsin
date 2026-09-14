@@ -37,7 +37,7 @@ const TRACKS = [['fatihah','Al-Fatihah','🕌'],['iqro','Iqro','📗'],['juz_amm
 
 async function load() {
   try {
-    const d = await (await fetch('/api/enroll/' + uid)).json();
+    const d = await (await authed('/api/enroll/' + uid)).json();
     if (d.error) { app.innerHTML = '<div class="empty"><span class="big">🙏</span>' + PP.esc(d.error) + '</div>'; return; }
     const nm = d.user.name.split(' ')[0];
     document.getElementById('heroName').textContent = 'Assalamu’alaikum, ' + nm;
@@ -156,7 +156,7 @@ async function saveBio() {
 }
 function selfId() { return uid; }
 function tk(){ return localStorage.getItem('token') || ''; }
-function authed(u, opt){ const t=tk(); if(!t) return fetch(u,opt); const sep=u.includes('?')?'&':'?'; const u2=u+(opt&&opt.method==='GET'||!opt?'':sep+'token='+encodeURIComponent(t)); if(opt&&opt.method&&['POST','PATCH','DELETE'].includes(opt.method)){ opt.headers=Object.assign({},opt.headers,{'x-auth-token':t}); } else if(opt&&opt.headers){ opt.headers=Object.assign({},opt.headers); } return fetch(u2,opt); }
+function authed(u, opt){ const t=tk(); opt=opt||{}; opt.headers=Object.assign({},opt.headers,t?{'x-auth-token':t}:{}); return fetch(u,opt); }
 async function loadNext() {
   const c = await (await fetch('/api/curriculum?uid=' + uid)).json().catch(() => null);
   const card = document.getElementById('nextCard'); if (!card) return;
