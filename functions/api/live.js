@@ -57,7 +57,7 @@ export async function onRequest(context) {
     if (g && g.wa_number) {
       try {
         const m = await db.prepare("SELECT name FROM users WHERE id = ?").bind(muridId).first();
-        await sendWA(g.wa_number, `🔔 *Ngaji Live 1-on-1*\n${m ? m.name : 'Seorang murid'} meminta sesi ngaji live bersamamu. Buka dashboard pengajar untuk merespons.`);
+        await sendWA(g.wa_number, `🔔 *Ngaji Live 1-on-1*\n${m ? m.name : 'Seorang murid'} meminta sesi ngaji live bersamamu. Buka dashboard pengajar untuk merespons.`, env);
       } catch (e) {}
     }
     return json({ success: true, sessionId: id });
@@ -73,7 +73,7 @@ export async function onRequest(context) {
     const m = await db.prepare("SELECT wa_number FROM users WHERE id = ?").bind(s.murid_id).first();
     if (m && m.wa_number) {
       try {
-        await sendWA(m.wa_number, accept ? '✅ Ustadz menerima sesi ngaji live-mu! Buka dashboard untuk mulai.' : '⏳ Maaf, ustadz belum bisa sekarang. Coba lagi nanti ya.');
+        await sendWA(m.wa_number, accept ? '✅ Ustadz menerima sesi ngaji live-mu! Buka dashboard untuk mulai.' : '⏳ Maaf, ustadz belum bisa sekarang. Coba lagi nanti ya.', env);
       } catch (e) {}
     }
     return json({ success: true, status });

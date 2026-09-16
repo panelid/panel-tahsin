@@ -1,34 +1,22 @@
-// WA notif via Meta WhatsApp Cloud API (free 1000 msgs/day)
-// Docs: POST https://graph.facebook.com/v19.0/{PHONE_ID}/messages
-// Needs: WHATSAPP_TOKEN, WHATSAPP_PHONE_ID (Meta app), user wa number in E.164
-// NOTE: Workers runtime has no `process`. Pass env from context.
+// WA notif via DL-BOX bridge (Baileys, nomor 62881010313264) — ganti Meta Cloud API.
+// Endpoint: POST {WAAPI_BASE}/waapi/send  body {key, to, text}
+// Env di CF Pages: WAAPI_BASE (https://panelid.xcodepod.cloud), WAAPI_KEY.
 
 export async function sendWA(to, text, env) {
-  const token = env && env.WHATSAPP_TOKEN;
-  const phoneId = env && env.WHATSAPP_PHONE_ID;
-  if (!token || !phoneId) {
-    console.warn('[WA] not configured, skip');
-    return false;
-  }
-  const res = await fetch(`https://graph.facebook.com/v19.0/${phoneId}/messages`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      messaging_product: 'whatsapp',
-      to,
-      type: 'text',
-      text: { body: text }
-    })
-  });
-  const json = await res.json();
-  if (!res.ok) {
-    console.error('[WA] send fail', json);
-    return false;
-  }
-  return true;
+  const base = (env && env.WAAPI_BASE) || 'https://panelid.xcodepod.cloud';
+  const key = env && env.WAAPI_KEY;
+  if (!key) { console.warn('[WA] WAAPI_KEY belum diset, skip'); return false; }
+  const wa = String(to || '').replace(/[^\d]/g, '');
+  if (!wa) { console.warn('[WA] nomor kosong, skip'); return false; }
+  try {
+    const res = await fetch(`${base}/waapi/send`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key, to: wa, text })
+    });
+    if (!res.ok) { console.error('[WA] send fail', res.status, await res.text().catch(() => '')); return false; }
+    return true;
+  } catch (e) { console.error('[WA] send err', e.message); return false; }
 }
 
 // Hooks into setoran/review flow
